@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capital Allocation &amp; Utility · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <style>
+    /* tool-local tweaks */
+    .cal-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.1rem 0 0;
+      line-height: 1.3;
+    }
+    .pin-flag {
+      display: none;
+      margin: 0.2rem 0 0;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .pin-flag.on { display: block; }
+    .inset-box { padding-top: 0.3rem; }
+    .inset-box .inset-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0 0 0.1rem 0.2rem;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.gold { border-color: var(--gold); }
+    .legend .swatch.gold-dash { border-color: var(--gold); border-top-style: dashed; }
+    #rb-wrap { display: none; }
+    #rb-wrap.on { display: flex; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Capital Allocation &amp; Utility</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Notre Dame · Lecture 3 §2–3</p>
+    </div>
+    <div class="header-actions">
+      <button id="present-btn" class="btn" type="button">Presenter mode</button>
+      <a class="btn" href="../../">All tools</a>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Capital allocation</h2>
+
+      <div class="group">
+        <div class="group-title">Risky portfolio P and risk-free asset</div>
+        <div id="ctrl-rf"></div>
+        <div id="ctrl-erp"></div>
+        <div id="ctrl-sp"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Investor &amp; allocation</div>
+        <div id="ctrl-A"></div>
+        <div id="ctrl-y"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Borrowing</div>
+        <div id="ctrl-borrow"></div>
+        <div id="rb-wrap"><div id="ctrl-rB" style="width:100%"></div></div>
+        <p class="pin-flag" id="pin-flag">y* pinned at the kink (y = 1).</p>
+        <p class="cal-note">When on, you can only borrow above r<sub>f</sub>, so the
+          CAL kinks (flattens) beyond P at y = 1.</p>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="chart-box">
+        <div id="main-chart"></div>
+        <div class="legend">
+          <span><span class="swatch blue"></span>CAL &amp; complete portfolio</span>
+          <span><span class="swatch gold"></span>Indifference curve (current)</span>
+          <span><span class="swatch gold-dash"></span>Indifference curve at y*</span>
+        </div>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="chart-box inset-box">
+        <p class="inset-title">Utility vs. allocation y</p>
+        <div id="inset-chart"></div>
+      </div>
+
+      <div class="formula-strip" id="formula-strip">
+        <div class="formula-row" id="f-utility"></div>
+        <div class="formula-row" id="f-ystar"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
