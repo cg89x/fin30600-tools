@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Efficient Frontier &amp; Tangency · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <style>
+    /* ---- tool-specific styling (uses the shared house CSS variables) ---- */
+    .asset-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .asset-table th {
+      text-align: left; color: var(--muted); font-weight: 700;
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.03em;
+      padding: 0 0.3rem 0.3rem; border-bottom: 1px solid var(--panel-border);
+    }
+    .asset-table td { padding: 0.18rem 0.25rem; vertical-align: middle; }
+    .asset-table .cell-name {
+      width: 100%; font-family: inherit; font-size: 0.82rem;
+      border: 1px solid var(--panel-border); border-radius: 5px; padding: 0.2rem 0.35rem;
+    }
+    .asset-table .cell-num {
+      width: 3.6rem; font-family: inherit; font-size: 0.82rem;
+      border: 1px solid var(--panel-border); border-radius: 5px; padding: 0.2rem 0.3rem;
+      text-align: right;
+    }
+    .asset-table .pct-suffix { color: var(--muted); font-size: 0.78rem; margin-left: 2px; }
+
+    .corr-table { border-collapse: collapse; font-size: 0.74rem; margin-top: 0.2rem; }
+    .corr-table th {
+      color: var(--muted); font-weight: 700; font-size: 0.68rem;
+      padding: 0.15rem 0.25rem; text-align: center;
+    }
+    .corr-table td { padding: 1px; text-align: center; }
+    .corr-cell {
+      width: 3.1rem; font-family: inherit; font-size: 0.74rem; text-align: center;
+      border: 1px solid var(--panel-border); border-radius: 4px; padding: 0.12rem 0.15rem;
+    }
+    .corr-diag { color: var(--navy); font-weight: 700; }
+    .corr-mirror { color: var(--muted); }
+    .corr-invalid .corr-cell { border-color: var(--red); background: #fdeceb; }
+
+    .pd-warning {
+      background: #fdeceb; border: 1px solid var(--red); color: #8a1c1b;
+      border-radius: 7px; padding: 0.55rem 0.7rem; font-size: 0.82rem;
+      margin-top: 0.5rem;
+    }
+
+    .weights-svg { display: block; width: 100%; height: auto; }
+    .weights-svg .w-name { fill: var(--label); font-size: 13px; font-family: var(--font-stack); }
+    .weights-svg .w-val {
+      fill: var(--navy); font-size: 12.5px; font-weight: 700;
+      font-family: var(--font-stack); font-variant-numeric: tabular-nums;
+    }
+    .weights-title {
+      font-size: 0.82rem; font-weight: 700; color: var(--navy);
+      text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 0.2rem;
+    }
+    svg.finchart .lbl-strong { font-weight: 700; }
+    .ef-tip-text { font-size: 11.5px; font-family: var(--font-stack); }
+
+    .btn-row { display: flex; gap: 0.5rem; margin-top: 0.2rem; }
+    .subtle-btn {
+      font-family: inherit; font-size: 0.8rem; color: var(--navy);
+      background: #fff; border: 1px solid var(--panel-border); border-radius: 6px;
+      padding: 0.3rem 0.6rem; cursor: pointer;
+    }
+    .subtle-btn:hover { background: var(--panel-bg); }
+    .hint { font-size: 0.76rem; color: var(--muted); margin: 0.15rem 0 0; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Efficient Frontier &amp; Tangency</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 3 §5 · Notre Dame</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn" id="reset-btn" type="button">Reset</button>
+      <button class="btn" id="present-btn" type="button">Presenter</button>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <section class="controls-panel">
+      <h2>Controls</h2>
+
+      <div class="group">
+        <div id="rf-slot"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Assets — E[r] and σ</div>
+        <table class="asset-table">
+          <thead>
+            <tr><th>Asset</th><th>E[r]</th><th>σ</th></tr>
+          </thead>
+          <tbody id="asset-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Correlations (edit upper triangle)</div>
+        <div id="corr-grid"></div>
+        <div class="pd-warning" id="pd-warning" hidden>
+          Correlations are inconsistent (matrix not positive definite) — adjust
+          the highlighted values.
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Random cloud</div>
+        <div id="seed-slot"></div>
+        <div class="btn-row">
+          <button class="subtle-btn" id="reshuffle-btn" type="button">Reshuffle cloud</button>
+        </div>
+        <p class="hint">~2,000 long-only portfolios, seeded for reproducibility.</p>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="chart-box">
+        <div id="chart"></div>
+      </div>
+
+      <div class="readouts">
+        <div class="readout"><div class="k">Tangency E[r]</div><div class="v blue" id="ro-tan-er">—</div></div>
+        <div class="readout"><div class="k">Tangency σ</div><div class="v blue" id="ro-tan-sd">—</div></div>
+        <div class="readout"><div class="k">Tangency Sharpe</div><div class="v blue" id="ro-tan-sh">—</div></div>
+        <div class="readout"><div class="k">MVP E[r]</div><div class="v gold" id="ro-mvp-er">—</div></div>
+        <div class="readout"><div class="k">MVP σ</div><div class="v gold" id="ro-mvp-sd">—</div></div>
+      </div>
+
+      <div class="chart-box">
+        <p class="weights-title">Tangency portfolio weights</p>
+        <div id="weights"></div>
+      </div>
+
+      <div class="formula-strip">
+        <div class="formula-row" id="formula-w"></div>
+        <div class="formula-row" id="formula-s"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span><a href="../../">← All FIN 30600 tools</a></span>
+    <span>Hover the frontier to read a portfolio's weights. Default assets: Jorion (1989) classes.</span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
