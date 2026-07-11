@@ -305,7 +305,6 @@ function extent(arr) {
   return { lo, hi };
 }
 
-/* ---- initial render (after KaTeX has a chance to load) -------------------- */
-function boot() { renderSML(); renderMM(); }
-if (/** @type {any} */ (globalThis).katex) boot();
-else window.addEventListener('load', boot);
+/* ---- initial render (MathJax load-order handled inside renderTeX) --------- */
+renderSML();
+renderMM();

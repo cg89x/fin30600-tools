@@ -235,7 +235,5 @@ if (new URLSearchParams(location.search).get('present') === '1') setPresenter(tr
 /* ------------------------------------------------------------------- init -- */
 applyShortRange(); // sync slider bounds to the loaded short-sales state
 fullRender();
-// KaTeX (a deferred classic script) may not have defined window.katex yet when
-// this module first runs; re-render the data layer once everything has loaded
-// so the formula strip is typeset rather than left as raw TeX text.
-if (!(/** @type {any} */ (globalThis).katex)) window.addEventListener('load', drawData);
+// (MathJax load-order is handled inside renderTeX: pre-load calls are queued
+// and replayed from the page's MathJax pageReady hook.)

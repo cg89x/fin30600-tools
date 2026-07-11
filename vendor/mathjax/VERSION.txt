@@ -1,0 +1,5 @@
+MathJax 3.2.2 (es5/tex-svg-full.js — ALL TeX extensions compiled in; required because
+self-hosting a single file breaks the autoload mechanism for \textcolor etc.)
+Source: https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg-full.js
+Downloaded: 2026-07-10
+NB: % is a TeX comment character - always escape \% in TeX strings.

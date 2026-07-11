@@ -15,7 +15,7 @@
   framework, no bundler, no server. Hosted on GitHub Pages from `main` of the
   public repo `fin30600-tools` (account `cg89x`). Deploy = `git push`.
 - Charts are **hand-rolled SVG** via a small shared helper — no chart library.
-  KaTeX (self-hosted in `vendor/`) is the only third-party dependency.
+  MathJax v3 (self-hosted tex-svg-full bundle in `vendor/`) is the only third-party dependency.
 
 ## Repo layout
 
@@ -28,7 +28,7 @@ fin30600-tools/
 │   ├── finmath.js          ALL finance math (pure functions, unit-tested)
 │   ├── ui.js               slider-with-readout, number input, toggle components
 │   └── state.js            URL-hash state encode/decode (bookmarkable configs)
-├── vendor/katex/           self-hosted KaTeX (pinned version, incl. fonts)
+├── vendor/mathjax/         self-hosted MathJax 3.2.2 (tex-svg-full.js)
 ├── tools/
 │   ├── two-asset/          index.html + main.js  (Lecture 3 §4)
 │   ├── capital-allocation/ index.html + main.js  (Lecture 3 §2–3)
@@ -38,7 +38,7 @@ fin30600-tools/
 └── docs/                   DESIGN.md (this file), PLAN.md
 ```
 
-Each tool imports only `lib/*` and KaTeX — tools are fully independent of each
+Each tool imports only `lib/*` and MathJax — tools are fully independent of each
 other. No cross-tool imports, ever.
 
 ## House style (match the lecture figures)
@@ -50,14 +50,14 @@ other. No cross-tool imports, ever.
 - **Typography**: Linux Biolinum (self-hosted woff2 if practical — it is
   SIL-OFL licensed; the OTFs live in `~/Library/Fonts/LinBiolinum_R*.otf` and
   can be converted, or fetched as web fonts) with
-  `Arial, Helvetica, sans-serif` fallback. Formula rendering via KaTeX.
+  `Arial, Helvetica, sans-serif` fallback. Formula rendering via MathJax (SVG output).
 - **Axis conventions** (Christian's standing rules): σ axis labeled exactly
   **“Standard Deviation”**, expected-return axis exactly **“Expected Return”**
   (singular, spelled out). Percent ticks are whole percents (`30%`, never
   `0.30` or `30.0%`). β/α/other axes keep their own names.
 - **Layout skeleton** (same for every tool): header bar (navy) with tool title
   + course name; controls panel left (~300 px), chart right (flex), live
-  formula strip below the chart (KaTeX with current numbers substituted);
+  formula strip below the chart (MathJax with current numbers substituted);
   footer with a link back to the tool index. On narrow screens the panel
   stacks above the chart.
 

@@ -152,6 +152,21 @@ a:hover { text-decoration: underline; }
   padding: 0.5rem 0.6rem;
 }
 
+/* MathJax (standalone tex2svg doesn't inject its own stylesheet):
+   container display + visually-hide the duplicate assistive MathML */
+mjx-container[jax="SVG"] { direction: ltr; display: inline-block; }
+mjx-container[jax="SVG"] > svg { overflow: visible; vertical-align: middle; }
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0; left: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0 0 0 !important;
+  border: 0 !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+}
+
 /* live formula strip below the chart */
 .formula-strip {
   background: var(--card-bg);

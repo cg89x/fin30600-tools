@@ -8,7 +8,7 @@ live on the classroom projector **and** used by students on their own laptops
 
 This is a **static site with zero build step**: plain HTML + ES-module
 JavaScript, no framework, no bundler, no npm install. The only third-party
-dependency is [KaTeX](https://katex.org/), self-hosted in `vendor/`.
+dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self-hosted in `vendor/`.
 
 ## The tools
 
@@ -81,7 +81,7 @@ fin30600-tools/
 │   ├── finmath.js          ALL finance/numerical math (pure, unit-tested)
 │   ├── ui.js               slider / number-input / toggle components
 │   └── state.js            URL-hash state (bookmarkable configs)
-├── vendor/katex/           self-hosted KaTeX 0.16.11 (css, js, fonts/)
+├── vendor/mathjax/         self-hosted MathJax 3.2.2 (tex-svg-full.js, single file)
 ├── tools/                  one folder per explorer (index.html + main.js)
 ├── tests/finmath.test.js   node --test, zero dependencies
 └── docs/                   DESIGN.md, PLAN.md
@@ -91,9 +91,12 @@ fin30600-tools/
 
 - **`lib/finmath.js` works in decimals everywhere** — 8% is `0.08`, never `8`.
   Only the UI formats decimals into whole-percent strings for display.
-- **Import only `lib/*` and KaTeX.** Tools never import each other.
-- **KaTeX is a global, not a module.** Load it with a `<script>`/`<link>` pair
-  (see `vendor/katex/VERSION.txt`); it exposes `window.katex`. `lib/ui.js`
+- **Import only `lib/*` and MathJax.** Tools never import each other.
+- **MathJax is a global, not a module.** Each tool page sets `window.MathJax`
+  (config: `startup.typeset:false`, `svg.fontCache:'local'`) then loads
+  `vendor/mathjax/tex-svg-full.js` deferred (the FULL bundle — the base bundle
+  autoloads extensions like `	extcolor` over the network, which a self-hosted
+  single file cannot serve). `lib/ui.js`
   exports a `renderTeX(host, tex)` convenience wrapper with a text fallback.
 - **House palette** (CSS custom properties in `style.css`): BLUE `#0072B2`
   primary series, GOLD `#C99700` secondary, NAVY `#0A234B` chrome, dashed RED

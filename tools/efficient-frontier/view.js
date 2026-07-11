@@ -236,7 +236,10 @@ export function renderWeights(host, names, weights, pointScale) {
   const svg = el('svg', {
     viewBox: `0 0 ${W} ${H}`, class: 'weights-svg', preserveAspectRatio: 'xMidYMid meet',
     role: 'img',
+    // Safari needs intrinsic dimensions + aspect-ratio (no auto height from viewBox).
+    width: W, height: H,
   });
+  svg.style.aspectRatio = `${W} / ${H}`;
 
   // zero baseline
   svg.appendChild(el('line', {
