@@ -73,6 +73,7 @@ presentBtn.addEventListener('click', () => {
 
 /* ---- formatting helpers --------------------------------------------------- */
 const pStr = (dec, d = 1) => `${(dec * 100).toFixed(d)}%`;       // decimal → "3.5%"
+const pTeX = (dec, d = 1) => `${(dec * 100).toFixed(d)}\\%`;     // TeX-safe: % must be escaped in KaTeX
 const pointScale = () =>
   Number(getComputedStyle(document.documentElement).getPropertyValue('--point-scale')) || 1;
 
@@ -169,8 +170,8 @@ function renderSML() {
   const tex =
     `E[r_i] = r_f + \\beta_i\\,(E[r_M] - r_f) = ${S.rf.toFixed(1)}\\% + ` +
     `${beta.toFixed(2)}\\,(${S.rm.toFixed(1)}\\% - ${S.rf.toFixed(1)}\\%) = ` +
-    `${pStr(req, 2)}\\quad\\Rightarrow\\quad \\alpha_i = ${pStr(er, 2)} - ${pStr(req, 2)} = ` +
-    `${(a >= 0 ? '+' : '') + pStr(a, 2)}`;
+    `${pTeX(req, 2)}\\quad\\Rightarrow\\quad \\alpha_i = ${pTeX(er, 2)} - ${pTeX(req, 2)} = ` +
+    `${(a >= 0 ? '+' : '') + pTeX(a, 2)}`;
   renderTeX(document.getElementById('sml-formula'), tex, { displayMode: false });
 }
 
@@ -289,9 +290,9 @@ function renderMM() {
   // KaTeX strips
   renderTeX(document.getElementById('mm-formula-model'),
     `R_i - R_f = \\hat{\\alpha}_i + \\hat{\\beta}_i\\,(R_M - R_f) + \\varepsilon_i` +
-    `\\;:\\; \\hat{\\beta}_i = ${fit.slope.toFixed(3)},\\; \\hat{\\alpha}_i = ${pStr(fit.intercept, 2)},\\; R^2 = ${fit.r2.toFixed(3)}`,
+    `\\;:\\; \\hat{\\beta}_i = ${fit.slope.toFixed(3)},\\; \\hat{\\alpha}_i = ${pTeX(fit.intercept, 2)},\\; R^2 = ${fit.r2.toFixed(3)}`,
     { displayMode: false });
-  const sigM = pStr(MKT_SIGMA, 1); // "4.5%"
+  const sigM = pTeX(MKT_SIGMA, 1); // "4.5\%" — TeX-safe
   renderTeX(document.getElementById('mm-formula-r2'),
     `R^2 = \\dfrac{\\beta^2\\sigma_M^2}{\\beta^2\\sigma_M^2 + \\sigma_e^2} = ` +
     `\\dfrac{${tbeta.toFixed(2)}^2\\,(${sigM})^2}{${tbeta.toFixed(2)}^2\\,(${sigM})^2 + (${S.sigmae.toFixed(1)}\\%)^2} = ${(sysPct / 100).toFixed(3)}`,
