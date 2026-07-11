@@ -126,12 +126,13 @@ function drawMain(m) {
     mainChart.text(N_MAX, m.beta, 'β', { dx: -4, dy: -6, anchor: 'end', fill: 'var(--navy)' });
   }
 
-  // the three curves (Case 3 dashed so a coinciding Case 2 stays visible)
-  if (m.c1) mainChart.path(curve(ewVarUncorrelated), { stroke: 'var(--blue)', width: 3.75 });
-  if (m.c2) mainChart.path(curve((n) => ewVarCommonCorr(n, m.rho)), { stroke: 'var(--gold)', width: 3.75 });
+  // the three curves (Case 3 dashed so a coinciding Case 2 stays visible);
+  // widths are pre---stroke-scale: 3 renders as 4.5px at this tool's 1.5×
+  if (m.c1) mainChart.path(curve(ewVarUncorrelated), { stroke: 'var(--blue)', width: 3 });
+  if (m.c2) mainChart.path(curve((n) => ewVarCommonCorr(n, m.rho)), { stroke: 'var(--gold)', width: 3 });
   if (m.c3) {
     mainChart.path(curve((n) => ewVarCommonCorr(n, m.beta * m.beta)), {
-      stroke: 'var(--navy)', width: 3.3, dash: '7 5',
+      stroke: 'var(--navy)', width: 2.6, dash: '7 5',
     });
   }
 

@@ -301,7 +301,9 @@ svg.finchart .axis-title {
   text-anchor: middle;
   font-family: var(--font-chart);
 }
-svg.finchart .series { stroke-width: calc(2px * var(--stroke-scale)); }
+/* NB: no stroke-width rule for .series here — a stylesheet rule would
+   override the per-path width chart.js sets (inline style, already scaled
+   by --stroke-scale). */
 svg.finchart .datalabel { font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-chart); }
 svg.finchart .marker { /* radius handled inline; scaled by --point-scale where used */ }
 
