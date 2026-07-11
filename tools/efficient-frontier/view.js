@@ -52,17 +52,22 @@ export function renderBase(chart, m, pointScale) {
   }
 
   // (b) minimum-variance frontier, split at the global MVP mean.
-  const eff = m.frontier.filter((p) => p.mean >= m.mvp.mean - 1e-9);
-  const ineff = m.frontier.filter((p) => p.mean <= m.mvp.mean + 1e-9);
+  const toXY = (p) => ({ x: p.std, y: p.mean });
+  // Clip the traced frontier to the plot domain so the dashed inefficient
+  // branch doesn't spill past the axes.
+  const inDomain = (p) => p.mean >= chart.yLo && p.mean <= chart.yHi
+    && p.std >= chart.xLo && p.std <= chart.xHi;
+  const eff = m.frontier.filter((p) => p.mean >= m.mvp.mean - 1e-9 && inDomain(p));
+  const ineff = m.frontier.filter((p) => p.mean <= m.mvp.mean + 1e-9 && inDomain(p));
   if (ineff.length > 1) {
-    chart.path(ineff, { stroke: 'var(--blue)', width: 2, dash: '6 5', opacity: 0.85 });
+    chart.path(ineff.map(toXY), { stroke: 'var(--blue)', width: 2, dash: '6 5', opacity: 0.85 });
   }
   if (eff.length > 1) {
-    chart.path(eff, { stroke: 'var(--blue)', width: 2.6 });
+    chart.path(eff.map(toXY), { stroke: 'var(--blue)', width: 2.6 });
   }
 
   // Invisible hover anchors along the whole frontier -> weights tooltip.
-  for (const p of m.frontier) {
+  for (const p of m.frontier.filter(inDomain)) {
     chart.point(p.std, p.mean, {
       r: 5, fill: 'rgba(0,0,0,0)',
       hoverData: { kind: 'frontier', mean: p.mean, std: p.std, weights: p.weights },
@@ -125,7 +130,7 @@ export function renderOverlay(chart, m, pointScale, prevNodes) {
   const rfLbl = el('text', {
     x: chart.sx(0) + 6, y: chart.sy(m.rf) - 6, fill: 'var(--navy)', class: 'datalabel',
   });
-  rfLbl.textContent = `r_f = ${pct1(m.rf)}`;
+  rfLbl.textContent = `r_f = ${(m.rf * 100).toFixed(2).replace(/\.?0+$/, '')}%`;
   chart.overlayGroup.appendChild(rfLbl);
   nodes.push(rfLbl);
 
@@ -292,9 +297,11 @@ export function renderFormula(rowW, rowS, m) {
     'w_{\\text{tan}} \\;\\propto\\; \\Sigma^{-1}\\,(\\mu - r_f\\,\\mathbf{1})',
     { displayMode: false });
   const S = m.tangency.sharpe;
-  const er = pct(m.tangency.mean);
-  const sd = pct(m.tangency.std);
-  const rf = pct(m.rf);
+  // NB: % must be escaped as \% in KaTeX (comment character otherwise).
+  const texPct = (v, d = 1) => `${(v * 100).toFixed(d).replace(/\.?0+$/, '')}\\%`;
+  const er = texPct(m.tangency.mean);
+  const sd = texPct(m.tangency.std);
+  const rf = texPct(m.rf, 2);
   renderTeX(rowS,
     `S_T \\;=\\; \\frac{E[r_T]-r_f}{\\sigma_T} \\;=\\; \\frac{${er}-${rf}}{${sd}} \\;=\\; ${S.toFixed(3)}`,
     { displayMode: false });

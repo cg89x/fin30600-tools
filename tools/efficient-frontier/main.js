@@ -222,7 +222,7 @@ function main() {
   // r_f slider — light re-render only.
   const rfSlider = slider({
     label: 'Risk-free rate  r_f', min: 0, max: 0.08, step: 0.0025,
-    value: Number(store.get('rf')), fmt: (v) => pct(v),
+    value: Number(store.get('rf')), fmt: (v) => `${(v * 100).toFixed(2).replace(/\.?0+$/, '')}%`,
     onChange: (v) => { store.set('rf', v); recomputeRf(); },
   });
   rq('rf-slot').appendChild(rfSlider);
