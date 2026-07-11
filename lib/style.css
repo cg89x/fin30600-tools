@@ -1,14 +1,54 @@
 /* =========================================================================
    FIN 30600 Interactive Tools — shared house style + layout skeleton.
-   Matches the lecture figures: ND navy chrome, blue/gold series, matplotlib
-   despined charts. No build step; plain CSS custom properties.
+   Matches the lecture decks (theme/ndcollegiate.sty "Collegiate Editorial"):
+   Libertinus Sans body + Libertinus Serif display titles in ND navy, gold
+   vertical-rule headers with a letterspaced grey eyebrow, white pages.
+   Chart text stays Arial to match the lecture FIGURES (figure style guide).
+   No build step; plain CSS custom properties.
    ========================================================================= */
+
+/* Libertinus = maintained successor of Linux Libertine (serif) / Linux
+   Biolinum (sans), the exact faces the beamer template uses. Self-hosted
+   woff2, SIL OFL 1.1 (see ../vendor/fonts/). */
+@font-face {
+  font-family: 'Libertinus Sans';
+  src: url('../vendor/fonts/LibertinusSans-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Libertinus Sans';
+  src: url('../vendor/fonts/LibertinusSans-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Libertinus Sans';
+  src: url('../vendor/fonts/LibertinusSans-Italic.woff2') format('woff2');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'Libertinus Serif';
+  src: url('../vendor/fonts/LibertinusSerif-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Libertinus Serif';
+  src: url('../vendor/fonts/LibertinusSerif-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Libertinus Serif';
+  src: url('../vendor/fonts/LibertinusSerif-Italic.woff2') format('woff2');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
 
 :root {
   /* House palette (locked in DESIGN.md) */
   --blue:   #0072B2;   /* primary series */
-  --gold:   #C99700;   /* secondary series */
+  --gold:   #C99700;   /* secondary series (ND web gold, deck's ndbgold) */
+  --goldmetal: #AE9142; /* ND metallic gold — deck's chrome accent (ndgold) */
   --navy:   #0A234B;   /* chrome / headers (ND identity) */
+  --softblue: #EBF1F8; /* deck softblue (progress-bar track) */
+  --softgray: #F5F7FA; /* deck softgray (beamer button bg) */
   --red:    #D62728;   /* reference / "overpriced" dashed lines only */
   --grid:   #DDDDDD;   /* chart gridlines */
   --axis:   #666666;   /* axis spine / tick color */
@@ -16,7 +56,7 @@
 
   /* Neutral UI shades derived from the above */
   --ink:      #1a1a1a;
-  --muted:    #5a6472;
+  --muted:    #5F6978;  /* deck ndgrey */
   --panel-bg: #f6f7f9;
   --panel-border: #e2e5ea;
   --card-bg:  #ffffff;
@@ -28,7 +68,12 @@
   --point-scale: 1;
   --panel-width: 300px;
 
-  --font-stack: 'Linux Biolinum O', Arial, Helvetica, sans-serif;
+  /* Body = the deck's sans (Biolinum → Libertinus Sans, self-hosted);
+     display = the deck's serif titles; charts = Arial like the lecture
+     figures (matplotlib house style). */
+  --font-stack: 'Libertinus Sans', 'Linux Biolinum O', Arial, Helvetica, sans-serif;
+  --font-display: 'Libertinus Serif', 'Linux Libertine O', Georgia, 'Times New Roman', serif;
+  --font-chart: Arial, Helvetica, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -49,44 +94,69 @@ a:hover { text-decoration: underline; }
 
 /* ---------------------------------------------------------------- header -- */
 
+/* White letterhead header, as on the deck's frames: gold vertical rule,
+   grey letterspaced uppercase eyebrow, navy SERIF title; closed off by the
+   letterhead rule (thin navy line + short thick accent block). */
 .app-header {
-  background: var(--navy);
-  color: #fff;
-  padding: 0.85rem 1.4rem;
+  background: var(--page-bg);
+  color: var(--ink);
+  padding: 1rem 1.4rem 0.85rem;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+  position: relative;
+  border-bottom: 1px solid var(--navy);
 }
-.app-header .titles { display: flex; flex-direction: column; gap: 0.15rem; }
+.app-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 56px;
+  height: 5px;
+  background: var(--navy);
+}
+.app-header .titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  border-left: 3px solid var(--goldmetal);
+  padding-left: 0.8rem;
+}
 .app-header h1 {
   margin: 0;
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
+  color: var(--navy);
+  line-height: 1.15;
 }
 .app-header .subtitle {
+  order: -1; /* eyebrow sits ABOVE the title, as on the frames */
   margin: 0;
-  font-size: 0.85rem;
-  color: #b9c4d6;
-  font-weight: 400;
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
 }
 .app-header .header-actions { display: flex; gap: 0.6rem; align-items: center; }
 
 .btn {
   font-family: inherit;
   font-size: 0.85rem;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--navy);
+  background: var(--softgray);
+  border: 1px solid var(--panel-border);
   border-radius: 6px;
   padding: 0.35rem 0.75rem;
   cursor: pointer;
   transition: background 0.15s;
 }
-.btn:hover { background: rgba(255, 255, 255, 0.24); }
-.btn.active { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.btn:hover { background: var(--softblue); }
+.btn.active { background: var(--gold); border-color: var(--gold); color: #fff; }
 
 /* ----------------------------------------------------- tool app layout --- */
 
@@ -163,7 +233,7 @@ mjx-assistive-mml {
 .formula-strip {
   background: var(--card-bg);
   border: 1px solid var(--panel-border);
-  border-left: 4px solid var(--blue);
+  border-left: 3px solid var(--goldmetal); /* deck's gold vertical-rule motif */
   border-radius: 8px;
   padding: 0.7rem 1rem;
   font-size: 1rem;
@@ -221,7 +291,7 @@ mjx-assistive-mml {
 svg.finchart { display: block; width: auto; max-width: 100%; height: auto; }
 svg.finchart .grid { stroke: var(--grid); stroke-width: 1; }
 svg.finchart .spine { stroke: var(--axis); stroke-width: calc(1.2px * var(--stroke-scale)); }
-svg.finchart .tick { fill: var(--label); font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-stack); }
+svg.finchart .tick { fill: var(--label); font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-chart); }
 svg.finchart .tick-x { text-anchor: middle; }
 svg.finchart .tick-y { text-anchor: end; }
 svg.finchart .axis-title {
@@ -229,17 +299,17 @@ svg.finchart .axis-title {
   font-size: calc(13px * var(--stroke-scale));
   font-weight: 600;
   text-anchor: middle;
-  font-family: var(--font-stack);
+  font-family: var(--font-chart);
 }
 svg.finchart .series { stroke-width: calc(2px * var(--stroke-scale)); }
-svg.finchart .datalabel { font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-stack); }
+svg.finchart .datalabel { font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-chart); }
 svg.finchart .marker { /* radius handled inline; scaled by --point-scale where used */ }
 
 /* hover tooltip (overlay layer, built by tools) */
 .chart-tooltip {
   fill: var(--navy);
   font-size: calc(11px * var(--stroke-scale));
-  font-family: var(--font-stack);
+  font-family: var(--font-chart);
 }
 .chart-tooltip-bg { fill: #fff; stroke: var(--panel-border); }
 
@@ -247,13 +317,21 @@ svg.finchart .marker { /* radius handled inline; scaled by --point-scale where u
 
 .app-footer {
   padding: 1rem 1.4rem;
-  border-top: 1px solid var(--panel-border);
+  position: relative;
   font-size: 0.82rem;
   color: var(--muted);
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+/* echo of the deck's footline: thin gold progress bar on a softblue track */
+.app-footer::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--gold) 0 38%, var(--softblue) 38%);
 }
 
 /* two side-by-side chart columns inside a chart-area (e.g. σ–E[r] plane next
@@ -281,20 +359,20 @@ svg.finchart .marker { /* radius handled inline; scaled by --point-scale where u
   display: block;
   background: var(--card-bg);
   border: 1px solid var(--panel-border);
-  border-top: 4px solid var(--blue);
+  border-top: 4px solid var(--goldmetal);
   border-radius: 10px;
   padding: 1.1rem 1.2rem 1.25rem;
   color: inherit;
   transition: box-shadow 0.15s, transform 0.15s;
 }
 .tool-card:hover { text-decoration: none; box-shadow: 0 6px 18px rgba(10, 35, 75, 0.12); transform: translateY(-2px); }
-.tool-card h3 { margin: 0 0 0.35rem; color: var(--navy); font-size: 1.1rem; }
+.tool-card h3 { margin: 0 0 0.35rem; color: var(--navy); font-family: var(--font-display); font-size: 1.18rem; }
 .tool-card p { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.9rem; }
 .tool-card .lecture-ref {
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--goldmetal);
   background: rgba(201, 151, 0, 0.1);
   border-radius: 4px;
   padding: 0.15rem 0.5rem;
