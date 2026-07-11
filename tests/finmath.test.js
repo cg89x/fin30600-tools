@@ -262,3 +262,21 @@ test('dirichlet returns a valid simplex point (seeded)', () => {
     assertNear(s, 1, 1e-9, 'weights sum to 1');
   }
 });
+
+/* --------------------------------------------- diversification (L4 appendix) */
+
+test('diversification: workbook PortfolioVarianceAndDiversification.xlsx', () => {
+  // Case 1 (col B): =SQRT(1/N)
+  assertNear(Math.sqrt(fm.ewVarUncorrelated(1)), 1, 1e-12, 'case1 N=1');
+  assertNear(Math.sqrt(fm.ewVarUncorrelated(100)), 0.1, 1e-12, 'case1 N=100');
+  // Case 2 (col C): =SQRT(1/N + (N-1)/N * 0.5)
+  assertNear(Math.sqrt(fm.ewVarCommonCorr(2, 0.5)), Math.sqrt(0.75), 1e-12, 'case2 N=2');
+  assertNear(Math.sqrt(fm.ewVarCommonCorr(100, 0.5)), Math.sqrt(0.505), 1e-12, 'case2 N=100');
+  // Case 3 (col D): beta = SQRT(0.5) => identical to case 2 at rho = beta^2
+  const beta = Math.sqrt(0.5);
+  for (const n of [1, 5, 25, 100]) {
+    assertNear(fm.ewVarCommonCorr(n, beta * beta), fm.ewVarCommonCorr(n, 0.5), 1e-12, `case3 N=${n}`);
+  }
+  // systematic floor: sigma_P -> sqrt(rho) as N grows
+  assertNear(Math.sqrt(fm.ewVarCommonCorr(1e9, 0.5)), Math.sqrt(0.5), 1e-4, 'floor');
+});

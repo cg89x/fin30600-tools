@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diversification &amp; Systematic Risk · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* tool-local tweaks */
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.1rem 0 0;
+      line-height: 1.3;
+    }
+    .coincide-flag {
+      display: none;
+      margin: 0.2rem 0 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .coincide-flag.on { display: block; }
+    .inset-box { padding-top: 0.3rem; }
+    .inset-box .inset-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0 0 0.1rem 0.2rem;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.gold { border-color: var(--gold); }
+    .legend .swatch.navy-dash { border-color: var(--navy); border-top-style: dashed; }
+    .legend .swatch.gold-dash { border-color: var(--gold); border-top-style: dashed; }
+
+    /* variance-source bar (as on the CAPM/market-model page) */
+    .vardecomp { display: flex; flex-direction: column; gap: 0.35rem; margin: 0.6rem 0.2rem 0.2rem; }
+    .vardecomp .vd-title {
+      font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .vd-bar {
+      display: flex; width: 100%; height: 1.7rem;
+      border-radius: 6px; overflow: hidden; border: 1px solid var(--panel-border);
+    }
+    .vd-seg {
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.8rem; font-weight: 700;
+      white-space: nowrap; overflow: hidden; min-width: 0;
+    }
+    .vd-seg.idio { background: var(--blue); }
+    .vd-seg.sys { background: var(--gold); }
+    .vd-legend { display: flex; gap: 1.2rem; font-size: 0.78rem; color: var(--label); flex-wrap: wrap; }
+    .vd-legend .sw { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+    .vd-legend .sw.idio { background: var(--blue); }
+    .vd-legend .sw.sys { background: var(--gold); }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Diversification &amp; Systematic Risk</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 4 · Appendix</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Diversification</h2>
+
+      <div class="group">
+        <div class="group-title">Portfolio</div>
+        <div id="ctrl-n"></div>
+        <p class="note" data-label="Equal weights $w_i = 1/N$; every asset's variance is normalized to 1, so the portfolio's $\sigma_P$ is measured in units of one asset's $\sigma$."></p>
+      </div>
+
+      <div class="group">
+        <div class="group-title" data-label="Case 2 — common correlation $\rho$"></div>
+        <div id="ctrl-rho"></div>
+        <div id="ctrl-c2"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-title" data-label="Case 3 — CAPM (single factor)"></div>
+        <div id="ctrl-beta"></div>
+        <div id="ctrl-c3"></div>
+        <p class="note" data-label="All assets share the same $\beta$; $\sigma_M^2 = 1$ and $\sigma_\varepsilon^2 = 1 - \beta^2$ keep $\mathrm{Var}(R_i) = 1$, so $\mathrm{Cov}(R_i,R_j) = \beta^2$."></p>
+      </div>
+
+      <div class="group">
+        <div class="group-title" data-label="Case 1 — uncorrelated"></div>
+        <div id="ctrl-c1"></div>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="formula-strip" id="formula-strip">
+        <div class="formula-row" id="f-general"></div>
+        <div class="formula-row" id="f-case2"></div>
+        <div class="formula-row" id="f-case3"></div>
+        <p class="coincide-flag" id="coincide-flag"></p>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="chart-row">
+        <div class="chart-box chart-col-main">
+          <div id="main-chart"></div>
+          <div class="legend">
+            <span><span class="swatch blue"></span>Case 1: uncorrelated</span>
+            <span><span class="swatch gold"></span><span data-label="Case 2: common $\rho$"></span></span>
+            <span><span class="swatch navy-dash"></span><span data-label="Case 3: CAPM, common $\beta$"></span></span>
+            <span><span class="swatch gold-dash"></span><span data-label="Systematic floor $\sqrt{\rho}$"></span></span>
+          </div>
+        </div>
+
+        <div class="chart-box inset-box chart-col-side">
+          <p class="inset-title">Where portfolio variance comes from (Case 2)</p>
+          <div id="inset-chart"></div>
+          <div class="vardecomp">
+            <span class="vd-title" id="vd-title">Share of portfolio variance at current N</span>
+            <div class="vd-bar" id="vd-bar"></div>
+            <div class="vd-legend">
+              <span><span class="sw idio"></span><span data-label="Variance term $1/N$ — vanishes as $N$ grows"></span></span>
+              <span><span class="sw sys"></span><span data-label="Covariance term $\frac{N-1}{N}\rho$ — does NOT vanish"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

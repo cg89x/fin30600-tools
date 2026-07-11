@@ -74,7 +74,7 @@ other. No cross-tool imports, ever.
   `finmath.js`; the seed is part of the URL state. Reloading a shared link
   reproduces the exact same picture.
 
-## The four tools
+## The tools
 
 ### 1. Two-asset diversification explorer (`tools/two-asset/`, L3 §4)
 
@@ -146,6 +146,26 @@ stacked variance-decomposition bar: systematic β²σ_M² vs idiosyncratic σ_e�
 "Resample" button draws a new seed (updates URL state) — estimation noise
 becomes visceral, especially at small n. Axis labels here: "Market excess
 return" / "Asset excess return" (SCL convention — NOT the σ/E[r] labels).
+
+### 5. Diversification & systematic risk (`tools/diversification/`, L4 Appendix)
+
+Web version of `Archive/Lectures (pptx)/Lecture 4/Additional Materials/
+PortfolioVarianceAndDiversification.xlsx` and the deck appendix
+(`app_diversification.tex`). Equal-weight portfolio of N unit-variance assets,
+N = 1..100:
+
+- **Case 1** (uncorrelated, blue): sigma_P^2 = 1/N.
+- **Case 2** (common pairwise rho, gold; slider 0-0.95, default 0.5):
+  sigma_P^2 = 1/N + ((N-1)/N) rho, dashed gold floor at sqrt(rho).
+- **Case 3** (CAPM single factor, navy DASHED so a coinciding Case 2 stays
+  visible; beta slider, default 0.707 = 1/sqrt(2)): sigma_eps^2 = 1 - beta^2
+  keeps Var(R_i) = 1, so sigma_P^2 = 1/N + ((N-1)/N) beta^2. A gold
+  "coincide flag" fires when |beta^2 - rho| < 0.005 — the workbook's
+  punchline that market exposure *is* the correlation.
+- Right column: stacked-area variance decomposition vs N (covariance term
+  swells to rho, 1/N band vanishes) + a capm-sml-style share bar at the
+  current N. Readouts include "variance term 1/N gone: 1 - 1/N".
+- State keys: `n, rho, beta, c1, c2, c3`.
 
 ## Math (all in `lib/finmath.js`, pure, unit-tested)
 

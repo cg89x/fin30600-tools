@@ -15,12 +15,10 @@ dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self
 | Tool | Lecture | What it does |
 |------|---------|--------------|
 | [`tools/two-asset/`](tools/two-asset/) | L3 §4 | Two-asset opportunity set as ρ and weight vary; minimum-variance portfolio. |
-| [`tools/capital-allocation/`](tools/capital-allocation/) | L3 §2–3 | CAL from the risk-free asset through a risky portfolio; utility and optimal y*. |
+| [`tools/capital-allocation/`](tools/capital-allocation/) | L3 §2–3 | CAL from the risk-free asset through a risky portfolio; utility and optimal w*. |
 | [`tools/efficient-frontier/`](tools/efficient-frontier/) | L3 §5 | N-asset minimum-variance frontier, global MVP, and max-Sharpe tangency. |
 | [`tools/capm-sml/`](tools/capm-sml/) | L4 §2–3 | Security market line + alpha, and a simulated market-model OLS regression. |
-
-The four tool folders are built by separate agents; the landing page
-(`index.html`) links to all four whether or not they exist yet.
+| [`tools/diversification/`](tools/diversification/) | L4 App. | Equal-weight portfolio risk vs. N: the 1/N term vanishes, correlation sets the systematic floor (web version of PortfolioVarianceAndDiversification.xlsx). |
 
 ## Run locally
 
