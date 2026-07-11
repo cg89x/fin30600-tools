@@ -5,6 +5,13 @@
 (Investment Theory, Notre Dame) lecture decks, starting with Portfolio Theory
 (Lecture 3) and CAPM (Lecture 4).
 
+> **This file is the original spec (2026-07-10). Since then:** a 5th tool
+> (diversification, §5 below) shipped; **presenter mode was removed** and
+> replaced by per-tool `--stroke-scale` (see README "Line & label scaling");
+> the theme was matched to the beamer deck (self-hosted Libertinus fonts in
+> `vendor/fonts/`, white letterhead header). The **README** is the current
+> living reference for conventions — prefer it where the two disagree.
+
 ## Decisions (locked with Christian, 2026-07-10)
 
 - **Dual-purpose**: driven live on the classroom projector AND used by students
@@ -23,17 +30,20 @@
 fin30600-tools/
 ├── index.html              landing page: course header + one card per tool
 ├── lib/
-│   ├── style.css           house style + layout skeleton + presenter mode
+│   ├── style.css           house style + deck-matched theme + layout skeleton
 │   ├── chart.js            SVG chart helper (axes, grid, curves, points, labels)
 │   ├── finmath.js          ALL finance math (pure functions, unit-tested)
 │   ├── ui.js               slider-with-readout, number input, toggle components
 │   └── state.js            URL-hash state encode/decode (bookmarkable configs)
-├── vendor/mathjax/         self-hosted MathJax 3.2.2 (tex-svg-full.js)
+├── vendor/
+│   ├── mathjax/            self-hosted MathJax 3.2.2 (tex-svg-full.js)
+│   └── fonts/              self-hosted Libertinus Sans/Serif woff2 (SIL OFL)
 ├── tools/
 │   ├── two-asset/          index.html + main.js  (Lecture 3 §4)
 │   ├── capital-allocation/ index.html + main.js  (Lecture 3 §2–3)
 │   ├── efficient-frontier/ index.html + main.js  (Lecture 3 §5)
-│   └── capm-sml/           index.html + main.js  (Lecture 4 §2–3)
+│   ├── capm-sml/           index.html + main.js  (Lecture 4 §2–3)
+│   └── diversification/    index.html + main.js  (Lecture 4 Appendix)
 ├── tests/finmath.test.js   plain `node --test`, zero dependencies
 └── docs/                   DESIGN.md (this file), PLAN.md
 ```
@@ -47,10 +57,11 @@ other. No cross-tool imports, ever.
   NAVY `#0A234B` = chrome/headers (ND identity); dashed red `#D62728` only for
   reference lines. Muted grey `#DDDDDD` grid, `#666666`/`#333333` axis
   edge/label colors. No top/right chart borders (matplotlib despined look).
-- **Typography**: Linux Biolinum (self-hosted woff2 if practical — it is
-  SIL-OFL licensed; the OTFs live in `~/Library/Fonts/LinBiolinum_R*.otf` and
-  can be converted, or fetched as web fonts) with
-  `Arial, Helvetica, sans-serif` fallback. Formula rendering via MathJax (SVG output).
+- **Typography** *(shipped 2026-07-11, matching the beamer deck)*: body text
+  is **Libertinus Sans** and display titles **Libertinus Serif** navy —
+  self-hosted woff2 in `vendor/fonts/` (SIL OFL), `Arial, Helvetica` fallback.
+  **On-chart SVG text stays Arial** (`--font-chart`) to match the lecture
+  figures. Formula rendering via MathJax (SVG output).
 - **Axis conventions** (Christian's standing rules): σ axis labeled exactly
   **“Standard Deviation”**, expected-return axis exactly **“Expected Return”**
   (singular, spelled out). Percent ticks are whole percents (`30%`, never
@@ -63,9 +74,10 @@ other. No cross-tool imports, ever.
 
 ## Cross-cutting behaviors (in `lib/`)
 
-- **Presenter mode**: toggled by a button and by `?present=1`. Adds a class on
-  `<html>` that scales fonts, stroke widths, point radii, and control sizes
-  ~1.4× for the DeBartolo Hall projector.
+- ~~**Presenter mode**~~ **(removed 2026-07-11)**: the button/`?present=1`
+  toggle is gone. Projector scaling is now per-tool: set `--stroke-scale` on a
+  `.chart-box` and `chart.js` multiplies every stroke and chart-text size by
+  it (see README "Line & label scaling").
 - **State in URL hash**: every control's value serializes into `#…` (compact
   `key=val` pairs) on change (debounced); on load, hash values override
   defaults. Any configuration is a shareable/bookmarkable link — slides can QR
@@ -165,6 +177,9 @@ N = 1..100:
 - Right column: stacked-area variance decomposition vs N (covariance term
   swells to rho, 1/N band vanishes) + a capm-sml-style share bar at the
   current N. Readouts include "variance term 1/N gone: 1 - 1/N".
+- Both charts' x-axis upper limit tracks the N slider (up to N_MAX = 100)
+  so low-N cases aren't squeezed against the axis. Charts use
+  `--stroke-scale: 1.5` for thicker projector lines (labels kept base size).
 - State keys: `n, rho, beta, c1, c2, c3`.
 
 ## Math (all in `lib/finmath.js`, pure, unit-tested)
@@ -187,8 +202,9 @@ UI layer formats to whole percents.
   a reference computed independently, e.g. a numpy one-off during development;
   OLS against a hand-computed small sample).
 - Browser QA on every tool: default view matches the corresponding slide
-  example; presenter mode legible at 1280×720; no console errors; URL state
-  round-trips (set sliders → copy URL → open fresh tab → same picture).
+  example; legible at 1280×720 (projector); no console errors; no horizontal
+  scroll; URL state round-trips (set sliders → copy URL → open fresh tab →
+  same picture).
 
 ## Out of scope for v1
 

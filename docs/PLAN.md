@@ -1,5 +1,12 @@
 # Implementation plan — executed by opus subagents, orchestrated by Fable
 
+> **Historical build plan (2026-07-10).** This is the one-time task breakdown
+> used to build the initial four tools in parallel; it is kept for provenance
+> and is **not** maintained. For current conventions see the **README**; for
+> the design spec see `DESIGN.md`. References here to "presenter mode" and
+> "the four tools" reflect the original build, not the shipped state (presenter
+> mode was later removed; a 5th tool, diversification, was added).
+
 Read `docs/DESIGN.md` first; it is the spec. This file assigns tasks.
 
 ## Task 0 — Scaffold (runs FIRST, alone)

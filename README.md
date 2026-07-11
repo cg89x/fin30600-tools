@@ -45,7 +45,9 @@ node --test tests/finmath.test.js
 worked numbers (two-asset ρ=±0.2 example, CAL y*, the ρ=0/−1 MVP special
 cases), a 3-asset MVP/tangency case cross-checked against an independent
 numpy computation (the snippet + its output are pasted in the test file), a
-hand-checked OLS sample, and the Cholesky positive-definite guard.
+hand-checked OLS sample, the Cholesky positive-definite guard, and the
+diversification workbook formulas (`ewVarUncorrelated`/`ewVarCommonCorr`
+against `PortfolioVarianceAndDiversification.xlsx`).
 
 Syntax-check every module with:
 
@@ -74,12 +76,14 @@ Pages site under `/fin30600-tools/` or a user site at the root).
 fin30600-tools/
 ├── index.html              landing page (course header + one card per tool)
 ├── lib/
-│   ├── style.css           house palette + layout skeleton + presenter mode
+│   ├── style.css           house palette + deck-matched theme + layout skeleton
 │   ├── chart.js            hand-rolled SVG chart helper (despined axes)
 │   ├── finmath.js          ALL finance/numerical math (pure, unit-tested)
-│   ├── ui.js               slider / number-input / toggle components
+│   ├── ui.js               slider / number-input / toggle components + renderTeX
 │   └── state.js            URL-hash state (bookmarkable configs)
-├── vendor/mathjax/         self-hosted MathJax 3.2.2 (tex-svg-full.js, single file)
+├── vendor/
+│   ├── mathjax/            self-hosted MathJax 3.2.2 (tex-svg-full.js, single file)
+│   └── fonts/              self-hosted Libertinus Sans/Serif woff2 (SIL OFL)
 ├── tools/                  one folder per explorer (index.html + main.js)
 ├── tests/finmath.test.js   node --test, zero dependencies
 └── docs/                   DESIGN.md, PLAN.md
@@ -97,14 +101,29 @@ fin30600-tools/
   single file cannot serve). `lib/ui.js`
   exports a `renderTeX(host, tex)` convenience wrapper with a text fallback.
 - **House palette** (CSS custom properties in `style.css`): BLUE `#0072B2`
-  primary series, GOLD `#C99700` secondary, NAVY `#0A234B` chrome, dashed RED
-  `#D62728` reference lines only, grey `#DDDDDD` grid.
+  primary series, GOLD `#C99700` secondary, NAVY `#0A234B` chrome, metallic
+  gold `#AE9142` (`--goldmetal`) for chrome accents (formula-strip rule, card
+  tops, section rules), dashed RED `#D62728` reference lines only, grey
+  `#DDDDDD` grid.
+- **Deck-matched theme**: the site mirrors the beamer lecture template
+  (`ndcollegiate.sty`). Body text is **Libertinus Sans** and display titles
+  are **Libertinus Serif** navy (self-hosted woff2 in `vendor/fonts/`, SIL
+  OFL); the page header is a white letterhead (gold vertical rule + grey
+  letterspaced eyebrow + serif title). **Chart/SVG text stays Arial**
+  (`--font-chart`) to match the lecture *figures* — never the body font.
 - **Axis labels** (Christian's standing rules): the σ axis is labeled exactly
   **"Standard Deviation"**, the expected-return axis exactly **"Expected
   Return"** (singular, spelled out). Percent ticks are whole percents (`30%`,
   never `0.30` or `30.0%`) — use `pct` from `chart.js`.
-- **Presenter mode**: adding `class="presenter"` to `<html>` (button toggle or
-  `?present=1`) scales type, strokes, and point radii ~1.4× for the projector.
+- **Line & label scaling** — `chart.js` sets every stroke width as an inline
+  style `calc(<w>px * var(--stroke-scale, 1))`, and tick/axis-title/datalabel
+  font sizes also carry the `--stroke-scale` factor. Scale a whole chart up
+  for the projector by setting `--stroke-scale` on its `.chart-box` (e.g. the
+  diversification tool uses `1.5`); override the per-element `font-size` back
+  if you want thicker lines but base-size labels.
+  **Never add a `stroke-width` rule for `.series`/`.refline` to `style.css`** —
+  a stylesheet rule beats the inline attribute and silently pins every curve
+  to one width (this bug shipped once; that's why widths are inline styles now).
 - **State in the URL hash**: every control serializes into `#key=val` pairs
   (debounced `replaceState`) via `lib/state.js`, so any configuration is a
   shareable, reload-stable link. All randomness runs through a seeded PRNG
