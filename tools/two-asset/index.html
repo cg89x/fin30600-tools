@@ -19,7 +19,7 @@
     </div>
     <div class="header-actions">
       <button id="presenter-btn" class="btn" type="button" title="Toggle projector-sized presenter mode">Presenter</button>
-      <a class="btn" href="../../">All tools</a>
+      <a class="btn" href="../../">&larr; Back to all tools</a>
     </div>
   </header>
 
@@ -49,7 +49,12 @@
     </aside>
 
     <div class="chart-area">
-      <div class="chart-box" id="chart-box"></div>
+      <div class="formula-strip">
+        <div class="formula-row"><span id="f-r1-sym"></span></div>
+        <div class="formula-row"><span id="f-r1-num"></span></div>
+        <div class="formula-row" style="margin-top:0.6rem;"><span id="f-r2-sym"></span></div>
+        <div class="formula-row"><span id="f-r2-num"></span></div>
+      </div>
 
       <div class="readouts">
         <div class="readout"><div class="k">E[r<sub>P</sub>]</div><div class="v blue" id="out-er">—</div></div>
@@ -58,12 +63,7 @@
         <div class="readout"><div class="k">MVP weight w<sub>A</sub><sup>min</sup></div><div class="v gold" id="out-mvp">—</div></div>
       </div>
 
-      <div class="formula-strip">
-        <div class="formula-row"><span id="f-r1-sym"></span></div>
-        <div class="formula-row"><span id="f-r1-num"></span></div>
-        <div class="formula-row" style="margin-top:0.6rem;"><span id="f-r2-sym"></span></div>
-        <div class="formula-row"><span id="f-r2-num"></span></div>
-      </div>
+      <div class="chart-box" id="chart-box"></div>
     </div>
   </main>
 

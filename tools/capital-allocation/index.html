@@ -67,7 +67,7 @@
     </div>
     <div class="header-actions">
       <button id="present-btn" class="btn" type="button">Presenter mode</button>
-      <a class="btn" href="../../">All tools</a>
+      <a class="btn" href="../../">&larr; Back to all tools</a>
     </div>
   </header>
 
@@ -99,25 +99,27 @@
     </section>
 
     <section class="chart-area">
-      <div class="chart-box">
-        <div id="main-chart"></div>
-        <div class="legend">
-          <span><span class="swatch blue"></span>CAL &amp; complete portfolio</span>
-          <span><span class="swatch gold"></span>Indifference curve (current)</span>
-          <span><span class="swatch gold-dash"></span>Indifference curve at y*</span>
-        </div>
+      <div class="formula-strip" id="formula-strip">
+        <div class="formula-row" id="f-utility"></div>
+        <div class="formula-row" id="f-ystar"></div>
       </div>
 
       <div class="readouts" id="readouts"></div>
 
-      <div class="chart-box inset-box">
-        <p class="inset-title">Utility vs. allocation y</p>
-        <div id="inset-chart"></div>
-      </div>
+      <div class="chart-row">
+        <div class="chart-box chart-col-main">
+          <div id="main-chart"></div>
+          <div class="legend">
+            <span><span class="swatch blue"></span>CAL &amp; complete portfolio</span>
+            <span><span class="swatch gold"></span>Indifference curve (current)</span>
+            <span><span class="swatch gold-dash"></span>Indifference curve at y*</span>
+          </div>
+        </div>
 
-      <div class="formula-strip" id="formula-strip">
-        <div class="formula-row" id="f-utility"></div>
-        <div class="formula-row" id="f-ystar"></div>
+        <div class="chart-box inset-box chart-col-side">
+          <p class="inset-title">Utility vs. allocation y</p>
+          <div id="inset-chart"></div>
+        </div>
       </div>
     </section>
   </main>

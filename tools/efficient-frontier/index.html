@@ -30,6 +30,8 @@
     }
     .asset-table .pct-suffix { color: var(--muted); font-size: 0.78rem; margin-left: 2px; }
 
+    /* keep the 5×5 correlation editor inside the panel — scroll if needed */
+    #corr-grid { overflow-x: auto; max-width: 100%; }
     .corr-table { border-collapse: collapse; font-size: 0.74rem; margin-top: 0.2rem; }
     .corr-table th {
       color: var(--muted); font-weight: 700; font-size: 0.68rem;
@@ -37,7 +39,7 @@
     }
     .corr-table td { padding: 1px; text-align: center; }
     .corr-cell {
-      width: 3.1rem; font-family: inherit; font-size: 0.74rem; text-align: center;
+      width: 2.6rem; font-family: inherit; font-size: 0.74rem; text-align: center;
       border: 1px solid var(--panel-border); border-radius: 4px; padding: 0.12rem 0.15rem;
     }
     .corr-diag { color: var(--navy); font-weight: 700; }
@@ -82,6 +84,7 @@
     <div class="header-actions">
       <button class="btn" id="reset-btn" type="button">Reset</button>
       <button class="btn" id="present-btn" type="button">Presenter</button>
+      <a class="btn" href="../../">&larr; Back to all tools</a>
     </div>
   </header>
 
@@ -123,8 +126,9 @@
     </section>
 
     <section class="chart-area">
-      <div class="chart-box">
-        <div id="chart"></div>
+      <div class="formula-strip">
+        <div class="formula-row" id="formula-w"></div>
+        <div class="formula-row" id="formula-s"></div>
       </div>
 
       <div class="readouts">
@@ -135,14 +139,15 @@
         <div class="readout"><div class="k">MVP σ</div><div class="v gold" id="ro-mvp-sd">—</div></div>
       </div>
 
-      <div class="chart-box">
-        <p class="weights-title">Tangency portfolio weights</p>
-        <div id="weights"></div>
-      </div>
+      <div class="chart-row">
+        <div class="chart-box chart-col-main">
+          <div id="chart"></div>
+        </div>
 
-      <div class="formula-strip">
-        <div class="formula-row" id="formula-w"></div>
-        <div class="formula-row" id="formula-s"></div>
+        <div class="chart-box chart-col-side">
+          <p class="weights-title">Tangency portfolio weights</p>
+          <div id="weights"></div>
+        </div>
       </div>
     </section>
   </main>

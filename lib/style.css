@@ -261,15 +261,27 @@ svg.finchart .marker { /* radius handled inline; scaled by --point-scale where u
   gap: 0.5rem;
 }
 
+/* two side-by-side chart columns inside a chart-area (e.g. σ–E[r] plane next
+   to the utility-vs-y chart, or the frontier next to the tangency weights) */
+.chart-row {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.1rem;
+  align-items: start;
+}
+@media (max-width: 1150px) { .chart-row { grid-template-columns: 1fr; } }
+
 /* --------------------------------------------------- landing (index) ------ */
 
-.landing { max-width: 980px; margin: 0 auto; padding: 1.75rem 1.4rem 3rem; }
+.landing { max-width: 1500px; margin: 0 auto; padding: 1.75rem 1.4rem 3rem; }
 .landing .lead { color: var(--muted); font-size: 1.02rem; margin: 0 0 1.5rem; }
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.1rem;
 }
+@media (max-width: 1150px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) { .card-grid { grid-template-columns: 1fr; } }
 .tool-card {
   display: block;
   background: var(--card-bg);

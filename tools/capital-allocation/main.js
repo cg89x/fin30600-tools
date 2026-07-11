@@ -119,8 +119,8 @@ const mainChart = new Chart(mainHost, {
 });
 
 const insetChart = new Chart(insetHost, {
-  width: 720,
-  height: 240,
+  width: 480,
+  height: 320,
   margin: { top: 14, right: 20, bottom: 44, left: 60 },
   xLabel: 'y (fraction in risky portfolio)',
   yLabel: 'Utility',

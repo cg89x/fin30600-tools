@@ -135,7 +135,7 @@ function drawData() {
   const sP = twoAssetStd(a.wA, a.sigA, a.sigB, cov);
   const eP = twoAssetMean(a.wA, a.muA, a.muB);
   chart.point(sP, eP, { r: 6.5 * scale(), fill: 'var(--blue)', stroke: '#fff' });
-  chart.text(sP, eP, `(${pctS(sP, 1)}, ${pctS(eP, 1)})`, { dx: 10, dy: -8, fill: 'var(--blue)', klass: 'p-label' });
+  chart.text(sP, eP, `(E[r] = ${pctS(eP, 1)}, σ = ${pctS(sP, 1)})`, { dx: 10, dy: -8, fill: 'var(--blue)', klass: 'p-label' });
 
   updateReadouts(a, cov, sP, eP, wMvp, mvpErr);
   updateFormulas(a, cov, eP, sP);
@@ -164,9 +164,9 @@ function updateFormulas(a, cov, eP, sP) {
     `= (${f(wA)})(${f(a.muA, 3)}) + (${f(wB)})(${f(a.muB, 3)}) = ${blue(tp(eP))}`);
 
   renderTeX(document.getElementById('f-r2-sym'),
-    '\\textbf{Rule 2:}\\quad \\sigma_P^2 = w_A^2\\sigma_A^2 + w_B^2\\sigma_B^2 + 2\\,w_A w_B\\,\\mathrm{Cov}(R_A,R_B)');
+    '\\textbf{Rule 2:}\\quad \\sigma_P^2 = w_A^2\\sigma_A^2 + w_B^2\\sigma_B^2 + 2\\,w_A w_B\\,\\sigma_A\\sigma_B\\,\\rho_{AB}');
   renderTeX(document.getElementById('f-r2-num'),
-    `= (${f(wA)})^2(${f(a.sigA, 2)})^2 + (${f(wB)})^2(${f(a.sigB, 2)})^2 + 2(${f(wA)})(${f(wB)})(${f(cov, 4)}) ` +
+    `= (${f(wA)})^2(${f(a.sigA, 2)})^2 + (${f(wB)})^2(${f(a.sigB, 2)})^2 + 2(${f(wA)})(${f(wB)})(${f(a.sigA, 2)})(${f(a.sigB, 2)})(${f(a.rho, 2)}) ` +
     `= ${f(varP, 5)}\\;\\Rightarrow\\; \\sigma_P = ${blue(tp(sP))}`);
 }
 

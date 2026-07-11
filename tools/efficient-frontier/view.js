@@ -134,15 +134,15 @@ export function renderOverlay(chart, m, pointScale, prevNodes) {
   chart.overlayGroup.appendChild(rfLbl);
   nodes.push(rfLbl);
 
-  // Tangency portfolio — blue star, labeled T.
+  // Tangency portfolio — gold star (stands out against the blue CAL), labeled T.
   const star = el('path', {
-    d: starPath(chart.sx(t.std), chart.sy(t.mean), 8 * pointScale, 3.6 * pointScale, 5),
-    fill: 'var(--blue)', stroke: 'var(--navy)', 'stroke-width': 1.2, class: 'tangency-star',
+    d: starPath(chart.sx(t.std), chart.sy(t.mean), 9 * pointScale, 4 * pointScale, 5),
+    fill: 'var(--gold)', stroke: '#fff', 'stroke-width': 1.2, class: 'tangency-star',
   });
   chart.overlayGroup.appendChild(star);
   nodes.push(star);
   const tLbl = el('text', {
-    x: chart.sx(t.std) + 11, y: chart.sy(t.mean) - 8, fill: 'var(--blue)',
+    x: chart.sx(t.std) + 12, y: chart.sy(t.mean) - 9, fill: 'var(--gold)',
     class: 'datalabel lbl-strong',
   });
   tLbl.textContent = 'T';

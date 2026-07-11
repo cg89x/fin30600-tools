@@ -195,7 +195,9 @@ function main() {
     lastValid = model;
     setDomainFor(raw);
     renderBase(chart, model, pointScale());
-    overlayNodes = renderOverlay(chart, model, pointScale(), []);
+    // pass the previous overlay nodes so the old CAL/star are removed —
+    // an empty array here leaves ghost stars behind on every asset edit
+    overlayNodes = renderOverlay(chart, model, pointScale(), overlayNodes);
     renderWeights(weightsHost, model.names, model.tangency.w, pointScale());
     renderReadouts(tiles, model);
     renderFormula(fRowW, fRowS, model);
