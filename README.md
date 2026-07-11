@@ -10,6 +10,10 @@ This is a **static site with zero build step**: plain HTML + ES-module
 JavaScript, no framework, no bundler, no npm install. The only third-party
 dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self-hosted in `vendor/`.
 
+> Working on this repo with Claude? Start with [`CLAUDE.md`](CLAUDE.md)
+> (operating guide + invariants) and [`MEMORY.md`](MEMORY.md) (living state log,
+> kept current each change).
+
 ## The tools
 
 | Tool | Lecture | What it does |
