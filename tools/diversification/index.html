@@ -12,9 +12,14 @@
   <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
   <style>
     /* tool-local tweaks */
-    /* projector-friendly charts: scale tick labels, spines, and all line
-       widths (chart.js multiplies every stroke by --stroke-scale) */
+    /* projector-friendly charts: thicker lines (chart.js multiplies every
+       stroke by --stroke-scale). Fonts stay at their base size — the
+       overrides below undo the --stroke-scale factor baked into the shared
+       .tick / .axis-title / .datalabel rules. */
     .chart-box { --stroke-scale: 1.5; }
+    .chart-box svg.finchart .tick { font-size: 12px; }
+    .chart-box svg.finchart .axis-title { font-size: 13px; }
+    .chart-box svg.finchart .datalabel { font-size: 12px; }
     .note {
       font-size: 0.8rem;
       color: var(--muted);
