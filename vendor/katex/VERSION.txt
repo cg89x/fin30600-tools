@@ -1,0 +1,31 @@
+KaTeX self-hosted vendor copy
+=============================
+
+Version:   0.16.11
+Source:    https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/
+Downloaded: 2026-07-10
+License:   MIT (https://github.com/KaTeX/KaTeX/blob/main/LICENSE)
+
+Files
+-----
+katex.min.css   stylesheet (references fonts/KaTeX_*.{woff2,woff,ttf})
+katex.min.js    UMD/global build — exposes window.katex when loaded via <script>
+fonts/          60 font files (woff2 + woff + ttf for each family)
+
+Usage in tools
+--------------
+Load as a plain global (NOT an ES module) from a tool page. Paths are relative
+to the tool's own index.html, e.g. from tools/two-asset/index.html:
+
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+
+Then, after load, `window.katex.render(texString, element, {throwOnError:false})`
+or `window.katex.renderToString(texString, {throwOnError:false})`.
+
+Re-download
+-----------
+  KVER=0.16.11
+  curl -f "https://cdn.jsdelivr.net/npm/katex@${KVER}/dist/katex.min.css" -o katex.min.css
+  curl -f "https://cdn.jsdelivr.net/npm/katex@${KVER}/dist/katex.min.js"  -o katex.min.js
+  # fonts: for each name referenced in katex.min.css, fetch dist/fonts/<name>

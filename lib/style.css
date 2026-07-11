@@ -1,0 +1,289 @@
+/* =========================================================================
+   FIN 30600 Interactive Tools — shared house style + layout skeleton.
+   Matches the lecture figures: ND navy chrome, blue/gold series, matplotlib
+   despined charts. No build step; plain CSS custom properties.
+   ========================================================================= */
+
+:root {
+  /* House palette (locked in DESIGN.md) */
+  --blue:   #0072B2;   /* primary series */
+  --gold:   #C99700;   /* secondary series */
+  --navy:   #0A234B;   /* chrome / headers (ND identity) */
+  --red:    #D62728;   /* reference / "overpriced" dashed lines only */
+  --grid:   #DDDDDD;   /* chart gridlines */
+  --axis:   #666666;   /* axis spine / tick color */
+  --label:  #333333;   /* axis + data labels */
+
+  /* Neutral UI shades derived from the above */
+  --ink:      #1a1a1a;
+  --muted:    #5a6472;
+  --panel-bg: #f6f7f9;
+  --panel-border: #e2e5ea;
+  --card-bg:  #ffffff;
+  --page-bg:  #ffffff;
+
+  /* Metrics (presenter mode scales these) */
+  --font-base: 16px;
+  --stroke-scale: 1;
+  --point-scale: 1;
+  --panel-width: 300px;
+
+  --font-stack: 'Linux Biolinum O', Arial, Helvetica, sans-serif;
+}
+
+/* Presenter mode: scale type, strokes, and point radii ~1.4x for the
+   DeBartolo Hall projector. Toggled by a button or ?present=1 (adds the class
+   to <html>). */
+html.presenter {
+  --font-base: 22px;
+  --stroke-scale: 1.4;
+  --point-scale: 1.4;
+  --panel-width: 340px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page-bg);
+  color: var(--ink);
+  font-family: var(--font-stack);
+  font-size: var(--font-base);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------------------------------------------------------------- header -- */
+
+.app-header {
+  background: var(--navy);
+  color: #fff;
+  padding: 0.85rem 1.4rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.app-header .titles { display: flex; flex-direction: column; gap: 0.15rem; }
+.app-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.app-header .subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #b9c4d6;
+  font-weight: 400;
+}
+.app-header .header-actions { display: flex; gap: 0.6rem; align-items: center; }
+
+.btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.24); }
+.btn.active { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+
+/* ----------------------------------------------------- tool app layout --- */
+
+.tool-main {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem 1.4rem;
+  align-items: flex-start;
+}
+
+.controls-panel {
+  flex: 0 0 var(--panel-width);
+  width: var(--panel-width);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.controls-panel h2 {
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+.controls-panel .group { display: flex; flex-direction: column; gap: 0.7rem; }
+.controls-panel .group-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 0.25rem;
+}
+
+.chart-area {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.chart-box {
+  background: var(--card-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem;
+}
+
+/* live formula strip below the chart */
+.formula-strip {
+  background: var(--card-bg);
+  border: 1px solid var(--panel-border);
+  border-left: 4px solid var(--blue);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  overflow-x: auto;
+}
+.formula-strip .formula-row { margin: 0.25rem 0; }
+
+/* readouts block */
+.readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem 1rem;
+}
+.readout {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+}
+.readout .k { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.readout .v { font-size: 1.1rem; font-weight: 700; color: var(--navy); }
+.readout .v.blue { color: var(--blue); }
+.readout .v.gold { color: var(--gold); }
+
+/* -------------------------------------------------------------- controls -- */
+
+.ctrl { display: flex; flex-direction: column; gap: 0.3rem; }
+.ctrl-head { display: flex; justify-content: space-between; align-items: baseline; }
+.ctrl-label { font-size: 0.85rem; color: var(--label); font-weight: 600; }
+.ctrl-readout {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+}
+.ctrl-range { width: 100%; accent-color: var(--blue); height: calc(1.1rem * var(--stroke-scale)); cursor: pointer; }
+.ctrl-number { flex-direction: row; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.ctrl-numinput {
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 5.5rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+}
+.ctrl-toggle { flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer; }
+.ctrl-checkbox { width: 1.1rem; height: 1.1rem; accent-color: var(--blue); cursor: pointer; }
+.ctrl-toggle-label { font-size: 0.85rem; color: var(--label); font-weight: 600; }
+
+/* ---------------------------------------------------------------- chart --- */
+
+svg.finchart { display: block; width: 100%; height: auto; }
+svg.finchart .grid { stroke: var(--grid); stroke-width: 1; }
+svg.finchart .spine { stroke: var(--axis); stroke-width: calc(1.2px * var(--stroke-scale)); }
+svg.finchart .tick { fill: var(--label); font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-stack); }
+svg.finchart .tick-x { text-anchor: middle; }
+svg.finchart .tick-y { text-anchor: end; }
+svg.finchart .axis-title {
+  fill: var(--label);
+  font-size: calc(13px * var(--stroke-scale));
+  font-weight: 600;
+  text-anchor: middle;
+  font-family: var(--font-stack);
+}
+svg.finchart .series { stroke-width: calc(2px * var(--stroke-scale)); }
+svg.finchart .datalabel { font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-stack); }
+svg.finchart .marker { /* radius handled inline; scaled by --point-scale where used */ }
+
+/* hover tooltip (overlay layer, built by tools) */
+.chart-tooltip {
+  fill: var(--navy);
+  font-size: calc(11px * var(--stroke-scale));
+  font-family: var(--font-stack);
+}
+.chart-tooltip-bg { fill: #fff; stroke: var(--panel-border); }
+
+/* --------------------------------------------------------------- footer --- */
+
+.app-footer {
+  padding: 1rem 1.4rem;
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* --------------------------------------------------- landing (index) ------ */
+
+.landing { max-width: 980px; margin: 0 auto; padding: 1.75rem 1.4rem 3rem; }
+.landing .lead { color: var(--muted); font-size: 1.02rem; margin: 0 0 1.5rem; }
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.1rem;
+}
+.tool-card {
+  display: block;
+  background: var(--card-bg);
+  border: 1px solid var(--panel-border);
+  border-top: 4px solid var(--blue);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem 1.25rem;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.tool-card:hover { text-decoration: none; box-shadow: 0 6px 18px rgba(10, 35, 75, 0.12); transform: translateY(-2px); }
+.tool-card h3 { margin: 0 0 0.35rem; color: var(--navy); font-size: 1.1rem; }
+.tool-card p { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.9rem; }
+.tool-card .lecture-ref {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: rgba(201, 151, 0, 0.1);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* --------------------------------------------------- responsive stacking -- */
+
+@media (max-width: 900px) {
+  .tool-main { flex-direction: column; }
+  .controls-panel { flex: 1 1 auto; width: 100%; }
+  .chart-area { width: 100%; }
+}
