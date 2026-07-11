@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CAPM / SML &amp; Market Model · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <style>
+    /* tool-local: stacked two-section layout + variance-decomposition bar */
+    .tool-section { border-bottom: 1px solid var(--panel-border); }
+    .tool-section:last-of-type { border-bottom: none; }
+    .section-head {
+      padding: 1.1rem 1.4rem 0;
+      display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;
+    }
+    .section-head h2 {
+      margin: 0; color: var(--navy); font-size: 1.15rem; font-weight: 700;
+    }
+    .section-head .sec-ref {
+      font-size: 0.75rem; font-weight: 700; color: var(--gold);
+      background: rgba(201, 151, 0, 0.1); border-radius: 4px;
+      padding: 0.12rem 0.5rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .section-head p.sec-lead { margin: 0; color: var(--muted); font-size: 0.9rem; flex-basis: 100%; }
+
+    .vardecomp { display: flex; flex-direction: column; gap: 0.35rem; }
+    .vardecomp .vd-title {
+      font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .vd-bar {
+      display: flex; width: 100%; height: calc(1.7rem * var(--stroke-scale));
+      border-radius: 6px; overflow: hidden; border: 1px solid var(--panel-border);
+    }
+    .vd-seg {
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.8rem; font-weight: 700;
+      white-space: nowrap; overflow: hidden; min-width: 0;
+    }
+    .vd-seg.sys { background: var(--blue); }
+    .vd-seg.idio { background: var(--gold); }
+    .vd-legend { display: flex; gap: 1.2rem; font-size: 0.78rem; color: var(--label); flex-wrap: wrap; }
+    .vd-legend .sw { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+    .vd-legend .sw.sys { background: var(--blue); }
+    .vd-legend .sw.idio { background: var(--gold); }
+
+    .btn.resample { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .btn.resample:hover { background: #016198; }
+    .ctrl-select-wrap { display: flex; flex-direction: column; gap: 0.3rem; }
+    .ctrl-select-wrap select {
+      font-family: inherit; font-size: 0.9rem; padding: 0.3rem 0.4rem;
+      border: 1px solid var(--panel-border); border-radius: 6px; background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>CAPM / SML &amp; Market Model</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 4 · §2–3</p>
+    </div>
+    <div class="header-actions">
+      <button id="presenterBtn" class="btn" type="button" title="Toggle presenter mode (larger type for the projector)">Presenter</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============================ SML ============================ -->
+    <section class="tool-section" id="sml-section">
+      <div class="section-head">
+        <h2>Security Market Line &amp; Alpha</h2>
+        <span class="sec-ref">§2 · CAPM</span>
+        <p class="sec-lead">
+          The SML plots the CAPM-required return against market risk (β). An asset
+          off the line is mispriced; the vertical gap to the line is its alpha.
+        </p>
+      </div>
+      <div class="tool-main">
+        <aside class="controls-panel" id="sml-controls">
+          <h2>Market</h2>
+          <div class="group" id="sml-market-controls"></div>
+          <h2>Test asset</h2>
+          <div class="group" id="sml-asset-controls"></div>
+        </aside>
+        <div class="chart-area">
+          <div class="chart-box" id="sml-chart"></div>
+          <div class="readouts" id="sml-readouts"></div>
+          <div class="formula-strip"><div class="formula-row" id="sml-formula"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= MARKET MODEL ======================= -->
+    <section class="tool-section" id="mm-section">
+      <div class="section-head">
+        <h2>The Market Model (single-index regression)</h2>
+        <span class="sec-ref">§3 · Estimation</span>
+        <p class="sec-lead">
+          Simulate n months of excess returns from a known β, then estimate it by
+          OLS. Watch estimation noise shrink as the sample grows — hit Resample to
+          redraw.
+        </p>
+      </div>
+      <div class="tool-main">
+        <aside class="controls-panel" id="mm-controls">
+          <h2>Simulation</h2>
+          <div class="group" id="mm-sim-controls"></div>
+        </aside>
+        <div class="chart-area">
+          <div class="chart-box" id="mm-chart"></div>
+          <div class="readouts" id="mm-readouts"></div>
+          <div class="vardecomp">
+            <span class="vd-title">Variance decomposition (true parameters)</span>
+            <div class="vd-bar" id="mm-vdbar"></div>
+            <div class="vd-legend">
+              <span><span class="sw sys"></span>Systematic β²σ<tspan>M</tspan>²</span>
+              <span><span class="sw idio"></span>Idiosyncratic σ<tspan>e</tspan>²</span>
+            </div>
+          </div>
+          <div class="formula-strip">
+            <div class="formula-row" id="mm-formula-model"></div>
+            <div class="formula-row" id="mm-formula-r2"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span><a href="../../">&larr; All FIN 30600 tools</a></span>
+    <span>Static site — no tracking, no server.</span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
