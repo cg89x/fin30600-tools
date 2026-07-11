@@ -105,6 +105,8 @@ a:hover { text-decoration: underline; }
   gap: 1.25rem;
   padding: 1.25rem 1.4rem;
   align-items: flex-start;
+  max-width: 1500px;
+  margin: 0 auto;
 }
 
 .controls-panel {
@@ -223,7 +225,12 @@ mjx-assistive-mml {
 
 /* ---------------------------------------------------------------- chart --- */
 
-svg.finchart { display: block; width: 100%; height: auto; }
+svg/* Render at the chart's designed (attribute) size; shrink to fit narrow
+   containers but NEVER scale up — unbounded width:100% made charts (text
+   included) grow until they filled a wide screen. Presenter mode fills the
+   projector width. */
+.finchart { display: block; width: auto; max-width: 100%; height: auto; }
+html.presenter .finchart { width: 100%; }
 svg.finchart .grid { stroke: var(--grid); stroke-width: 1; }
 svg.finchart .spine { stroke: var(--axis); stroke-width: calc(1.2px * var(--stroke-scale)); }
 svg.finchart .tick { fill: var(--label); font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-stack); }

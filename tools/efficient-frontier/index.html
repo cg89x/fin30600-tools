@@ -52,7 +52,8 @@
       margin-top: 0.5rem;
     }
 
-    .weights-svg { display: block; width: 100%; height: auto; }
+    .weights-svg { display: block; width: auto; max-width: 100%; height: auto; }
+    html.presenter .weights-svg { width: 100%; }
     .weights-svg .w-name { fill: var(--label); font-size: 13px; font-family: var(--font-stack); }
     .weights-svg .w-val {
       fill: var(--navy); font-size: 12.5px; font-weight: 700;
