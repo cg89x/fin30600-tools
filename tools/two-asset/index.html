@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two-Asset Diversification · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Two-Asset Diversification Explorer</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 3 §4 · University of Notre Dame</p>
+    </div>
+    <div class="header-actions">
+      <button id="presenter-btn" class="btn" type="button" title="Toggle projector-sized presenter mode">Presenter</button>
+      <a class="btn" href="../../">All tools</a>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <aside class="controls-panel">
+      <h2>Controls</h2>
+
+      <div class="group">
+        <div class="group-title">Security A</div>
+        <div id="ctrl-muA"></div>
+        <div id="ctrl-sigA"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Security B</div>
+        <div id="ctrl-muB"></div>
+        <div id="ctrl-sigB"></div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Portfolio</div>
+        <div id="ctrl-rho"></div>
+        <div id="ctrl-wA"></div>
+        <div id="ctrl-shorts"></div>
+        <div id="ctrl-refs"></div>
+      </div>
+    </aside>
+
+    <div class="chart-area">
+      <div class="chart-box" id="chart-box"></div>
+
+      <div class="readouts">
+        <div class="readout"><div class="k">E[r<sub>P</sub>]</div><div class="v blue" id="out-er">—</div></div>
+        <div class="readout"><div class="k">&sigma;<sub>P</sub></div><div class="v blue" id="out-sd">—</div></div>
+        <div class="readout"><div class="k">Cov(A,&nbsp;B)</div><div class="v" id="out-cov">—</div></div>
+        <div class="readout"><div class="k">MVP weight w<sub>A</sub><sup>min</sup></div><div class="v gold" id="out-mvp">—</div></div>
+      </div>
+
+      <div class="formula-strip">
+        <div class="formula-row"><span id="f-r1-sym"></span></div>
+        <div class="formula-row"><span id="f-r1-num"></span></div>
+        <div class="formula-row" style="margin-top:0.6rem;"><span id="f-r2-sym"></span></div>
+        <div class="formula-row"><span id="f-r2-num"></span></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
