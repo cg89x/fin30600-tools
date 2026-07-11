@@ -88,9 +88,9 @@
           <div class="group" id="sml-asset-controls"></div>
         </aside>
         <div class="chart-area">
-          <div class="chart-box" id="sml-chart"></div>
-          <div class="readouts" id="sml-readouts"></div>
           <div class="formula-strip"><div class="formula-row" id="sml-formula"></div></div>
+          <div class="readouts" id="sml-readouts"></div>
+          <div class="chart-box" id="sml-chart"></div>
         </div>
       </div>
     </section>
@@ -112,7 +112,10 @@
           <div class="group" id="mm-sim-controls"></div>
         </aside>
         <div class="chart-area">
-          <div class="chart-box" id="mm-chart"></div>
+          <div class="formula-strip">
+            <div class="formula-row" id="mm-formula-model"></div>
+            <div class="formula-row" id="mm-formula-r2"></div>
+          </div>
           <div class="readouts" id="mm-readouts"></div>
           <div class="vardecomp">
             <span class="vd-title">Variance decomposition (true parameters)</span>
@@ -122,10 +125,7 @@
               <span><span class="sw idio"></span>Idiosyncratic σ<tspan>e</tspan>²</span>
             </div>
           </div>
-          <div class="formula-strip">
-            <div class="formula-row" id="mm-formula-model"></div>
-            <div class="formula-row" id="mm-formula-r2"></div>
-          </div>
+          <div class="chart-box" id="mm-chart"></div>
         </div>
       </div>
     </section>
