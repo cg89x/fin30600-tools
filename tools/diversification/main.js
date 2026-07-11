@@ -55,16 +55,36 @@ function model() {
   };
 }
 
-/** σ_P(N) samples for a case (sqrt of the variance function), N = 1..N_MAX. */
-function curve(varAt) {
-  return samples((n) => Math.sqrt(varAt(n)));
+/** σ_P(N) samples for a case (sqrt of the variance function), N = 1..nMax. */
+function curve(varAt, nMax) {
+  return samples((n) => Math.sqrt(varAt(n)), nMax);
 }
 
-/** Raw {x: n, y: f(n)} samples, N = 1..N_MAX. */
-function samples(f) {
+/** Raw {x: n, y: f(n)} samples, N = 1..nMax. */
+function samples(f, nMax) {
   const pts = [];
-  for (let n = 1; n <= N_MAX; n++) pts.push({ x: n, y: f(n) });
+  for (let n = 1; n <= nMax; n++) pts.push({ x: n, y: f(n) });
   return pts;
+}
+
+/**
+ * X-axis upper limit: scales with the current N (≈1.25·N of headroom),
+ * snapped up to a "nice" ceiling so ticks stay round.
+ */
+function xLimit(n) {
+  const raw = Math.max(10, 1.25 * n);
+  for (const c of [10, 15, 20, 25, 30, 40, 50, 60, 80, 100]) {
+    if (raw <= c) return c;
+  }
+  return 125; // N = 100 (slider max) with headroom
+}
+
+/** Round x ticks for a given upper limit; the left edge (N = 1) is marked. */
+function xTicksFor(xHi) {
+  const step = xHi <= 10 ? 2 : xHi <= 30 ? 5 : xHi <= 60 ? 10 : xHi <= 100 ? 20 : 25;
+  const ticks = [1];
+  for (let v = step; v <= xHi; v += step) if (v > 1) ticks.push(v);
+  return ticks;
 }
 
 /**
@@ -90,10 +110,7 @@ const mainChart = new Chart(mainHost, {
   xFmt: fixed(0),
   yFmt: fixed(1),
 });
-mainChart.setDomain(1, N_MAX, 0, 1.05).renderAxes({
-  xTicks: [1, 20, 40, 60, 80, 100],
-  yTicks: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
-});
+// domain + axes are (re)built in renderAll — the x limit follows N
 
 const insetChart = new Chart(insetHost, {
   width: 480,
@@ -104,34 +121,30 @@ const insetChart = new Chart(insetHost, {
   xFmt: fixed(0),
   yFmt: fixed(1),
 });
-insetChart.setDomain(1, N_MAX, 0, 1.05).renderAxes({
-  xTicks: [1, 25, 50, 75, 100],
-  yTicks: [0, 0.2, 0.4, 0.6, 0.8, 1.0],
-});
 
 /* --------------------------------------------------- draw the main chart -- */
-function drawMain(m) {
+function drawMain(m, xHi) {
   mainChart.clearData();
 
   // systematic floors (asymptotes), drawn under the curves
   if (m.c2 && m.rho > 0) {
     const floor = Math.sqrt(m.rho);
     mainChart.hline(floor, { stroke: 'var(--gold)', dash: '6 5', width: 1.4, opacity: 0.9 });
-    mainChart.text(N_MAX, floor, 'systematic risk √ρ', {
+    mainChart.text(xHi, floor, 'systematic risk √ρ', {
       dx: -4, dy: 14, anchor: 'end', fill: 'var(--gold)',
     });
   }
   if (m.c3 && m.beta > 0 && Math.abs(m.beta * m.beta - m.rho) > 5e-3) {
     mainChart.hline(m.beta, { stroke: 'var(--navy)', dash: '2 4', width: 1.3, opacity: 0.8 });
-    mainChart.text(N_MAX, m.beta, 'β', { dx: -4, dy: -6, anchor: 'end', fill: 'var(--navy)' });
+    mainChart.text(xHi, m.beta, 'β', { dx: -4, dy: -6, anchor: 'end', fill: 'var(--navy)' });
   }
 
   // the three curves (Case 3 dashed so a coinciding Case 2 stays visible);
   // widths are pre---stroke-scale: 3 renders as 4.5px at this tool's 1.5×
-  if (m.c1) mainChart.path(curve(ewVarUncorrelated), { stroke: 'var(--blue)', width: 3 });
-  if (m.c2) mainChart.path(curve((n) => ewVarCommonCorr(n, m.rho)), { stroke: 'var(--gold)', width: 3 });
+  if (m.c1) mainChart.path(curve(ewVarUncorrelated, xHi), { stroke: 'var(--blue)', width: 3 });
+  if (m.c2) mainChart.path(curve((n) => ewVarCommonCorr(n, m.rho), xHi), { stroke: 'var(--gold)', width: 3 });
   if (m.c3) {
-    mainChart.path(curve((n) => ewVarCommonCorr(n, m.beta * m.beta)), {
+    mainChart.path(curve((n) => ewVarCommonCorr(n, m.beta * m.beta), xHi), {
       stroke: 'var(--navy)', width: 2.6, dash: '7 5',
     });
   }
@@ -144,13 +157,13 @@ function drawMain(m) {
 }
 
 /* ------------------------------------- draw the variance-source inset ----- */
-function drawInset(m) {
+function drawInset(m, xHi) {
   insetChart.clearData();
 
   // VARIANCE units on this chart (not σ) — the two stacked terms sum to σ_P²
-  const sys = samples((n) => ((n - 1) / n) * m.rho);
-  const total = samples((n) => ewVarCommonCorr(n, m.rho));
-  const base = [{ x: 1, y: 0 }, { x: N_MAX, y: 0 }];
+  const sys = samples((n) => ((n - 1) / n) * m.rho, xHi);
+  const total = samples((n) => ewVarCommonCorr(n, m.rho), xHi);
+  const base = [{ x: 1, y: 0 }, { x: xHi, y: 0 }];
 
   // stacked variance components: covariance (systematic) term below,
   // 1/N variance term as the band on top; their sum is σ_P².
@@ -159,7 +172,7 @@ function drawInset(m) {
   insetChart.path(total, { stroke: 'var(--gold)', width: 3 });
   if (m.rho > 0) {
     insetChart.hline(m.rho, { stroke: 'var(--gold)', dash: '6 5', width: 1.2, opacity: 0.9 });
-    insetChart.text(N_MAX, m.rho, 'ρ', { dx: -4, dy: -5, anchor: 'end', fill: 'var(--gold)' });
+    insetChart.text(xHi, m.rho, 'ρ', { dx: -4, dy: -5, anchor: 'end', fill: 'var(--gold)' });
   }
   insetChart.vline(m.n, { stroke: 'var(--axis)', dash: '3 4', width: 1, opacity: 0.55 });
   insetChart.point(m.n, m.var2, { r: 4.5, fill: 'var(--gold)', stroke: '#fff' });
@@ -258,10 +271,19 @@ function drawFormulas(m) {
 }
 
 /* ---------------------------------------------------------- render cycle -- */
+let lastXHi = 0; // axes are rebuilt only when the x limit actually changes
 function renderAll() {
   const m = model();
-  drawMain(m);
-  drawInset(m);
+  const xHi = xLimit(m.n);
+  if (xHi !== lastXHi) {
+    const xTicks = xTicksFor(xHi);
+    const yTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+    mainChart.setDomain(1, xHi, 0, 1.05).renderAxes({ xTicks, yTicks });
+    insetChart.setDomain(1, xHi, 0, 1.05).renderAxes({ xTicks, yTicks });
+    lastXHi = xHi;
+  }
+  drawMain(m, xHi);
+  drawInset(m, xHi);
   drawVdBar(m);
   drawReadouts(m);
   drawFormulas(m);
