@@ -101,6 +101,11 @@
       </div>
 
       <div class="group">
+        <div class="group-title" data-label="Case 1 — uncorrelated"></div>
+        <div id="ctrl-c1"></div>
+      </div>
+
+      <div class="group">
         <div class="group-title" data-label="Case 2 — common correlation $\rho$"></div>
         <div id="ctrl-rho"></div>
         <div id="ctrl-c2"></div>
@@ -112,16 +117,12 @@
         <div id="ctrl-c3"></div>
         <p class="note" data-label="All assets share the same $\beta$; $\sigma_M^2 = 1$ and $\sigma_\varepsilon^2 = 1 - \beta^2$ keep $\mathrm{Var}(R_i) = 1$, so $\mathrm{Cov}(R_i,R_j) = \beta^2$."></p>
       </div>
-
-      <div class="group">
-        <div class="group-title" data-label="Case 1 — uncorrelated"></div>
-        <div id="ctrl-c1"></div>
-      </div>
     </section>
 
     <section class="chart-area">
       <div class="formula-strip" id="formula-strip">
         <div class="formula-row" id="f-general"></div>
+        <div class="formula-row" id="f-case1"></div>
         <div class="formula-row" id="f-case2"></div>
         <div class="formula-row" id="f-case3"></div>
         <p class="coincide-flag" id="coincide-flag"></p>

@@ -127,11 +127,11 @@ function drawMain(m) {
   }
 
   // the three curves (Case 3 dashed so a coinciding Case 2 stays visible)
-  if (m.c1) mainChart.path(curve(ewVarUncorrelated), { stroke: 'var(--blue)', width: 2.5 });
-  if (m.c2) mainChart.path(curve((n) => ewVarCommonCorr(n, m.rho)), { stroke: 'var(--gold)', width: 2.5 });
+  if (m.c1) mainChart.path(curve(ewVarUncorrelated), { stroke: 'var(--blue)', width: 3.75 });
+  if (m.c2) mainChart.path(curve((n) => ewVarCommonCorr(n, m.rho)), { stroke: 'var(--gold)', width: 3.75 });
   if (m.c3) {
     mainChart.path(curve((n) => ewVarCommonCorr(n, m.beta * m.beta)), {
-      stroke: 'var(--navy)', width: 2.2, dash: '7 5',
+      stroke: 'var(--navy)', width: 3.3, dash: '7 5',
     });
   }
 
@@ -155,7 +155,7 @@ function drawInset(m) {
   // 1/N variance term as the band on top; their sum is σ_P².
   area(insetChart, sys, base, 'var(--gold)', 0.45);
   area(insetChart, total, sys, 'var(--blue)', 0.35);
-  insetChart.path(total, { stroke: 'var(--gold)', width: 2 });
+  insetChart.path(total, { stroke: 'var(--gold)', width: 3 });
   if (m.rho > 0) {
     insetChart.hline(m.rho, { stroke: 'var(--gold)', dash: '6 5', width: 1.2, opacity: 0.9 });
     insetChart.text(N_MAX, m.rho, 'ρ', { dx: -4, dy: -5, anchor: 'end', fill: 'var(--gold)' });
@@ -227,6 +227,11 @@ function drawFormulas(m) {
     `\\sigma_P^2 \\;=\\; ${BLUE}{\\sum_{i=1}^{N} w_i^2\\,\\mathrm{Var}(R_i)}` +
     ` \\;+\\; ${GOLD}{\\sum_{i=1}^{N}\\sum_{j \\neq i} w_i w_j\\,\\mathrm{Cov}(R_i,R_j)}` +
     `\\qquad w_i = \\tfrac{1}{N},\\; \\mathrm{Var}(R_i) = 1`,
+  );
+  renderTeX(
+    /** @type {HTMLElement} */ (document.getElementById('f-case1')),
+    `\\textbf{Case 1:}\\;\\; \\sigma_P^2 = ${BLUE}{\\tfrac{1}{N}}` +
+    ` = ${BLUE}{${m.var1.toFixed(4)}} \\;\\Rightarrow\\; \\sigma_P = \\mathbf{${Math.sqrt(m.var1).toFixed(4)}}`,
   );
   renderTeX(
     /** @type {HTMLElement} */ (document.getElementById('f-case2')),
