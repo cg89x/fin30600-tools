@@ -22,23 +22,13 @@
   --card-bg:  #ffffff;
   --page-bg:  #ffffff;
 
-  /* Metrics (presenter mode scales these) */
+  /* Metrics */
   --font-base: 16px;
   --stroke-scale: 1;
   --point-scale: 1;
   --panel-width: 300px;
 
   --font-stack: 'Linux Biolinum O', Arial, Helvetica, sans-serif;
-}
-
-/* Presenter mode: scale type, strokes, and point radii ~1.4x for the
-   DeBartolo Hall projector. Toggled by a button or ?present=1 (adds the class
-   to <html>). */
-html.presenter {
-  --font-base: 22px;
-  --stroke-scale: 1.4;
-  --point-scale: 1.4;
-  --panel-width: 340px;
 }
 
 * { box-sizing: border-box; }
@@ -225,12 +215,10 @@ mjx-assistive-mml {
 
 /* ---------------------------------------------------------------- chart --- */
 
-svg/* Render at the chart's designed (attribute) size; shrink to fit narrow
+/* Render at the chart's designed (attribute) size; shrink to fit narrow
    containers but NEVER scale up — unbounded width:100% made charts (text
-   included) grow until they filled a wide screen. Presenter mode fills the
-   projector width. */
-.finchart { display: block; width: auto; max-width: 100%; height: auto; }
-html.presenter .finchart { width: 100%; }
+   included) grow until they filled a wide screen. */
+svg.finchart { display: block; width: auto; max-width: 100%; height: auto; }
 svg.finchart .grid { stroke: var(--grid); stroke-width: 1; }
 svg.finchart .spine { stroke: var(--axis); stroke-width: calc(1.2px * var(--stroke-scale)); }
 svg.finchart .tick { fill: var(--label); font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-stack); }

@@ -8,12 +8,8 @@
  * long-only random portfolios fills the feasible region. All finance math is
  * in ../../lib/finmath.js; rendering is in ./view.js.
  *
- * Default asset set = the five Jorion (1989) asset classes used in the deck's
- * `l3_jorion_*` figures (means/σ digitized in Lecture 3/code/make_l3_figures.py,
- * `JORION` dict; original: Jorion, "Asset Allocation with Hedged and Unhedged
- * Foreign Stocks and Bonds", J. Portfolio Management 16, 1989). The pairwise
- * correlation matrix is a plausible illustrative one (the deck stored only
- * means/σ, not correlations) — verified positive definite.
+ * Default asset set = five broad asset classes with plausible long-run
+ * moments and Sharpe ratios (see DEFAULT_ASSETS below).
  *
  * Performance contract (DESIGN): the random cloud is recomputed only when
  * assets / correlations / seed change, never on an r_f drag.
@@ -27,7 +23,7 @@ import {
   mulberry32, dirichlet,
 } from '../../lib/finmath.js';
 import { Chart, pct } from '../../lib/chart.js';
-import { slider, numberInput } from '../../lib/ui.js';
+import { slider, numberInput, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 import {
   renderBase, renderOverlay, renderReadouts, renderFormula,
@@ -37,22 +33,27 @@ import {
 /* --------------------------------------------------------- defaults ------- */
 
 const N = 5;
-/** @type {{name:string,er:number,sd:number}[]} Jorion (1989) asset classes. */
+/**
+ * @type {{name:string,er:number,sd:number}[]} Broad asset classes with
+ * REASONABLE long-run Sharpe ratios (all < 1 at r_f = 3%: stocks ≈ 0.3–0.4,
+ * bonds ≈ 0.3). Correlations verified positive definite (min eigenvalue 0.18);
+ * tangency Sharpe ≈ 0.47 (numpy cross-check 2026-07-10).
+ */
 const DEFAULT_ASSETS = [
-  { name: 'U.S. T-Bills', er: 0.039, sd: 0.033 },
-  { name: 'U.S. Bonds', er: 0.097, sd: 0.112 },
-  { name: 'Foreign Bonds', er: 0.126, sd: 0.138 },
-  { name: 'U.S. Stocks', er: 0.158, sd: 0.166 },
-  { name: 'Foreign Stocks', er: 0.229, sd: 0.173 },
+  { name: 'U.S. Stocks', er: 0.090, sd: 0.160 },
+  { name: 'Intl Stocks', er: 0.085, sd: 0.170 },
+  { name: 'EM Stocks', er: 0.100, sd: 0.220 },
+  { name: 'U.S. Bonds', er: 0.045, sd: 0.050 },
+  { name: 'Real Estate', er: 0.080, sd: 0.180 },
 ];
 const DEFAULT_CORR = [
-  [1.00, 0.30, 0.10, 0.05, 0.00],
-  [0.30, 1.00, 0.55, 0.25, 0.15],
-  [0.10, 0.55, 1.00, 0.20, 0.35],
-  [0.05, 0.25, 0.20, 1.00, 0.60],
-  [0.00, 0.15, 0.35, 0.60, 1.00],
+  [1.00, 0.80, 0.70, 0.10, 0.70],
+  [0.80, 1.00, 0.75, 0.10, 0.60],
+  [0.70, 0.75, 1.00, 0.05, 0.55],
+  [0.10, 0.10, 0.05, 1.00, 0.20],
+  [0.70, 0.60, 0.55, 0.20, 1.00],
 ];
-const DEFAULT_RF = 0.0375; // deck RF_J ≈ 3.7%, snapped to the 0.25pp grid
+const DEFAULT_RF = 0.03;
 const DEFAULT_SEED = 12345;
 const CLOUD_N = 2000;
 
@@ -141,11 +142,8 @@ function attachTangency(model, rf) {
 function main() {
   const defaults = buildDefaults();
 
-  // Presenter mode: ?present=1 or the toggle button (adds html.presenter).
   const params = new URLSearchParams(location.search);
-  if (params.get('present') === '1') document.documentElement.classList.add('presenter');
-  const presentBtn = /** @type {HTMLButtonElement} */ (document.getElementById('present-btn'));
-  const pointScale = () => (document.documentElement.classList.contains('presenter') ? 1.4 : 1);
+  const pointScale = () => 1; // point-radius scale factor (fixed)
 
   // Chart.
   const chartHost = /** @type {HTMLElement} */ (document.getElementById('chart'));
@@ -223,7 +221,7 @@ function main() {
 
   // r_f slider — light re-render only.
   const rfSlider = slider({
-    label: 'Risk-free rate  r_f', min: 0, max: 0.08, step: 0.0025,
+    label: 'Risk-free rate $r_f$', min: 0, max: 0.08, step: 0.0025,
     value: Number(store.get('rf')), fmt: (v) => `${(v * 100).toFixed(2).replace(/\.?0+$/, '')}%`,
     onChange: (v) => { store.set('rf', v); recomputeRf(); },
   });
@@ -245,14 +243,6 @@ function main() {
   buildAssetTable(store, recomputeAll);
   buildCorrEditor(store, corrGrid, recomputeAll);
 
-  // Presenter toggle re-renders (radii / strokes scale).
-  presentBtn.classList.toggle('active', document.documentElement.classList.contains('presenter'));
-  presentBtn.addEventListener('click', () => {
-    const on = document.documentElement.classList.toggle('presenter');
-    presentBtn.classList.toggle('active', on);
-    recomputeAll();
-  });
-
   // Reset button.
   const resetBtn = document.getElementById('reset-btn');
   if (resetBtn) {
@@ -262,6 +252,7 @@ function main() {
     });
   }
 
+  hydrateLabels(); // typeset static data-label readout keys / group titles
   recomputeAll();
 }
 

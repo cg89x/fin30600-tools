@@ -15,7 +15,7 @@ import {
   covFromCorr, twoAssetMean, twoAssetStd, twoAssetVar, mvpWeightTwoAsset,
 } from '../../lib/finmath.js';
 import { Chart, pct } from '../../lib/chart.js';
-import { slider, numberInput, toggle, renderTeX } from '../../lib/ui.js';
+import { slider, numberInput, toggle, renderTeX, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
 /* ------------------------------------------------------------------ state -- */
@@ -64,8 +64,7 @@ const chart = new Chart(chartBox, {
   xFmt: pct, yFmt: pct,
 });
 
-/** Presenter scaling factor for point radii (font/strokes come from CSS vars). */
-const scale = () => (document.documentElement.classList.contains('presenter') ? 1.4 : 1);
+const scale = () => 1; // point-radius scale factor (fixed)
 
 /**
  * Domain depends only on the asset inputs and the short-sales range — NOT on ρ
@@ -178,19 +177,19 @@ function fullRender() {
 }
 
 /* ------------------------------------------------------------- controls --- */
-const muA = numberInput({ label: 'E[r] (%)', value: S.muA, step: 0.5,
+const muA = numberInput({ label: '$E[r]$ (%)', value: S.muA, step: 0.5,
   onChange: (v) => { store.set('muA', v); fullRender(); } });
-const sigA = numberInput({ label: 'σ (%)', value: S.sigA, min: 0, step: 0.5,
+const sigA = numberInput({ label: '$\\sigma$ (%)', value: S.sigA, min: 0, step: 0.5,
   onChange: (v) => { store.set('sigA', v); fullRender(); } });
-const muB = numberInput({ label: 'E[r] (%)', value: S.muB, step: 0.5,
+const muB = numberInput({ label: '$E[r]$ (%)', value: S.muB, step: 0.5,
   onChange: (v) => { store.set('muB', v); fullRender(); } });
-const sigB = numberInput({ label: 'σ (%)', value: S.sigB, min: 0, step: 0.5,
+const sigB = numberInput({ label: '$\\sigma$ (%)', value: S.sigB, min: 0, step: 0.5,
   onChange: (v) => { store.set('sigB', v); fullRender(); } });
 
-const rho = slider({ label: 'Correlation ρ', min: -1, max: 1, step: 0.05, value: S.rho,
+const rho = slider({ label: 'Correlation $\\rho$', min: -1, max: 1, step: 0.05, value: S.rho,
   fmt: (v) => v.toFixed(2), onChange: (v) => { store.set('rho', v); drawData(); } });
 
-const wA = slider({ label: 'Weight in A  (w_A)', min: -0.5, max: 1.5, step: 0.01, value: S.wA,
+const wA = slider({ label: 'Weight in A ($w_A$)', min: -0.5, max: 1.5, step: 0.01, value: S.wA,
   fmt: (v) => v.toFixed(2), onChange: (v) => { store.set('wA', v); drawData(); } });
 
 const shorts = toggle({ label: 'Allow short sales', value: S.shorts,
@@ -200,7 +199,7 @@ const shorts = toggle({ label: 'Allow short sales', value: S.shorts,
     fullRender();
   } });
 
-const refs = toggle({ label: 'Show ρ = +1, 0, −1 reference curves', value: S.refs,
+const refs = toggle({ label: 'Show $\\rho = +1, 0, -1$ reference curves', value: S.refs,
   onChange: (v) => { store.set('refs', v); drawData(); } });
 
 /** Limit the w_A slider to [0,1] when short sales are off, clamping the value. */
@@ -222,17 +221,9 @@ document.getElementById('ctrl-wA').appendChild(wA);
 document.getElementById('ctrl-shorts').appendChild(shorts);
 document.getElementById('ctrl-refs').appendChild(refs);
 
-/* ------------------------------------------------------------- presenter -- */
-const presenterBtn = /** @type {HTMLButtonElement} */ (document.getElementById('presenter-btn'));
-function setPresenter(on) {
-  document.documentElement.classList.toggle('presenter', on);
-  presenterBtn.classList.toggle('active', on);
-  fullRender(); // re-scale point radii
-}
-presenterBtn.addEventListener('click', () => setPresenter(!document.documentElement.classList.contains('presenter')));
-if (new URLSearchParams(location.search).get('present') === '1') setPresenter(true);
 
 /* ------------------------------------------------------------------- init -- */
+hydrateLabels(); // typeset static data-label readout keys
 applyShortRange(); // sync slider bounds to the loaded short-sales state
 fullRender();
 // (MathJax load-order is handled inside renderTeX: pre-load calls are queued

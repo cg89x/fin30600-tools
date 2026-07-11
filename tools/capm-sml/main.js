@@ -2,7 +2,8 @@
 /**
  * CAPM / SML + Market Model explorer (FIN 30600, Lecture 4 §2–3).
  *
- * Two stacked sections, each controls-left / chart-right:
+ * Two side-by-side sections (stacking on narrow screens), each
+ * controls-left / chart-right:
  *   1. Security Market Line + alpha (deck §2, the "CAPM implications" example).
  *   2. Market-model single-index regression: simulate n monthly excess returns
  *      from a known beta, estimate by OLS, decompose variance (deck §3).
@@ -22,7 +23,7 @@
 
 import { capmReturn, alpha as capmAlpha, ols, mulberry32, randn } from '../../lib/finmath.js';
 import { Chart, pct, fixed } from '../../lib/chart.js';
-import { slider, numberInput, renderTeX } from '../../lib/ui.js';
+import { slider, numberInput, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
 /* ---- Fixed, documented market-model parameters (monthly) ------------------
@@ -51,34 +52,22 @@ const DEFAULTS = {
 const store = bindState(DEFAULTS);
 const S = store.state;
 
-/* ---- presenter mode (?present=1 or the button) ---------------------------- */
-function applyPresent(on) {
-  document.documentElement.classList.toggle('presenter', on);
-  const q = new URLSearchParams(location.search);
-  if (on) q.set('present', '1'); else q.delete('present');
-  const search = q.toString();
-  history.replaceState(null, '', `${location.pathname}${search ? '?' + search : ''}${location.hash}`);
-}
-const presentBtn = /** @type {HTMLButtonElement} */ (document.getElementById('presenterBtn'));
-let presentOn = new URLSearchParams(location.search).get('present') === '1';
-applyPresent(presentOn);
-presentBtn.classList.toggle('active', presentOn);
-presentBtn.addEventListener('click', () => {
-  presentOn = !presentOn;
-  applyPresent(presentOn);
-  presentBtn.classList.toggle('active', presentOn);
-  renderSML();
-  renderMM();
-});
-
 /* ---- formatting helpers --------------------------------------------------- */
 const pStr = (dec, d = 1) => `${(dec * 100).toFixed(d)}%`;       // decimal → "3.5%"
 const pTeX = (dec, d = 1) => `${(dec * 100).toFixed(d)}\\%`;     // TeX-safe: % must be escaped in KaTeX
-const pointScale = () =>
-  Number(getComputedStyle(document.documentElement).getPropertyValue('--point-scale')) || 1;
+const pointScale = () => 1; // point-radius scale factor (fixed)
 
 function readout(k, v, cls = '') {
-  return `<div class="readout"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  const cell = document.createElement('div');
+  cell.className = 'readout';
+  const key = document.createElement('div');
+  key.className = 'k';
+  renderLabel(key, k);
+  const val = document.createElement('div');
+  val.className = `v ${cls}`;
+  val.innerHTML = v;
+  cell.append(key, val);
+  return cell;
 }
 
 /* ==========================================================================
@@ -86,6 +75,7 @@ function readout(k, v, cls = '') {
  * ======================================================================== */
 
 const smlChart = new Chart(document.getElementById('sml-chart'), {
+  width: 460, height: 400,
   xLabel: 'Beta (β)', yLabel: 'Expected Return',
   xFmt: fixed(1), yFmt: pct,
 });
@@ -93,21 +83,21 @@ const BETA_LO = -0.5, BETA_HI = 2.5;
 
 // Controls
 const cRf = slider({
-  label: 'Risk-free rate  r_f', min: 0, max: 8, step: 0.1, value: S.rf,
+  label: 'Risk-free rate $r_f$', min: 0, max: 8, step: 0.1, value: S.rf,
   fmt: (v) => `${v.toFixed(1)}%`, onChange: (v) => { store.set('rf', v); renderSML(); },
 });
 const cRm = slider({
-  label: 'Market return  E[r_M]', min: 4, max: 14, step: 0.1, value: S.rm,
+  label: 'Market return $E[r_M]$', min: 4, max: 14, step: 0.1, value: S.rm,
   fmt: (v) => `${v.toFixed(1)}%`, onChange: (v) => { store.set('rm', v); renderSML(); },
 });
 document.getElementById('sml-market-controls').append(cRf, cRm);
 
 const cBeta = slider({
-  label: 'Test-asset beta  β_i', min: BETA_LO, max: BETA_HI, step: 0.05, value: S.beta,
+  label: 'Test-asset beta $\\beta_i$', min: BETA_LO, max: BETA_HI, step: 0.05, value: S.beta,
   fmt: (v) => v.toFixed(2), onChange: (v) => { store.set('beta', v); renderSML(); },
 });
 const cEr = numberInput({
-  label: 'Test-asset E[r_i] (%)', min: -10, max: 40, step: 0.1, value: S.er,
+  label: 'Test-asset $E[r_i]$ (%)', min: -10, max: 40, step: 0.1, value: S.er,
   onChange: (v) => { store.set('er', v); renderSML(); },
 });
 document.getElementById('sml-asset-controls').append(cBeta, cEr);
@@ -159,12 +149,12 @@ function renderSML() {
   smlChart.text(beta, er, 'i', { dx: 9, dy: overpricedDy(a), fill: 'var(--navy)' });
 
   // readouts
-  document.getElementById('sml-readouts').innerHTML =
-    readout('CAPM-required E[r]', pStr(req), 'blue') +
-    readout('Actual E[r]', pStr(er)) +
-    readout('Alpha (α)', (a >= 0 ? '+' : '') + pStr(a),
-      Math.abs(a) < eps ? '' : (a < 0 ? '' : 'blue')) +
-    readout('Verdict', mispricingVerdict(a, eps));
+  document.getElementById('sml-readouts').replaceChildren(
+    readout('CAPM-required $E[r_i]$', pStr(req), 'blue'),
+    readout('Actual $E[r_i]$', pStr(er)),
+    readout('Alpha ($\\alpha_i$)', (a >= 0 ? '+' : '') + pStr(a),
+      Math.abs(a) < eps ? '' : (a < 0 ? '' : 'blue')),
+    readout('Verdict', mispricingVerdict(a, eps)));
 
   // KaTeX strip with live numbers
   const tex =
@@ -186,16 +176,17 @@ function mispricingVerdict(a, eps) {
  * ======================================================================== */
 
 const mmChart = new Chart(document.getElementById('mm-chart'), {
+  width: 460, height: 400,
   xLabel: 'Market excess return', yLabel: 'Asset excess return',
   xFmt: pct, yFmt: pct,
 });
 
 const cTbeta = slider({
-  label: 'True beta  β', min: BETA_LO, max: BETA_HI, step: 0.05, value: S.tbeta,
+  label: 'True beta $\\beta$', min: BETA_LO, max: BETA_HI, step: 0.05, value: S.tbeta,
   fmt: (v) => v.toFixed(2), onChange: (v) => { store.set('tbeta', v); renderMM(); },
 });
 const cSigmae = slider({
-  label: 'Idiosyncratic σ_e (per mo.)', min: 0, max: 10, step: 0.1, value: S.sigmae,
+  label: 'Idiosyncratic $\\sigma_e$ (per mo.)', min: 0, max: 10, step: 0.1, value: S.sigmae,
   fmt: (v) => `${v.toFixed(1)}%`, onChange: (v) => { store.set('sigmae', v); renderMM(); },
 });
 document.getElementById('mm-sim-controls').append(cTbeta, cSigmae);
@@ -269,11 +260,11 @@ function renderMM() {
   mmChart.text(xLo, tbeta * xLo, `true β=${tbeta.toFixed(2)}`, { dx: 4, dy: 14, anchor: 'start', fill: 'var(--gold)' });
 
   // readouts: β̂ (±SE), α̂ (±SE), R²
-  document.getElementById('mm-readouts').innerHTML =
-    readout('β̂ (± SE)', `${fit.slope.toFixed(3)} <small>± ${fit.seSlope.toFixed(3)}</small>`, 'blue') +
-    readout('α̂ (± SE)', `${pStr(fit.intercept, 2)} <small>± ${pStr(fit.seIntercept, 2)}</small>`, 'gold') +
-    readout('R²', fit.r2.toFixed(3)) +
-    readout('n', String(n));
+  document.getElementById('mm-readouts').replaceChildren(
+    readout('$\\hat{\\beta}$ (± SE)', `${fit.slope.toFixed(3)} <small>± ${fit.seSlope.toFixed(3)}</small>`, 'blue'),
+    readout('$\\hat{\\alpha}$ (± SE)', `${pStr(fit.intercept, 2)} <small>± ${pStr(fit.seIntercept, 2)}</small>`, 'gold'),
+    readout('$R^2$', fit.r2.toFixed(3)),
+    readout('$n$', String(n)));
 
   // variance decomposition — uses the TRUE parameters (the population split the
   // regression is trying to recover), not the noisy sample estimates.
@@ -304,6 +295,8 @@ function extent(arr) {
   for (const v of arr) { if (v < lo) lo = v; if (v > hi) hi = v; }
   return { lo, hi };
 }
+
+hydrateLabels(); // typeset data-label spans (variance-bar legend)
 
 /* ---- initial render (MathJax load-order handled inside renderTeX) --------- */
 renderSML();

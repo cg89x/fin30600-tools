@@ -16,7 +16,7 @@
 
 import { Chart, pct, fixed } from '../../lib/chart.js';
 import { sharpe, utility, optimalY, completeReturn, completeStd } from '../../lib/finmath.js';
-import { slider, numberInput, toggle, renderTeX } from '../../lib/ui.js';
+import { slider, numberInput, toggle, renderTeX, renderLabel } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
 /* ----------------------------------------------------------------- state -- */
@@ -35,34 +35,7 @@ const defaults = {
 const store = bindState(defaults, () => {}, { debounce: 150 });
 const S = store.state;
 
-/* ------------------------------------------------------------- presenter -- */
-(function initPresenter() {
-  const params = new URLSearchParams(location.search);
-  if (params.get('present') === '1') document.documentElement.classList.add('presenter');
-  const btn = /** @type {HTMLButtonElement} */ (document.getElementById('present-btn'));
-  const sync = () => {
-    const on = document.documentElement.classList.contains('presenter');
-    btn.classList.toggle('active', on);
-    btn.textContent = on ? 'Exit presenter' : 'Presenter mode';
-  };
-  btn.addEventListener('click', () => {
-    const on = document.documentElement.classList.toggle('presenter');
-    const p = new URLSearchParams(location.search);
-    if (on) p.set('present', '1'); else p.delete('present');
-    const q = p.toString();
-    history.replaceState(null, '', `${location.pathname}${q ? '?' + q : ''}${location.hash}`);
-    sync();
-    // re-render: presenter mode changes stroke/point scale via CSS only, but
-    // point radii are set inline, so redraw to pick up the new scale.
-    renderAll(true);
-  });
-  sync();
-})();
-
-/** Current presenter scale for inline point radii / label offsets. */
-function pscale() {
-  return document.documentElement.classList.contains('presenter') ? 1.4 : 1;
-}
+const pscale = () => 1; // point-radius scale factor (fixed)
 
 /* --------------------------------------------------------------- helpers -- */
 const dec = (p) => p / 100;                 // percent -> decimal
@@ -122,7 +95,7 @@ const insetChart = new Chart(insetHost, {
   width: 480,
   height: 320,
   margin: { top: 14, right: 20, bottom: 44, left: 60 },
-  xLabel: 'y (fraction in risky portfolio)',
+  xLabel: 'w (fraction in risky portfolio)',
   yLabel: 'Utility',
   xFmt: fixed(1),
   yFmt: pct,
@@ -196,7 +169,7 @@ function drawMain(m, dom) {
     stroke: 'var(--gold)', width: 1.8, dash: '5 4', opacity: 0.6,
   });
   mainChart.point(optS, optE, { r: 7 * ps, shape: 'star', fill: 'var(--gold)' });
-  mainChart.text(optS, optE, `y* = ${opt.y.toFixed(3)}`, {
+  mainChart.text(optS, optE, `w* = ${opt.y.toFixed(3)}`, {
     dx: 9, dy: -8, fill: 'var(--gold)',
   });
 
@@ -245,19 +218,25 @@ function drawReadouts(m) {
   const uOpt = utility(optE, optS, m.A);
 
   const rows = [
-    ['Sharpe of P', m.S_P.toFixed(4), 'blue'],
-    ['y* (optimal)', opt.y.toFixed(4) + (opt.pinned ? ' (kink)' : ''), 'gold'],
-    ['E[r_C] (current)', fpct1(cE), 'blue'],
-    ['σ_C (current)', fpct1(cS), 'blue'],
-    ['U (current)', uCur.toFixed(4), ''],
-    ['U (at y*)', uOpt.toFixed(4), 'gold'],
+    ['Sharpe of $P$', m.S_P.toFixed(4), 'blue'],
+    ['$w^*$ (optimal)', opt.y.toFixed(4) + (opt.pinned ? ' (kink)' : ''), 'gold'],
+    ['$E[r_C]$ (current)', fpct1(cE), 'blue'],
+    ['$\\sigma_C$ (current)', fpct1(cS), 'blue'],
+    ['$U$ (current)', uCur.toFixed(4), ''],
+    ['$U$ (at $w^*$)', uOpt.toFixed(4), 'gold'],
   ];
   const host = /** @type {HTMLElement} */ (document.getElementById('readouts'));
   host.innerHTML = '';
   for (const [k, v, cls] of rows) {
     const cell = document.createElement('div');
     cell.className = 'readout';
-    cell.innerHTML = `<div class="k">${k}</div><div class="v ${cls}">${v}</div>`;
+    const key = document.createElement('div');
+    key.className = 'k';
+    renderLabel(key, k);
+    const val = document.createElement('div');
+    val.className = `v ${cls}`;
+    val.textContent = v;
+    cell.append(key, val);
     host.appendChild(cell);
   }
 
@@ -279,13 +258,13 @@ function drawFormulas(m) {
   const denom = m.A * m.sp * m.sp;
   const yLend = optimalY(m.erp, m.rf, m.sp, m.A);
   let tail = `= \\frac{${m.erp.toFixed(4)} - ${m.rf.toFixed(4)}}{(${m.A})(${m.sp.toFixed(4)})^2} = \\mathbf{${yLend.toFixed(4)}}`;
-  if (opt.pinned) tail += `\\;\\Rightarrow\\; \\text{pinned at the kink } y^* = 1`;
+  if (opt.pinned) tail += `\\;\\Rightarrow\\; \\text{pinned at the kink } w^* = 1`;
   else if (m.borrow && Math.abs(opt.y - yLend) > 1e-9) {
-    tail += `\\;\\Rightarrow\\; \\text{(borrowing) } y^* = ${opt.y.toFixed(4)}`;
+    tail += `\\;\\Rightarrow\\; \\text{(borrowing) } w^* = ${opt.y.toFixed(4)}`;
   }
   renderTeX(
     /** @type {HTMLElement} */ (document.getElementById('f-ystar')),
-    `y^* = \\frac{E[r_p] - r_f}{A\\,\\sigma_p^2} ${tail}`,
+    `w^* = \\frac{E[r_p] - r_f}{A\\,\\sigma_p^2} ${tail}`,
   );
 }
 
@@ -322,33 +301,33 @@ function renderAll(rebuildAxes = false) {
 const rbWrap = /** @type {HTMLElement} */ (document.getElementById('rb-wrap'));
 
 const rfCtrl = numberInput({
-  label: 'r_f (%)', value: S.rf, min: 0, max: 20, step: 0.5,
+  label: '$r_f$ (%)', value: S.rf, min: 0, max: 20, step: 0.5,
   onChange: (v) => { store.set('rf', v); renderAll(); },
 });
 const erpCtrl = numberInput({
-  label: 'E[r_p] (%)', value: S.erp, min: 0, max: 40, step: 0.5,
+  label: '$E[r_p]$ (%)', value: S.erp, min: 0, max: 40, step: 0.5,
   onChange: (v) => { store.set('erp', v); renderAll(); },
 });
 const spCtrl = numberInput({
-  label: 'σ_p (%)', value: S.sp, min: 1, max: 60, step: 0.5,
+  label: '$\\sigma_p$ (%)', value: S.sp, min: 1, max: 60, step: 0.5,
   onChange: (v) => { store.set('sp', v); renderAll(); },
 });
 const aCtrl = slider({
-  label: 'Risk aversion A', min: 1, max: 10, step: 0.5, value: S.A,
+  label: 'Risk aversion $A$', min: 1, max: 10, step: 0.5, value: S.A,
   fmt: (v) => v.toFixed(1),
   onChange: (v) => { store.set('A', v); renderAll(); },
 });
 const yCtrl = slider({
-  label: 'Allocation y (risky share)', min: 0, max: 2, step: 0.01, value: S.y,
+  label: 'Allocation $w$ (risky share)', min: 0, max: 2, step: 0.01, value: S.y,
   fmt: (v) => v.toFixed(2),
   onChange: (v) => { store.set('y', v); renderAll(); },
 });
 const rbCtrl = numberInput({
-  label: 'r_B (%)', value: S.rB, min: 0, max: 25, step: 0.5,
+  label: '$r_B$ (%)', value: S.rB, min: 0, max: 25, step: 0.5,
   onChange: (v) => { store.set('rB', v); renderAll(); },
 });
 const borrowCtrl = toggle({
-  label: 'Borrowing rate > r_f', value: S.borrow,
+  label: 'Borrowing rate $> r_f$', value: S.borrow,
   onChange: (v) => {
     store.set('borrow', v);
     rbWrap.classList.toggle('on', v);

@@ -10,7 +10,7 @@
  * @module efficient-frontier/view
  */
 
-import { pct } from '../../lib/chart.js';
+import { pct, svgMathText } from '../../lib/chart.js';
 import { renderTeX } from '../../lib/ui.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
@@ -39,7 +39,7 @@ function pctSigned(v) {
  * assets / correlations / seed change (NOT on an rf drag).
  * @param {import('../../lib/chart.js').Chart} chart
  * @param {object} m computed model
- * @param {number} pointScale presenter-mode radius multiplier
+ * @param {number} pointScale point-radius multiplier
  */
 export function renderBase(chart, m, pointScale) {
   chart.clearData();
@@ -130,7 +130,7 @@ export function renderOverlay(chart, m, pointScale, prevNodes) {
   const rfLbl = el('text', {
     x: chart.sx(0) + 6, y: chart.sy(m.rf) - 6, fill: 'var(--navy)', class: 'datalabel',
   });
-  rfLbl.textContent = `r_f = ${(m.rf * 100).toFixed(2).replace(/\.?0+$/, '')}%`;
+  svgMathText(rfLbl, `r_f = ${(m.rf * 100).toFixed(2).replace(/\.?0+$/, '')}%`);
   chart.overlayGroup.appendChild(rfLbl);
   nodes.push(rfLbl);
 
@@ -220,18 +220,18 @@ export function makeHoverTip(chart, getNames) {
 export function renderWeights(host, names, weights, pointScale) {
   host.replaceChildren();
   const n = names.length;
-  const rowH = 30 * pointScale;
-  const padTop = 10;
-  const padBot = 10;
-  const W = 640;
+  const rowH = 44;
+  const padTop = 14;
+  const padBot = 26; // room for the axis labels under the bars
+  const W = 560;
   const H = padTop + padBot + n * rowH;
-  const labelW = 128;
-  const valueW = 54;
+  const labelW = 118;
   const x0 = labelW;
-  const x1 = W - valueW - 12;
-  const maxAbs = Math.max(0.05, ...weights.map((w) => Math.abs(w)));
-  const zero = x0 + ((0 - -maxAbs) / (maxAbs - -maxAbs)) * (x1 - x0);
-  const scale = (w) => ((w) / (2 * maxAbs)) * (x1 - x0);
+  const x1 = W - 16;
+  // symmetric scale, padded so value labels never clip at the edge
+  const maxAbs = Math.max(0.1, ...weights.map((w) => Math.abs(w))) * 1.35;
+  const zero = x0 + (x1 - x0) / 2;
+  const scale = (w) => (w / (2 * maxAbs)) * (x1 - x0);
 
   const svg = el('svg', {
     viewBox: `0 0 ${W} ${H}`, class: 'weights-svg', preserveAspectRatio: 'xMidYMid meet',
@@ -241,32 +241,48 @@ export function renderWeights(host, names, weights, pointScale) {
   });
   svg.style.aspectRatio = `${W} / ${H}`;
 
-  // zero baseline
+  // light row separators + subtle vertical gridlines at ±50%, ±100%
+  for (const g of [-1, -0.5, 0.5, 1]) {
+    const gx = zero + scale(g);
+    if (gx <= x0 || gx >= x1) continue;
+    svg.appendChild(el('line', {
+      x1: gx, y1: padTop, x2: gx, y2: H - padBot,
+      stroke: 'var(--grid)', 'stroke-width': 1,
+    }));
+    const gl = el('text', { x: gx, y: H - padBot + 15, 'text-anchor': 'middle', class: 'w-axis' });
+    gl.textContent = `${g > 0 ? '+' : ''}${Math.round(g * 100)}%`;
+    svg.appendChild(gl);
+  }
+  // zero baseline (strong) + 0% label
   svg.appendChild(el('line', {
-    x1: zero, y1: padTop - 2, x2: zero, y2: H - padBot + 2,
-    stroke: 'var(--axis)', 'stroke-width': 1,
+    x1: zero, y1: padTop - 4, x2: zero, y2: H - padBot,
+    stroke: 'var(--axis)', 'stroke-width': 1.4,
   }));
+  const zl = el('text', { x: zero, y: H - padBot + 15, 'text-anchor': 'middle', class: 'w-axis' });
+  zl.textContent = '0%';
+  svg.appendChild(zl);
 
   weights.forEach((w, i) => {
-    const cy = padTop + i * rowH + rowH / 2;
+    const cy = padTop + i * rowH + rowH / 2 + 4;
     const barW = scale(w);
     const bx = w >= 0 ? zero : zero + barW;
-    const bh = rowH * 0.52;
-    // bar
+    const bh = 20;
+    // bar: BLUE = long, GOLD = short
     svg.appendChild(el('rect', {
-      x: bx, y: cy - bh / 2, width: Math.max(1, Math.abs(barW)), height: bh, rx: 2,
-      fill: w >= 0 ? 'var(--blue)' : '#8fb8d6',
+      x: bx, y: cy - bh / 2, width: Math.max(1.5, Math.abs(barW)), height: bh, rx: 4,
+      fill: w >= 0 ? 'var(--blue)' : 'var(--gold)',
     }));
     // asset name (left gutter)
     const nm = el('text', {
-      x: labelW - 10, y: cy + 4, 'text-anchor': 'end', class: 'w-name',
+      x: labelW - 12, y: cy + 4, 'text-anchor': 'end', class: 'w-name',
     });
     nm.textContent = names[i];
     svg.appendChild(nm);
-    // value label at the bar tip
-    const vx = w >= 0 ? zero + barW + 6 : zero + barW - 6;
+    // value label just past the bar tip
+    const vx = w >= 0 ? zero + barW + 7 : zero + barW - 7;
     const val = el('text', {
-      x: vx, y: cy + 4, 'text-anchor': w >= 0 ? 'start' : 'end', class: 'w-val',
+      x: vx, y: cy + 4, 'text-anchor': w >= 0 ? 'start' : 'end',
+      class: 'w-val', fill: w >= 0 ? 'var(--blue)' : 'var(--gold)',
     });
     val.textContent = pctSigned(w);
     svg.appendChild(val);

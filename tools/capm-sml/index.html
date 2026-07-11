@@ -11,9 +11,23 @@
   </script>
   <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
   <style>
-    /* tool-local: stacked two-section layout + variance-decomposition bar */
-    .tool-section { border-bottom: 1px solid var(--panel-border); }
-    .tool-section:last-of-type { border-bottom: none; }
+    /* tool-local: the SML and market-model sections sit SIDE BY SIDE, each
+       with its own input panel and chart; they stack on narrow screens. */
+    .sections-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      max-width: 1500px; margin: 0 auto;
+    }
+    /* min-width: 0 prevents grid blowout — without it the long formula strip
+       forces the column past the viewport */
+    .sections-row .tool-section { border-right: 1px solid var(--panel-border); min-width: 0; }
+    .sections-row .tool-section:last-of-type { border-right: none; }
+    .tool-section .tool-main { padding: 1rem; gap: 0.9rem; }
+    .tool-section .controls-panel { flex: 0 0 220px; width: 220px; padding: 0.8rem 0.9rem 1rem; }
+    @media (max-width: 1250px) {
+      .sections-row { grid-template-columns: 1fr; }
+      .sections-row .tool-section { border-right: none; border-bottom: 1px solid var(--panel-border); }
+      .sections-row .tool-section:last-of-type { border-bottom: none; }
+    }
     .section-head {
       padding: 1.1rem 1.4rem 0;
       display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;
@@ -64,12 +78,11 @@
       <p class="subtitle">FIN 30600 · Investment Theory — Lecture 4 · §2–3</p>
     </div>
     <div class="header-actions">
-      <button id="presenterBtn" class="btn" type="button" title="Toggle presenter mode (larger type for the projector)">Presenter</button>
       <a class="btn" href="../../">&larr; Back to all tools</a>
     </div>
   </header>
 
-  <main>
+  <main class="sections-row">
     <!-- ============================ SML ============================ -->
     <section class="tool-section" id="sml-section">
       <div class="section-head">
@@ -121,8 +134,8 @@
             <span class="vd-title">Variance decomposition (true parameters)</span>
             <div class="vd-bar" id="mm-vdbar"></div>
             <div class="vd-legend">
-              <span><span class="sw sys"></span>Systematic β²σ<tspan>M</tspan>²</span>
-              <span><span class="sw idio"></span>Idiosyncratic σ<tspan>e</tspan>²</span>
+              <span><span class="sw sys"></span><span data-label="Systematic $\beta^2\sigma_M^2$"></span></span>
+              <span><span class="sw idio"></span><span data-label="Idiosyncratic $\sigma_e^2$"></span></span>
             </div>
           </div>
           <div class="chart-box" id="mm-chart"></div>
@@ -133,7 +146,6 @@
 
   <footer class="app-footer">
     <span><a href="../../">&larr; All FIN 30600 tools</a></span>
-    <span>Static site — no tracking, no server.</span>
   </footer>
 
   <script type="module" src="./main.js"></script>

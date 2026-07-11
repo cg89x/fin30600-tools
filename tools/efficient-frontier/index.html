@@ -53,12 +53,12 @@
     }
 
     .weights-svg { display: block; width: auto; max-width: 100%; height: auto; }
-    html.presenter .weights-svg { width: 100%; }
-    .weights-svg .w-name { fill: var(--label); font-size: 13px; font-family: var(--font-stack); }
+    .weights-svg .w-name { fill: var(--label); font-size: 13.5px; font-weight: 600; font-family: var(--font-stack); }
     .weights-svg .w-val {
-      fill: var(--navy); font-size: 12.5px; font-weight: 700;
+      font-size: 13px; font-weight: 700;
       font-family: var(--font-stack); font-variant-numeric: tabular-nums;
     }
+    .weights-svg .w-axis { fill: var(--muted); font-size: 11px; font-family: var(--font-stack); }
     .weights-title {
       font-size: 0.82rem; font-weight: 700; color: var(--navy);
       text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 0.2rem;
@@ -84,7 +84,6 @@
     </div>
     <div class="header-actions">
       <button class="btn" id="reset-btn" type="button">Reset</button>
-      <button class="btn" id="present-btn" type="button">Presenter</button>
       <a class="btn" href="../../">&larr; Back to all tools</a>
     </div>
   </header>
@@ -98,10 +97,10 @@
       </div>
 
       <div class="group">
-        <div class="group-title">Assets — E[r] and σ</div>
+        <div class="group-title" data-label="Assets — $E[r]$ and $\sigma$"></div>
         <table class="asset-table">
           <thead>
-            <tr><th>Asset</th><th>E[r]</th><th>σ</th></tr>
+            <tr><th>Asset</th><th data-label="$E[r]$"></th><th data-label="$\sigma$"></th></tr>
           </thead>
           <tbody id="asset-tbody"></tbody>
         </table>
@@ -133,11 +132,11 @@
       </div>
 
       <div class="readouts">
-        <div class="readout"><div class="k">Tangency E[r]</div><div class="v blue" id="ro-tan-er">—</div></div>
-        <div class="readout"><div class="k">Tangency σ</div><div class="v blue" id="ro-tan-sd">—</div></div>
-        <div class="readout"><div class="k">Tangency Sharpe</div><div class="v blue" id="ro-tan-sh">—</div></div>
-        <div class="readout"><div class="k">MVP E[r]</div><div class="v gold" id="ro-mvp-er">—</div></div>
-        <div class="readout"><div class="k">MVP σ</div><div class="v gold" id="ro-mvp-sd">—</div></div>
+        <div class="readout"><div class="k" data-label="Tangency $E[r]$"></div><div class="v blue" id="ro-tan-er">—</div></div>
+        <div class="readout"><div class="k" data-label="Tangency $\sigma$"></div><div class="v blue" id="ro-tan-sd">—</div></div>
+        <div class="readout"><div class="k" data-label="Tangency Sharpe"></div><div class="v blue" id="ro-tan-sh">—</div></div>
+        <div class="readout"><div class="k" data-label="MVP $E[r]$"></div><div class="v gold" id="ro-mvp-er">—</div></div>
+        <div class="readout"><div class="k" data-label="MVP $\sigma$"></div><div class="v gold" id="ro-mvp-sd">—</div></div>
       </div>
 
       <div class="chart-row">
@@ -155,7 +154,7 @@
 
   <footer class="app-footer">
     <span><a href="../../">← All FIN 30600 tools</a></span>
-    <span>Hover the frontier to read a portfolio's weights. Default assets: Jorion (1989) classes.</span>
+    <span>Hover the frontier to read a portfolio's weights.</span>
   </footer>
 
   <script type="module" src="./main.js"></script>
