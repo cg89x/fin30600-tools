@@ -2,9 +2,9 @@
 
 Browser-based interactive explorers accompanying the FIN 30600 (Investment
 Theory, University of Notre Dame — Christian Kontz) lecture decks. They cover
-Portfolio Theory (Lecture 3) and CAPM (Lecture 4), and are meant to be driven
-live on the classroom projector **and** used by students on their own laptops
-(linked from Canvas).
+Portfolio Theory (L3), CAPM (L4), Behavioral Finance (L6), Fixed Income (L7),
+and Derivatives (L8), and are meant to be driven live on the classroom
+projector **and** used by students on their own laptops (linked from Canvas).
 
 This is a **static site with zero build step**: plain HTML + ES-module
 JavaScript, no framework, no bundler, no npm install. The only third-party
@@ -23,6 +23,9 @@ dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self
 | [`tools/efficient-frontier/`](tools/efficient-frontier/) | L3 §5 | N-asset minimum-variance frontier, global MVP, and max-Sharpe tangency. |
 | [`tools/capm-sml/`](tools/capm-sml/) | L4 §2–3 | Security market line + alpha, and a simulated market-model OLS regression. |
 | [`tools/diversification/`](tools/diversification/) | L4 App. | Equal-weight portfolio risk vs. N: the 1/N term vanishes, correlation sets the systematic floor (web version of PortfolioVarianceAndDiversification.xlsx). |
+| [`tools/beauty-contest/`](tools/beauty-contest/) | L6 §3 | The 2/3-of-the-average game, live in class: students submit by QR code (Firebase RTDB via plain REST/SSE — see its SETUP.md), instructor screen reveals mean/target/winner per round; built-in simulation mode needs no backend. |
+| [`tools/duration/`](tools/duration/) | L7 §3–4 | Price–yield curve with the duration tangent vs. exact repricing, the PV cash-flow fulcrum at t = D, and spot-curve/forward-rate pricing. |
+| [`tools/black-scholes/`](tools/black-scholes/) | L8 §3–4 | Black–Scholes calls and puts: intrinsic vs. time value, delta hedge ratio, comparative statics in σ and T, put–call parity (deck's discrete-rate form). |
 
 ## Run locally
 
@@ -49,9 +52,12 @@ node --test tests/finmath.test.js
 worked numbers (two-asset ρ=±0.2 example, CAL y*, the ρ=0/−1 MVP special
 cases), a 3-asset MVP/tangency case cross-checked against an independent
 numpy computation (the snippet + its output are pasted in the test file), a
-hand-checked OLS sample, the Cholesky positive-definite guard, and the
+hand-checked OLS sample, the Cholesky positive-definite guard, the
 diversification workbook formulas (`ewVarUncorrelated`/`ewVarCommonCorr`
-against `PortfolioVarianceAndDiversification.xlsx`).
+against `PortfolioVarianceAndDiversification.xlsx`), Black–Scholes (the
+10.4506/5.5735 textbook case, deck put–call parity anchors $3.29 and $0.35),
+and the bond math (price/duration hand-computed case, the deck's −D·Δy/(1+y)
+anchor of +1.16%, forward rates).
 
 Syntax-check every module with:
 
@@ -87,7 +93,8 @@ fin30600-tools/
 │   └── state.js            URL-hash state (bookmarkable configs)
 ├── vendor/
 │   ├── mathjax/            self-hosted MathJax 3.2.2 (tex-svg-full.js, single file)
-│   └── fonts/              self-hosted Libertinus Sans/Serif woff2 (SIL OFL)
+│   ├── fonts/              self-hosted Libertinus Sans/Serif woff2 (SIL OFL)
+│   └── qrcode/             qrcode-generator 1.4.4 (MIT) — beauty-contest QR codes
 ├── tools/                  one folder per explorer (index.html + main.js)
 ├── tests/finmath.test.js   node --test, zero dependencies
 └── docs/                   DESIGN.md, PLAN.md

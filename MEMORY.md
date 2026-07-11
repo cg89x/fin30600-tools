@@ -6,7 +6,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Current state
 
-- **Five tools** (`tools/<name>/` = `index.html` + `main.js`):
+- **Eight tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
+  tool-local modules where noted):
   1. `two-asset` — two-asset diversification, opportunity set vs ρ and weight
      (L3 §4). Deck example A 8/13, B 16/20; Rule 2 shown in correlation form.
   2. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
@@ -21,14 +22,33 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      variance-decomposition inset + share bar (L4 Appendix). Web version of
      `PortfolioVarianceAndDiversification.xlsx`. x-axis tracks the N slider;
      charts use `--stroke-scale: 1.5` (thick lines, base-size labels).
+  6. `beauty-contest` — 2/3-of-the-average game (L6 §3). Instructor/projector
+     page (histogram, close-round reveal of mean/target/winner, round-history
+     convergence chart, level-k markers) + mobile student page `submit.html`
+     reachable by QR (vendored qrcode-generator 1.4.4). Live channel =
+     Firebase RTDB via plain REST/EventSource in tool-local `rtdb.js` (NO
+     SDK); `config.js` NOT yet created → runs in seeded level-k SIMULATION
+     mode until Christian follows `SETUP.md` (free Spark tier + paste rules).
+     Pure game logic in `game.js` (desk-checked vs Loudis's workbook:
+     mean 33.179 → target 22.119).
+  7. `duration` — price–yield curve with duration tangent vs exact repricing,
+     PV cash-flow fulcrum at t = D, spot-curve/forward panel in `spotpanel.js`
+     (L7 §3–4). Defaults = deck Example 1 (8% coupon, 6y, y=8% → B=$1,000,
+     D=4.9927); deck slide prints ΔB≈$46.20 from rounded D, tool uses full
+     precision ($46.23).
+  8. `black-scholes` — BS call/put pricing (L8 §3–4): time-value band, delta
+     tangent + deck-phrased hedging readout, σ/T comparative statics, parity
+     card in the deck's discrete form (anchors $3.29 and deck Ex. 1 $0.35).
+     Defaults = deck example S=100, X=95, σ=50%, r=10%, T=0.25 (C=13.695).
 - **Theme matches the beamer deck** (`ndcollegiate.sty`): self-hosted
   Libertinus Sans body / Libertinus Serif navy display titles (`vendor/fonts/`,
   SIL OFL), white letterhead header (gold rule + grey eyebrow + serif title),
   metallic gold `#AE9142` chrome accents. On-chart text stays Arial.
 - **No presenter mode** (removed 2026-07-11) — projector scaling is per-tool
   via `--stroke-scale` on `.chart-box`.
-- **Landing page** = one card per tool, 4-up grid (5th wraps).
-- **Tests:** `node --test tests/finmath.test.js`, 17 passing.
+- **Landing page** = one card per tool, in lecture order.
+- **Tests:** `node --test tests/finmath.test.js`, 25 passing (incl. BS,
+  parity, bond price/duration, forward-rate anchor tests).
 - **Deploy:** push to `main` → GitHub Pages → christiankontz.com/fin30600-tools.
 
 ## Key decisions / rulings (Christian)
@@ -53,9 +73,21 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - `python3 -m http.server` sends no Cache-Control → stale `lib/*.js` in the
   browser after edits; `fetch(url,{cache:'reload'})` + reload, or ⌘⇧R.
 - `node --test tests/` (bare dir) breaks on Node 25 — name the file.
+- `\$` inside a `$...$` renderLabel segment breaks the splitter; use
+  `\unicode{x24}` (`\mathdollar`/`\char` are NOT in tex-svg-full — silent red
+  text, no merror).
+- Author `display:flex/grid` beats the `hidden` attribute — pages that toggle
+  such elements need `[hidden]{display:none !important}`.
+- Put–call parity: the DECK discounts at an effective annual rate
+  (X/(1+r)^T, `parityCall`); Black–Scholes uses continuous e^{−rT}. Keep the
+  two forms straight in any option UI.
 
 ## Open threads / backlog
 
+- **Beauty contest live polling is unconfigured**: Christian must create the
+  free Firebase project per `tools/beauty-contest/SETUP.md` and commit
+  `config.js`; until then the tool runs in simulation mode. The live
+  REST/SSE path is desk-checked but needs one real end-to-end smoke test.
 - Repo is public; making it private needs GitHub Pro for private-repo Pages
   (Christian's call, not done).
 - v2 ideas: link tools from Canvas; short-sale-constrained frontier (needs a QP
@@ -64,6 +96,13 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-11 — Three new tools (parallel subagent build): `beauty-contest`
+  (L6; Firebase-REST live polling + simulation fallback, QR student page,
+  vendored qrcode-generator), `duration` (L7; tangent vs exact, fulcrum,
+  spot/forward panel), `black-scholes` (L8; time value, delta hedge,
+  comparative statics, parity). finmath grew normCdf/BS/parity/bond/forward
+  functions; tests 17 → 25. New gotchas: `\unicode{x24}` for $ in math,
+  `[hidden]` vs author display rules.
 - 2026-07-11 — Added `CLAUDE.md` + this `MEMORY.md`.
 - 2026-07-11 — Docs synced to shipped state (removed presenter-mode refs, added
   fonts/theme + `--stroke-scale` + 5th tool); README is now the living ref.

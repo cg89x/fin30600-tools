@@ -280,3 +280,81 @@ test('diversification: workbook PortfolioVarianceAndDiversification.xlsx', () =>
   // systematic floor: sigma_P -> sqrt(rho) as N grows
   assertNear(Math.sqrt(fm.ewVarCommonCorr(1e9, 0.5)), Math.sqrt(0.5), 1e-4, 'floor');
 });
+
+/* --------------------------------------------- Black–Scholes (Lecture 8) */
+
+test('normCdf matches standard normal table values', () => {
+  assertNear(fm.normCdf(0), 0.5, 1e-7, 'Phi(0)');
+  assertNear(fm.normCdf(1), 0.8413447, 1e-6, 'Phi(1)');
+  assertNear(fm.normCdf(1.96), 0.9750021, 1e-6, 'Phi(1.96)');
+  assertNear(fm.normCdf(-1), 0.1586553, 1e-6, 'Phi(-1)');
+  assertNear(fm.normCdf(3), 0.9986501, 1e-6, 'Phi(3)');
+});
+
+test('Black–Scholes: textbook standard case S=X=100, sigma=20%, r=5%, T=1', () => {
+  // d1 = 0.35, d2 = 0.15; C = 10.4506, P = 5.5735 (standard reference values)
+  const { d1, d2 } = fm.bsD1D2(100, 100, 0.2, 0.05, 1);
+  assertNear(d1, 0.35, 1e-12, 'd1');
+  assertNear(d2, 0.15, 1e-12, 'd2');
+  assertNear(fm.bsCall(100, 100, 0.2, 0.05, 1), 10.4506, 5e-4, 'call');
+  assertNear(fm.bsPut(100, 100, 0.2, 0.05, 1), 5.5735, 5e-4, 'put');
+  assertNear(fm.bsCallDelta(100, 100, 0.2, 0.05, 1), 0.6368, 5e-4, 'call delta');
+  assertNear(fm.bsPutDelta(100, 100, 0.2, 0.05, 1), -0.3632, 5e-4, 'put delta');
+});
+
+test('Black–Scholes internal put–call parity (continuous discounting)', () => {
+  // C - P = S e^{-qT} - X e^{-rT}, incl. a dividend-yield case
+  for (const [S, X, sig, r, T, q] of [[100, 100, 0.2, 0.05, 1, 0], [42, 40, 0.3, 0.04, 0.5, 0.02]]) {
+    const lhs = fm.bsCall(S, X, sig, r, T, q) - fm.bsPut(S, X, sig, r, T, q);
+    const rhs = S * Math.exp(-q * T) - X * Math.exp(-r * T);
+    assertNear(lhs, rhs, 1e-9, `parity S=${S}`);
+  }
+});
+
+test('put–call parity, deck form (discrete effective-annual rate)', () => {
+  // Tool-2 spec anchor: P=$3, X=$10, S=$10, r=3%, T=1 -> C = $3.29
+  assertNear(fm.parityCall(3, 10, 10, 0.03, 1), 3.2913, 1e-4, 'spec anchor');
+  // Deck L8 §3 Example 1: P=4.20, S=26, X=30, r=6% EAY, T=1/12 -> C = 0.35
+  assertNear(fm.parityCall(4.20, 26, 30, 0.06, 1 / 12), 0.3454, 1e-4, 'deck example 1');
+  // parityPut inverts parityCall
+  assertNear(fm.parityPut(fm.parityCall(3, 10, 10, 0.03, 1), 10, 10, 0.03, 1), 3, 1e-12, 'inverse');
+});
+
+/* ------------------------------------------------ fixed income (Lecture 7) */
+
+test('bond price and Macaulay duration: 3y 10% annual coupon at y=8%', () => {
+  // B = 100/1.08 + 100/1.08^2 + 1100/1.08^3 = 1051.54
+  assertNear(fm.bondPrice(0.10, 0.08, 3, 1000), 1051.54, 0.01, 'price');
+  // D = (1*92.59 + 2*171.47/2*... ) / B = 2.7424 (hand-computed PV-weighted time)
+  assertNear(fm.macaulayDuration(0.10, 0.08, 3, 1000), 2.7424, 5e-4, 'duration');
+  // zero-coupon: duration = maturity, price = discounted face
+  assertNear(fm.macaulayDuration(0, 0.08, 5, 1000), 5, 1e-12, 'zero duration');
+  assertNear(fm.bondPrice(0, 0.08, 5, 1000), 1000 / 1.08 ** 5, 1e-9, 'zero price');
+  // par bond: coupon = yield -> price = face
+  assertNear(fm.bondPrice(0.08, 0.08, 10, 1000), 1000, 1e-6, 'par bond');
+});
+
+test('duration comparative statics (deck: higher coupon shorter D, longer maturity longer D)', () => {
+  assert.ok(fm.macaulayDuration(0.12, 0.08, 10) < fm.macaulayDuration(0.04, 0.08, 10), 'coupon');
+  assert.ok(fm.macaulayDuration(0.08, 0.08, 20) > fm.macaulayDuration(0.08, 0.08, 5), 'maturity');
+});
+
+test('duration approximation: deck discussion-question anchor', () => {
+  // D = 2.5, y: 8% -> 7.5%  =>  DeltaB/B ~ -2.5*(-0.005)/1.08 = +1.16%
+  assertNear(fm.durationApproxRel(2.5, 0.08, -0.005), 0.0115741, 1e-6, 'anchor +1.16%');
+  // approximation vs exact repricing agree to first order for a small dy
+  const D = fm.macaulayDuration(0.10, 0.08, 3, 1000);
+  const b0 = fm.bondPrice(0.10, 0.08, 3, 1000);
+  const b1 = fm.bondPrice(0.10, 0.0801, 3, 1000);
+  assertNear(fm.durationApproxRel(D, 0.08, 0.0001), (b1 - b0) / b0, 1e-6, 'first order');
+});
+
+test('forward rates and pricing off the spot curve', () => {
+  // (1+f)= 1.06^2/1.05  =>  f = 7.0095%
+  assertNear(fm.forwardRate(0.05, 1, 0.06, 2), 0.070095, 1e-6, '1y1y forward');
+  // multi-year: (1+f)^2 = 1.06^4/1.05^2
+  assertNear(fm.forwardRate(0.05, 2, 0.06, 4), (1.06 ** 4 / 1.05 ** 2) ** 0.5 - 1, 1e-12, '2y2y');
+  // flat spot curve reproduces the flat-yield price
+  assertNear(fm.bondPriceFromSpots(0.10, [0.08, 0.08, 0.08], 1000),
+    fm.bondPrice(0.10, 0.08, 3, 1000), 1e-9, 'flat curve = flat yield');
+});

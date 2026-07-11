@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Duration &amp; Bond Pricing · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* tool-local tweaks */
+    /* projector-friendly charts: thicker lines (chart.js multiplies every
+       stroke by --stroke-scale). Fonts stay at their base size — the
+       overrides below undo the --stroke-scale factor baked into the shared
+       .tick / .axis-title / .datalabel rules. */
+    .chart-box { --stroke-scale: 1.5; }
+    .chart-box svg.finchart .tick { font-size: 12px; }
+    .chart-box svg.finchart .axis-title { font-size: 13px; }
+    .chart-box svg.finchart .datalabel { font-size: 12px; }
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.1rem 0 0;
+      line-height: 1.3;
+    }
+    .chart-caption {
+      font-size: 0.82rem;
+      color: var(--label);
+      margin: 0.25rem 0.2rem 0.1rem;
+      line-height: 1.35;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.gold { border-color: var(--gold); }
+    .legend .swatch.red-dash { border-color: var(--red); border-top-style: dashed; }
+    .legend .box {
+      display: inline-block;
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 2px;
+      margin-right: 0.35rem;
+      vertical-align: -1px;
+    }
+    .legend .box.blue { background: var(--blue); }
+    .legend .box.gold { background: var(--gold); }
+    .legend .box.navy { background: var(--navy); }
+    .face-note {
+      font-size: 0.85rem;
+      color: var(--label);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+    .face-note .val { color: var(--blue); font-weight: 700; }
+
+    /* spot-curve / forward-rate card */
+    .spot-card { padding: 0.8rem 1rem 1rem; }
+    .spot-card h3 {
+      margin: 0 0 0.2rem;
+      font-size: 0.95rem;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .spot-grid {
+      display: grid;
+      grid-template-columns: minmax(230px, 1fr) minmax(300px, 2fr);
+      gap: 1rem 1.6rem;
+      align-items: start;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 900px) { .spot-grid { grid-template-columns: 1fr; } }
+    .spot-inputs { display: flex; flex-direction: column; gap: 0.4rem; }
+    .spot-inputs .ctrl-number .ctrl-numinput { width: 4.6rem; }
+    .fwd-table {
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      font-variant-numeric: tabular-nums;
+      width: 100%;
+      max-width: 34rem;
+    }
+    .fwd-table th, .fwd-table td {
+      border-bottom: 1px solid var(--panel-border);
+      padding: 0.3rem 0.7rem;
+      text-align: center;
+    }
+    .fwd-table thead th {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 700;
+      border-bottom: 2px solid var(--goldmetal);
+    }
+    .fwd-table td.fwd { color: var(--gold); font-weight: 700; }
+    .fwd-table td.spot { color: var(--blue); font-weight: 700; }
+    .spot-formula { margin: 0.4rem 0 0.1rem; font-size: 0.95rem; overflow-x: auto; }
+    .spot-readouts { margin-top: 0.6rem; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Duration &amp; Bond Pricing</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 7 · Fixed Income</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Bond &amp; yield move</h2>
+
+      <div class="group">
+        <div class="group-title">The bond</div>
+        <div id="ctrl-c"></div>
+        <div id="ctrl-n"></div>
+        <div class="face-note"><span data-label="Face value $F$"></span><span class="val">$1,000</span></div>
+        <p class="note" data-label="Annual coupons of $c \times F$; the last payment adds the face value."></p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Yield &amp; the rate move</div>
+        <div id="ctrl-y"></div>
+        <div id="ctrl-dy"></div>
+        <p class="note" data-label="$\Delta y$ shifts the yield; compare the duration approximation with exact repricing at $y + \Delta y$."></p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Deck example</div>
+        <button type="button" class="btn" id="btn-deck">Load deck example (L7 §4)</button>
+        <p class="note" data-label="The deck's worked example: 8% coupon, 6 years, $y = 8\%$, $\Delta y = -100$ bp. Slide answer: $\Delta B/B \approx {+}4.62\%$ by duration vs. ${+}4.77\%$ exact (${+}46.2$ vs. ${+}47.7$ in dollars)."></p>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="formula-strip" id="formula-strip">
+        <div class="formula-row" id="f-rel"></div>
+        <div class="formula-row" id="f-dollar"></div>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="chart-row">
+        <div class="chart-box chart-col-main">
+          <div id="py-chart"></div>
+          <div class="legend">
+            <span><span class="swatch blue"></span><span data-label="Price–yield curve $B(y)$"></span></span>
+            <span><span class="swatch red-dash"></span>Duration tangent at the current yield</span>
+            <span><span class="box gold"></span><span data-label="Exact $B(y+\Delta y)$"></span></span>
+            <span><span class="box navy"></span>Tangent (duration) prediction</span>
+          </div>
+          <p class="chart-caption" data-label="Duration is a linear approximation; the true price–yield relation is convex, so the curve sits above the tangent on both sides — the gap between the two $y+\Delta y$ markers."></p>
+        </div>
+
+        <div class="chart-box chart-col-side">
+          <div id="cf-chart"></div>
+          <div class="legend">
+            <span><span class="box blue"></span>PV of coupon</span>
+            <span><span class="box gold"></span>PV of face value</span>
+            <span><span class="box navy"></span><span data-label="Fulcrum at $t = D$"></span></span>
+          </div>
+          <p class="chart-caption" data-label="$D$ is the balance point of the PV bars. Raising the coupon shifts cash flow earlier and moves the fulcrum left; raising the maturity moves it right."></p>
+        </div>
+      </div>
+
+      <div class="chart-box spot-card">
+        <h3>Spot curve, forward rates &amp; pricing off the curve</h3>
+        <p class="note" data-label="Self-contained panel (deck §3): set the spot (zero-coupon) rates $y_1,\dots,y_5$; each adjacent pair implies a one-year forward rate. A 5-year coupon bond is priced by discounting every cash flow at its own spot rate."></p>
+        <div class="spot-formula" id="spot-formula"></div>
+        <div class="spot-grid">
+          <div class="spot-inputs" id="spot-inputs"></div>
+          <div>
+            <div id="fwd-table-host"></div>
+            <div class="spot-inputs" id="spot-coupon" style="margin-top:0.6rem; max-width: 22rem;"></div>
+            <div class="readouts spot-readouts" id="spot-readouts"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

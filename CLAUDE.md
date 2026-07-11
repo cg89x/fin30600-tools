@@ -48,6 +48,12 @@ classroom projector AND used by students on their laptops (Canvas links).
   On-chart SVG labels: `svgMathText` in `chart.js` (`_x` → tspan subscripts).
 - **`%` inside any renderTeX/`$...$` string is a TeX comment — escape it `\%`**
   or the rest of the formula silently vanishes.
+- **`\$` inside a `$...$` renderLabel segment breaks the delimiter split** —
+  for a dollar sign inside math use `\unicode{x24}` (note `\mathdollar` and
+  `\char` are NOT in tex-svg-full; they fail silently as red literal text).
+- **The `hidden` attribute loses to any author `display:flex/grid` rule** —
+  tool-local CSS that sets display on toggleable elements needs
+  `[hidden]{display:none !important}` (beauty-contest pages carry it).
 - **On-chart SVG text stays Arial** (`--font-chart`) to match the lecture
   *figures*; body text is Libertinus Sans, display titles Libertinus Serif
   (deck theme). Don't let chart text inherit the body font.

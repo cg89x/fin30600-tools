@@ -1,0 +1,12 @@
+qrcode-generator 1.4.4 — qrcode.js (classic-script / UMD build)
+
+Source:     https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js
+Downloaded: 2026-07-11
+License:    MIT — Copyright (c) 2009 Kazuhiko Arase (http://www.d-project.com/)
+            ("QR Code" is a registered trademark of DENSO WAVE INCORPORATED.)
+Size:       ~55 KB unminified (2,297 lines)
+
+Loaded as a plain classic <script> tag; defines a global `qrcode` function.
+Usage: const qr = qrcode(0, 'M'); qr.addData(url); qr.make();
+       host.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2 });
+Used by tools/beauty-contest/ (instructor page: QR of the student join URL).

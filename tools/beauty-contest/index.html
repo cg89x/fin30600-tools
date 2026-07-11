@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keynesian Beauty Contest · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <script defer src="../../vendor/qrcode/qrcode.js"></script>
+  <style>
+    /* tool-local tweaks */
+    /* the flex/grid display rules below would beat the UA [hidden] style */
+    [hidden] { display: none !important; }
+    .chart-box { --stroke-scale: 1.5; }
+    .chart-box svg.finchart .tick { font-size: 12px; }
+    .chart-box svg.finchart .axis-title { font-size: 13px; }
+    .chart-box svg.finchart .datalabel { font-size: 12px; }
+
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.1rem 0 0;
+      line-height: 1.3;
+    }
+
+    /* deck-quoted rules card */
+    .rules-card .rules-lead { margin: 0 0 0.4rem; font-size: 1.02rem; }
+    .rules-card strong { color: var(--navy); }
+
+    /* dismissible simulation notice */
+    .sim-notice {
+      display: flex;
+      align-items: baseline;
+      gap: 0.8rem;
+      background: rgba(201, 151, 0, 0.10);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.88rem;
+      color: var(--ink);
+    }
+    .sim-notice .dismiss {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.05rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 0.2rem;
+    }
+
+    /* join card: HUGE session code + QR, projector-readable */
+    .join-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.2rem;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-top: 4px solid var(--goldmetal);
+      border-radius: 10px;
+      padding: 0.9rem 1.3rem;
+    }
+    .join-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .join-url {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 1.35rem;
+      color: var(--blue);
+      word-break: break-all;
+      margin: 0.1rem 0 0.6rem;
+    }
+    .join-code {
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 6.5vw, 5.2rem);
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.22em;
+      line-height: 1.05;
+      white-space: nowrap;
+    }
+    .join-qr svg { display: block; }
+
+    /* round bar: status + big n + action buttons */
+    .round-bar {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      flex-wrap: wrap;
+      padding: 0.7rem 1.1rem;
+    }
+    .round-label {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .round-status {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 0.22rem 0.7rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .round-status.open { background: rgba(0, 114, 178, 0.12); color: var(--blue); }
+    .round-status.closed { background: rgba(214, 39, 40, 0.10); color: var(--red); }
+    .round-n {
+      font-family: var(--font-chart);
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+    }
+    .round-actions { margin-left: auto; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .btn-big { font-size: 1.02rem; font-weight: 700; padding: 0.55rem 1.1rem; }
+    .btn-big:disabled { opacity: 0.45; cursor: default; }
+    .btn-close-round { background: var(--navy); border-color: var(--navy); color: #fff; }
+    .btn-close-round:hover:not(:disabled) { background: #143766; }
+
+    /* winner banner */
+    .winner-card {
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      padding: 0.7rem 1.1rem;
+      font-size: 1.15rem;
+    }
+    .winner-card .w-name { color: var(--navy); font-weight: 700; }
+    .winner-card .w-detail { color: var(--muted); font-size: 0.95rem; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.gold { border-color: var(--gold); }
+    .legend .swatch.red-dash { border-color: var(--red); border-top-style: dashed; }
+
+    .side-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0 0 0.1rem 0.2rem;
+    }
+    .btn-block { width: 100%; text-align: center; }
+    .code-inline {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 700;
+      color: var(--navy);
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Keynesian Beauty Contest</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 6 · Behavioral Finance</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Game Controls</h2>
+
+      <div class="group">
+        <div class="group-title">Session</div>
+        <div id="ctrl-session"></div>
+        <p class="note" id="live-status"></p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Simulation</div>
+        <div id="ctrl-sim"></div>
+        <div id="ctrl-simn"></div>
+        <div id="ctrl-seed"></div>
+        <p class="note" data-label="A seeded class of level-$k$ reasoners. Each simulated round the class reasons one level deeper, so repeated play converges toward 0. Changing the class size or re-seeding restarts at round 1."></p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Display</div>
+        <div id="ctrl-lk"></div>
+        <p class="note" data-label="Marks level-1 (33.3), level-2 (22.2), level-3 (14.8), and the Nash equilibrium (0) on the axis. Shown only after the round closes."></p>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="sim-notice" id="sim-notice" hidden>
+        <span id="sim-notice-text"></span>
+        <button class="dismiss" id="sim-notice-dismiss" aria-label="Dismiss">&times;</button>
+      </div>
+
+      <div class="formula-strip rules-card">
+        <p class="rules-lead"><strong>Let&rsquo;s play a game.</strong>
+          On your phone, enter your name and a number between
+          <strong>0 and 100</strong>. The person who guesses the number that is
+          <strong>2/3 of the class average</strong> wins a prize!</p>
+        <div class="formula-row" id="f-target"></div>
+        <div class="formula-row" id="f-iter"></div>
+        <div class="formula-row" id="f-reveal"></div>
+      </div>
+
+      <div class="join-row" id="join-card" hidden>
+        <div class="join-info">
+          <div class="join-label">Join at</div>
+          <div class="join-url" id="student-url"></div>
+          <div class="join-label">Session code</div>
+          <div class="join-code" id="code-display"></div>
+        </div>
+        <div class="join-qr" id="qr-box" aria-label="QR code of the student join link"></div>
+      </div>
+
+      <div class="round-bar chart-box">
+        <span class="round-label" id="round-label">Round 1</span>
+        <span class="round-status open" id="round-status">Open</span>
+        <span class="round-n" id="n-count">n = 0</span>
+        <span class="round-actions">
+          <button class="btn btn-big" id="btn-play">Play round</button>
+          <button class="btn btn-big btn-close-round" id="btn-close">Close round</button>
+          <button class="btn btn-big" id="btn-next">Next round &rarr;</button>
+        </span>
+      </div>
+
+      <div class="winner-card" id="winner-card" hidden></div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="chart-row">
+        <div class="chart-box chart-col-main">
+          <div id="hist-chart"></div>
+          <div class="legend">
+            <span><span class="swatch blue"></span>Guesses (bin width 5)</span>
+            <span><span class="swatch gold"></span>Class mean (after close)</span>
+            <span><span class="swatch red-dash"></span><span data-label="Target $\tfrac{2}{3}\times$ mean (after close)"></span></span>
+          </div>
+        </div>
+
+        <div class="chart-box chart-col-side">
+          <p class="side-title">Round history — converging on the Nash equilibrium</p>
+          <div id="history-chart"></div>
+          <div class="legend">
+            <span><span class="swatch blue"></span>Class mean</span>
+            <span><span class="swatch gold"></span><span data-label="$\tfrac{2}{3}\times$ mean target"></span></span>
+            <span><span class="swatch red-dash"></span>Nash equilibrium (0)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

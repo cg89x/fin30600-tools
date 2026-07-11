@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Black&ndash;Scholes Option Pricing · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* tool-local tweaks */
+    /* projector-friendly charts: thicker lines (chart.js multiplies every
+       stroke by --stroke-scale). Fonts stay at their base size — the
+       overrides below undo the --stroke-scale factor baked into the shared
+       .tick / .axis-title / .datalabel rules. */
+    .chart-box { --stroke-scale: 1.5; }
+    .chart-box svg.finchart .tick { font-size: 12px; }
+    .chart-box svg.finchart .axis-title { font-size: 13px; }
+    .chart-box svg.finchart .datalabel { font-size: 12px; }
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.15rem 0 0;
+      line-height: 1.35;
+    }
+    .inset-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0.1rem 0 0.15rem 0.2rem;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.gold { border-color: var(--gold); }
+    .legend .swatch.red-dash { border-color: var(--red); border-top-style: dashed; }
+    .legend .swatch.band {
+      width: 1.1rem;
+      height: 0.75rem;
+      border: 1px solid rgba(0, 114, 178, 0.35);
+      background: rgba(0, 114, 178, 0.16);
+      border-radius: 2px;
+    }
+    /* call/put focus segmented buttons */
+    .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn-row .btn { flex: 1 1 auto; text-align: center; }
+    /* mini-chart pair + cards */
+    .minis { grid-template-columns: 1fr 1fr; }
+    .cards { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 1150px) { .minis, .cards { grid-template-columns: 1fr; } }
+    /* grid items default to min-width:auto — a long formula would force the
+       column past the page edge instead of scrolling inside its card */
+    .chart-row > .chart-box { min-width: 0; }
+    .card .formula-row { margin: 0.35rem 0.2rem; overflow-x: auto; }
+    .hedge-line {
+      font-size: 0.88rem;
+      color: var(--label);
+      margin: 0.4rem 0.2rem 0;
+      line-height: 1.4;
+    }
+    .parity-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem 1rem;
+      margin: 0.3rem 0.2rem 0.5rem;
+    }
+    .parity-inputs .ctrl-numinput { width: 4.8rem; }
+    .card .btn-row { margin: 0.2rem 0.2rem 0.4rem; }
+    .card .btn { font-size: 0.78rem; padding: 0.28rem 0.6rem; flex: 0 0 auto; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Black&ndash;Scholes Option Pricing</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 8 §3&ndash;4 · Notre Dame</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Black&ndash;Scholes</h2>
+
+      <div class="group">
+        <div class="group-title">Underlying &amp; option</div>
+        <div id="ctrl-s"></div>
+        <div id="ctrl-x"></div>
+        <div class="btn-row" role="group" aria-label="Option focus">
+          <button class="btn" id="focus-call" type="button">Call</button>
+          <button class="btn" id="focus-put" type="button">Put</button>
+        </div>
+        <p class="note">The focused option drives the main chart; readouts always show both prices.</p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Model inputs</div>
+        <div id="ctrl-v"></div>
+        <div id="ctrl-r"></div>
+        <div id="ctrl-t"></div>
+        <div id="ctrl-q"></div>
+        <p class="note" data-label="European options; constant $r$ and $\sigma$, continuous dividend yield $\delta$, continuous discounting $e^{-rT}$. Defaults are the deck's worked example ($S=100$, $X=95$, $\sigma=50$%, $r_f=0.10$, $T=0.25$)."></p>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="formula-strip" id="formula-strip">
+        <div class="formula-row" id="f-price"></div>
+        <div class="formula-row" id="f-d"></div>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="chart-box">
+        <div id="main-chart"></div>
+        <div class="legend">
+          <span><span class="swatch blue"></span><span id="legend-value"></span></span>
+          <span><span class="swatch gold"></span><span id="legend-intrinsic"></span></span>
+          <span><span class="swatch band"></span>Time value (price &minus; intrinsic)</span>
+          <span><span class="swatch red-dash"></span><span data-label="Delta tangent at current $S_0$ (slope $= \Delta$)"></span></span>
+        </div>
+      </div>
+
+      <div class="chart-row minis">
+        <div class="chart-box">
+          <p class="inset-title" data-label="Option price vs volatility $\sigma$"></p>
+          <div id="sigma-chart"></div>
+          <div class="legend">
+            <span><span class="swatch blue"></span>Call</span>
+            <span><span class="swatch gold"></span>Put</span>
+          </div>
+          <p class="note" data-label="Both call and put values rise with $\sigma$: more upside, and exercise is optional on the downside."></p>
+        </div>
+        <div class="chart-box">
+          <p class="inset-title" data-label="Option price vs time to expiration $T$"></p>
+          <div id="t-chart"></div>
+          <div class="legend">
+            <span><span class="swatch blue"></span>Call</span>
+            <span><span class="swatch gold"></span>Put</span>
+          </div>
+          <p class="note" data-label="The call value rises with $T$; for a European put the effect is ambiguous — more optionality, but $X$ is discounted longer."></p>
+        </div>
+      </div>
+
+      <div class="chart-row cards">
+        <div class="chart-box card">
+          <p class="inset-title">Hedge ratio (delta)</p>
+          <div class="formula-row" id="delta-tex"></div>
+          <p class="hedge-line" id="hedge-call"></p>
+          <p class="hedge-line" id="hedge-put"></p>
+        </div>
+
+        <div class="chart-box card">
+          <p class="inset-title" data-label="Put–call parity (deck form, §3)"></p>
+          <div class="parity-inputs" id="parity-inputs"></div>
+          <div class="btn-row">
+            <button class="btn" id="parity-deck" type="button">Load deck Example 1</button>
+            <button class="btn" id="parity-reset" type="button">Reset</button>
+          </div>
+          <div class="formula-row" id="parity-tex"></div>
+          <p class="note" data-label="Note: Black–Scholes discounts the strike continuously ($X e^{-rT}$); this panel uses the deck's discrete form $X/(1+r_f)^T$ with an effective annual rate."></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
