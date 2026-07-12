@@ -62,6 +62,10 @@ classroom projector AND used by students on their laptops (Canvas links).
 - **Palette:** BLUE `#0072B2` primary, GOLD `#C99700` secondary, NAVY `#0A234B`
   chrome, metallic gold `#AE9142` (`--goldmetal`) chrome accents, RED `#D62728`
   dashed references only.
+- **Every tool is release-gated.** A new tool must (1) get an entry in
+  `releases.js` and (2) `await gateTool('<folder>')` (from `lib/release.js`)
+  right after the imports in its `main.js`, plus `data-tool="<folder>"` on its
+  landing card. `#preview` in the URL bypasses the gate (instructor-only).
 
 ## Run / test / deploy
 
