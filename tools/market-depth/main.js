@@ -1,8 +1,8 @@
 // @ts-check
 /**
  * Market Depth & Price Impact (FIN 30600, Lecture 2 §3) — the depth half of
- * the old order-book tool, redesigned 2026-07-12 (prototype "A1"); the order
- * types half ships separately. Adapted from tools/order-book/main.js.
+ * the retired order-book tool, redesigned 2026-07-12 (prototype "A1"); the
+ * order-types half ships separately.
  *
  * Four levels a side. Default book (Christian 2026-07-12): asks $10.25×4 /
  * $10.75×10 / $11.60×5 / $13.00×15, bids $9.75×5 / $9.30×9 / $8.50×6 /

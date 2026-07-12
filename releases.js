@@ -26,8 +26,7 @@ export const HIDE_LOCKED = false;
 const RELEASES = {
   'volatility-drag': true,     // L1 §4
   'fee-drag': true,            // L1 §6
-  'market-depth': true,        // L2 §3 (order-book redesign, depth half)
-  'order-book': true,          // L2 §3 — retires once the order-types half ships
+  'market-depth': true,        // L2 §3 (ex order-book; order-types tool to follow)
   'margin-short': true,        // L2 §4–5
   'two-asset': true,           // L3 §4
   'capital-allocation': true,  // L3 §2–3

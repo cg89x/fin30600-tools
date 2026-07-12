@@ -6,7 +6,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Current state
 
-- **Fourteen tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
+- **Thirteen tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
   tool-local modules where noted), listed in lecture order:
   1. `volatility-drag` — L1 §4: 25 seeded wealth paths
      vs the "arithmetic promise" (1+μ)^t and geometric expectation,
@@ -26,13 +26,6 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      revealed line by line with a trade headline "SELL 30 · MARKET ORDER…"),
      one-row readouts, ladder + equally-sized depth-cost curve side by side,
      book editor in a disclosure. "shares" written out, never "sh".
-  4. `order-book` — L2 §3: editable deck book (bids 9.75×15/9.50×10/2.00×10,
-     asks 10.25×15/11.50×10/20.00×10), animated market-order walk (sell 30 →
-     $251.25, avg $8.375; buy 30 → $368.75), depth-cost staircase, thin-book
-     preset (flash-crash caption), ABC $55.25/$55.50 order-type card (deck
-     wording), resting limit/stop vs a seeded price path w/ gap risk (extra
-     module `paths.js`). RETIRES once the order-types redesign (local
-     prototype `proto-a-types`) ships.
   4. `margin-short` — L2 §4–5, two stacked mirror sections: margin buy (deck
      SpaceX: N=100, loan $4,500, M=1.8182, call $75.00 / $82.50 w/ 10%
      interest, ±20% → ±36.36%; balance bar + magnification line + MARGIN
@@ -146,6 +139,13 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-12 — `order-book` REMOVED (Christian's call; earlier than the
+  "after A2 ships" plan): tool folder, releases.js entry, and landing card
+  deleted. Its depth half lives on as `market-depth`; the order-types half is
+  the approved LOCAL prototype `tools/proto-a-types/` (has its own copy of
+  paths.js — nothing imported from the deleted folder; the finmath walkBook
+  anchor tests are untouched). L2 §3 has NO live order-types coverage until
+  A2 ships. Suite back to THIRTEEN tools.
 - 2026-07-12 — NEW TOOL: `market-depth` (L2 §3) — the order-book redesign.
   Christian judged three local prototypes (A: split & focus, B: unified
   ladder w/ order-flow sim, C: four-act story) and picked A; A1 shipped

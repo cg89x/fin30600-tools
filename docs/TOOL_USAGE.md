@@ -2,9 +2,9 @@
 
 Written 2026-07-12 at Christian's request. One entry per tool, student-facing
 voice — usable verbatim as Canvas blurbs or on-page "How to use" leads.
-The old `order-book` tool is being replaced by two focused tools:
-`market-depth` (live) and the order-types tool (prototype `proto-a-types`,
-local). `order-book` retires once the latter ships.
+The old `order-book` tool was removed 2026-07-12, replaced by two focused
+tools: `market-depth` (live) and the order-types tool (prototype
+`proto-a-types`, local, ships next).
 
 ## Volatility drag (L1 §4)
 
