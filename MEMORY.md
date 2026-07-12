@@ -6,23 +6,40 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Current state
 
-- **Eight tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
-  tool-local modules where noted):
-  1. `two-asset` — two-asset diversification, opportunity set vs ρ and weight
+- **Eleven tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
+  tool-local modules where noted), listed in lecture order:
+  1. `compounding-drags` — L1 §4+§6, TWO COLUMNS (Christian's spec): left =
+     fee drag (deck Class A 6% load vs Class B 0.5%+declining exit; anchors
+     T=4 → $1,376.25/$1,423.28 B wins, T=15 → $3,926.61/$3,901.30 A wins;
+     active-vs-passive preset → $99,628 gap), right = volatility drag
+     (+100%/−50% hook card, 25 seeded wealth paths, R_G ≈ R_A − ½σ²,
+     1991–2025 deck-table presets).
+  2. `order-book` — L2 §3: editable deck book (bids 9.75×15/9.50×10/2.00×10,
+     asks 10.25×15/11.50×10/20.00×10), animated market-order walk (sell 30 →
+     $251.25, avg $8.375; buy 30 → $368.75), depth-cost staircase, thin-book
+     preset (flash-crash caption), ABC $55.25/$55.50 order-type card (deck
+     wording), resting limit/stop vs a seeded price path w/ gap risk (extra
+     module `paths.js`).
+  3. `margin-short` — L2 §4–5, two stacked mirror sections: margin buy (deck
+     SpaceX: N=100, loan $4,500, M=1.8182, call $75.00 / $82.50 w/ 10%
+     interest, ±20% → ±36.36%; balance bar + magnification line + MARGIN
+     CALL badge) and short sale (deck ATT: C₀ $2,500, call $57.69, $53 →
+     −12%, slope −1/margin; danger is UP).
+  4. `two-asset` — two-asset diversification, opportunity set vs ρ and weight
      (L3 §4). Deck example A 8/13, B 16/20; Rule 2 shown in correlation form.
-  2. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
+  5. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
      from y\*), borrowing kink (L3 §2–3). Deck 7/15/22; w\* = 0.8264 at A = 2.
-  3. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
+  6. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
      tangency-weights bar (L3 §5). Defaults = 5 broad asset classes with
      realistic Sharpes (stocks 0.28–0.38, tangency ~0.47), NOT Jorion 1989.
-  4. `capm-sml` — SML + alpha and a simulated market-model OLS regression, two
+  7. `capm-sml` — SML + alpha and a simulated market-model OLS regression, two
      side-by-side sections (L4 §2–3). Deck β = 1.45.
-  5. `diversification` — equal-weight portfolio σ vs N for 3 cases
+  8. `diversification` — equal-weight portfolio σ vs N for 3 cases
      (uncorrelated, common ρ, CAPM single-factor); β²=ρ coincide flag;
      variance-decomposition inset + share bar (L4 Appendix). Web version of
      `PortfolioVarianceAndDiversification.xlsx`. x-axis tracks the N slider;
      charts use `--stroke-scale: 1.5` (thick lines, base-size labels).
-  6. `beauty-contest` — 2/3-of-the-average game (L6 §3). Instructor/projector
+  9. `beauty-contest` — 2/3-of-the-average game (L6 §3). Instructor/projector
      page (histogram, close-round reveal of mean/target/winner, round-history
      convergence chart, level-k markers) + mobile student page `submit.html`
      reachable by QR (vendored qrcode-generator 1.4.4). Live channel =
@@ -33,12 +50,12 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      as a toggle/fallback.
      Pure game logic in `game.js` (desk-checked vs Loudis's workbook:
      mean 33.179 → target 22.119).
-  7. `duration` — price–yield curve with duration tangent vs exact repricing,
+  10. `duration` — price–yield curve with duration tangent vs exact repricing,
      PV cash-flow fulcrum at t = D, spot-curve/forward panel in `spotpanel.js`
      (L7 §3–4). Defaults = deck Example 1 (8% coupon, 6y, y=8% → B=$1,000,
      D=4.9927); deck slide prints ΔB≈$46.20 from rounded D, tool uses full
      precision ($46.23).
-  8. `black-scholes` — BS call/put pricing (L8 §3–4): time-value band, delta
+  11. `black-scholes` — BS call/put pricing (L8 §3–4): time-value band, delta
      tangent + deck-phrased hedging readout, σ/T comparative statics, parity
      card in the deck's discrete form (anchors $3.29 and deck Ex. 1 $0.35).
      Defaults = deck example S=100, X=95, σ=50%, r=10%, T=0.25 (C=13.695).
@@ -53,8 +70,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
   self-gate via `lib/release.js` `gateTool()`; `#preview` = instructor
   bypass. Edit + push to release a tool.
-- **Tests:** `node --test tests/finmath.test.js`, 25 passing (incl. BS,
-  parity, bond price/duration, forward-rate anchor tests).
+- **Tests:** `node --test tests/finmath.test.js`, 30 passing (incl. BS,
+  parity, bond price/duration, forward-rate, L1 fee/average and L2
+  order-book/margin/short anchor tests).
 - **Deploy:** push to `main` → GitHub Pages → christiankontz.com/fin30600-tools.
 
 ## Key decisions / rulings (Christian)
@@ -99,6 +117,15 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-07-11 — Three L1/L2 tools added (parallel subagent build; Christian
+  picked them from a brainstormed menu): `compounding-drags` (L1 fee drag +
+  volatility drag, two columns), `order-book` (L2 book walker + depth-cost
+  curve + limit/stop playground), `margin-short` (L2 margin buy + short sale
+  mirror). finmath grew arithmeticMean/geometricMean/geometricApprox/
+  feeWealth/decliningExitFee/walkBook + 8 margin/short functions; tests
+  25 → 30. All three registered in releases.js (`true`) with landing cards
+  in lecture order. Suite is now 11 tools spanning L1–L8.
 
 - 2026-07-11 — RELEASE GATING added: `releases.js` (repo root) maps each tool
   to true / false / 'YYYY-MM-DD' (auto-release on the lecture date). Landing

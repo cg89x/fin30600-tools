@@ -18,6 +18,9 @@ dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self
 
 | Tool | Lecture | What it does |
 |------|---------|--------------|
+| [`tools/compounding-drags/`](tools/compounding-drags/) | L1 §4+§6 | Two columns, one lesson: fund-fee drag (Class A front load vs. Class B level load, active vs. passive) and volatility drag (arithmetic vs. geometric average, R_G ≈ R_A − ½σ², simulated wealth paths). |
+| [`tools/order-book/`](tools/order-book/) | L2 §3 | Limit order book: market orders walk the book level by level (deck's hypothetical book), depth-cost staircase, and limit/stop orders against a static quote and a moving price path (gap risk). |
+| [`tools/margin-short/`](tools/margin-short/) | L2 §4–5 | Buying on margin and short sales as mirror images: balance-sheet bar, return magnified by 1/margin, margin-call prices, unbounded short losses. |
 | [`tools/two-asset/`](tools/two-asset/) | L3 §4 | Two-asset opportunity set as ρ and weight vary; minimum-variance portfolio. |
 | [`tools/capital-allocation/`](tools/capital-allocation/) | L3 §2–3 | CAL from the risk-free asset through a risky portfolio; utility and optimal w*. |
 | [`tools/efficient-frontier/`](tools/efficient-frontier/) | L3 §5 | N-asset minimum-variance frontier, global MVP, and max-Sharpe tangency. |
@@ -65,8 +68,11 @@ hand-checked OLS sample, the Cholesky positive-definite guard, the
 diversification workbook formulas (`ewVarUncorrelated`/`ewVarCommonCorr`
 against `PortfolioVarianceAndDiversification.xlsx`), Black–Scholes (the
 10.4506/5.5735 textbook case, deck put–call parity anchors $3.29 and $0.35),
-and the bond math (price/duration hand-computed case, the deck's −D·Δy/(1+y)
-anchor of +1.16%, forward rates).
+the bond math (price/duration hand-computed case, the deck's −D·Δy/(1+y)
+anchor of +1.16%, forward rates), the L1 fee/average math (Class A vs. B
+share-class anchors, the +100%/−50% arithmetic-vs-geometric example), and the
+L2 trading math (order-book walks — sell 30 → $251.25, margin magnification
+±36.36%, margin-call prices $75/$82.50 and $57.69, short return −12%).
 
 Syntax-check every module with:
 

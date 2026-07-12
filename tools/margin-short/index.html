@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buying on Margin &amp; Short Sales · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* tool-local: two FULL-WIDTH sections stacked (long margin buy, then the
+       short sale — deliberately parallel, mirror-image geometry). */
+    [hidden] { display: none !important; }
+
+    .page-lead {
+      max-width: 1500px; margin: 0.9rem auto 0; padding: 0 1.4rem;
+      color: var(--muted); font-size: 0.95rem;
+    }
+    .sections-col { max-width: 1500px; margin: 0 auto; }
+    .tool-section { border-bottom: 1px solid var(--panel-border); padding-bottom: 1.2rem; }
+    .tool-section:last-of-type { border-bottom: none; }
+
+    .section-head {
+      margin: 1.1rem 1.4rem 0;
+      padding-left: 0.7rem;
+      border-left: 3px solid var(--goldmetal);
+      display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;
+    }
+    .section-head h2 {
+      margin: 0; color: var(--navy); font-family: var(--font-display);
+      font-size: 1.25rem; font-weight: 700;
+    }
+    .section-head .sec-ref {
+      font-size: 0.75rem; font-weight: 700; color: var(--goldmetal);
+      background: rgba(201, 151, 0, 0.1); border-radius: 4px;
+      padding: 0.12rem 0.5rem; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .section-head p.sec-lead { margin: 0; color: var(--muted); font-size: 0.9rem; flex-basis: 100%; }
+
+    /* chart rows: account bar (narrow) | magnification line (wide);
+       collapse below ~980px (house breakpoint) */
+    .chart-row { grid-template-columns: minmax(300px, 2fr) 3fr; }
+    @media (max-width: 980px) { .chart-row { grid-template-columns: 1fr; } }
+
+    /* the "star" control — the current-price scenario slider */
+    .star-group .group-title { color: var(--goldmetal); }
+    .star-group .ctrl-range { accent-color: var(--gold); }
+    .star-group .ctrl-readout { color: var(--gold); }
+
+    /* margin-call status strip (constant height so the chart never jumps) */
+    .mc-strip {
+      display: flex; align-items: center; gap: 0.6rem;
+      min-height: 2.2rem; border-radius: 8px; padding: 0.3rem 0.8rem;
+      font-size: 0.85rem; margin: 0.1rem 0.1rem 0.4rem;
+    }
+    .mc-strip.ok {
+      background: var(--softgray); color: var(--muted);
+      border: 1px solid var(--panel-border);
+    }
+    .mc-strip.call {
+      background: #FBE9E9; color: #8F1414; border: 1px solid var(--red);
+      animation: mcflash 1.1s ease-in-out infinite;
+    }
+    .mc-strip .mc-flag {
+      background: var(--red); color: #fff; font-weight: 700;
+      letter-spacing: 0.06em; padding: 0.12rem 0.55rem; border-radius: 4px;
+      font-size: 0.78rem; white-space: nowrap;
+    }
+    @keyframes mcflash {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(214, 39, 40, 0.35); }
+      50%      { box-shadow: 0 0 0 6px rgba(214, 39, 40, 0); }
+    }
+
+    .readout .v.red { color: var(--red); }
+    svg.finchart .seglabel { font-weight: 700; }
+
+    .chart-caption {
+      font-size: 0.82rem; color: var(--label);
+      margin: 0.25rem 0.2rem 0.1rem; line-height: 1.35;
+    }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 0.4rem 1rem;
+      font-size: 0.8rem; color: var(--label); margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block; width: 1.4rem; height: 0;
+      border-top-width: 3px; border-top-style: solid;
+      vertical-align: middle; margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.navy { border-color: var(--navy); }
+    .legend .swatch.red-dash { border-color: var(--red); border-top-style: dashed; }
+    .legend .swatch.grey-dash { border-color: var(--axis); border-top-style: dashed; }
+    .legend .box {
+      display: inline-block; width: 0.8rem; height: 0.8rem;
+      border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px;
+    }
+    .legend .box.blue { background: var(--blue); }
+    .legend .box.gold { background: var(--gold); }
+    .legend .box.navy { background: var(--navy); }
+
+    /* "short selling in practice" note card (deck §5) */
+    .practice-card { padding: 0.8rem 1rem 0.9rem; }
+    .practice-card h3 {
+      margin: 0 0 0.2rem; font-size: 0.95rem; color: var(--navy);
+      text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
+    }
+    .practice-card ul {
+      margin: 0.4rem 0 0; padding-left: 1.1rem;
+      columns: 2; column-gap: 2.4rem;
+      font-size: 0.88rem; color: var(--label);
+    }
+    .practice-card li { margin-bottom: 0.3rem; break-inside: avoid; }
+    .practice-card b { color: var(--navy); }
+    @media (max-width: 700px) { .practice-card ul { columns: 1; } }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Buying on Margin &amp; Short Sales</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 2 · §4–5</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <p class="page-lead">
+    Margin magnifies returns in both directions by 1/margin; a short sale is the
+    mirror image — with the margin call <em>above</em> you instead of below.
+  </p>
+
+  <main class="sections-col">
+    <!-- ==================== SECTION 1 — BUYING ON MARGIN ==================== -->
+    <section class="tool-section" id="long-section">
+      <div class="section-head">
+        <h2>Buying on Margin</h2>
+        <span class="sec-ref">§4 · Margin</span>
+        <p class="sec-lead">
+          The deck's SpaceX example: borrow from your broker to buy more shares than
+          your cash allows. Every price move lands on your equity slice — magnified
+          by M = 1/margin — and if the price falls far enough, the broker calls.
+        </p>
+      </div>
+      <div class="tool-main">
+        <aside class="controls-panel" aria-label="Margin-buy controls">
+          <h2>The levered long</h2>
+          <div class="group">
+            <div class="group-title">Position</div>
+            <div id="long-position"></div>
+          </div>
+          <div class="group">
+            <div class="group-title">Margin &amp; loan</div>
+            <div id="long-margin"></div>
+          </div>
+          <div class="group star-group">
+            <div class="group-title">★ Scenario</div>
+            <div id="long-scenario"></div>
+          </div>
+        </aside>
+        <div class="chart-area">
+          <div class="formula-strip">
+            <div class="formula-row" id="long-f1"></div>
+            <div class="formula-row" id="long-f2"></div>
+          </div>
+          <div class="readouts" id="long-readouts"></div>
+          <div class="chart-row">
+            <div class="chart-box">
+              <div class="mc-strip ok" id="long-mc"></div>
+              <div id="long-bar"></div>
+              <div class="legend">
+                <span><span class="box gold"></span>Broker loan</span>
+                <span><span class="box blue"></span>Your equity</span>
+                <span><span class="swatch grey-dash"></span>Loan balance (fixed)</span>
+                <span><span class="swatch red-dash"></span>Margin-call price</span>
+              </div>
+              <p class="chart-caption" data-label="The account at the current price: the position is worth $N \times P_1$; the broker's loan claim is the fixed gold slice at the bottom, and your equity is whatever is left on top. Right-hand labels: the same scale in price per share."></p>
+            </div>
+            <div class="chart-box">
+              <div id="long-mag"></div>
+              <div class="legend">
+                <span><span class="swatch blue"></span>Levered return on equity</span>
+                <span><span class="swatch grey-dash"></span>Unlevered (all-cash) stock</span>
+                <span><span class="box navy"></span><span data-label="Deck $\pm 20\%$ scenarios"></span></span>
+                <span><span class="box gold"></span><span data-label="Current $P_1$"></span></span>
+                <span><span class="swatch red-dash"></span>Margin-call region</span>
+              </div>
+              <p class="chart-caption" data-label="Slope $M = 1/\text{margin}$: every $1\%$ the stock moves becomes $M\%$ on your equity — in both directions. Left of the red line, the price has fallen past the margin-call trigger."></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= SECTION 2 — SHORT SALES ====================== -->
+    <section class="tool-section" id="short-section">
+      <div class="section-head">
+        <h2>Short Sales</h2>
+        <span class="sec-ref">§5 · Short Sales</span>
+        <p class="sec-lead">
+          The deck's ATT example: sell borrowed shares hoping to buy them back
+          cheaper. The payoff line flips sign — you gain when the price falls —
+          and the margin call now sits <em>above</em> the current price.
+        </p>
+      </div>
+      <div class="tool-main">
+        <aside class="controls-panel" aria-label="Short-sale controls">
+          <h2>The short position</h2>
+          <div class="group">
+            <div class="group-title">Position</div>
+            <div id="short-position"></div>
+          </div>
+          <div class="group">
+            <div class="group-title">Margin</div>
+            <div id="short-margin"></div>
+          </div>
+          <div class="group star-group">
+            <div class="group-title">★ Scenario</div>
+            <div id="short-scenario"></div>
+          </div>
+        </aside>
+        <div class="chart-area">
+          <div class="formula-strip">
+            <div class="formula-row" id="short-f1"></div>
+            <div class="formula-row" id="short-f2"></div>
+          </div>
+          <div class="readouts" id="short-readouts"></div>
+          <div class="chart-row">
+            <div class="chart-box">
+              <div class="mc-strip ok" id="short-mc"></div>
+              <div id="short-bar"></div>
+              <div class="legend">
+                <span><span class="swatch navy"></span><span data-label="Assets $C_0 + N P_0$ (fixed)"></span></span>
+                <span><span class="box gold"></span><span data-label="Shares owed ($N \times P_1$)"></span></span>
+                <span><span class="box blue"></span>Your equity</span>
+                <span><span class="swatch red-dash"></span>Margin-call price</span>
+              </div>
+              <p class="chart-caption" data-label="Assets are frozen at $C_0 + N P_0$ (margin cash + sale proceeds); what you owe — $N$ shares at the market price — grows as the price RISES and squeezes your equity from below. For a short, danger is up."></p>
+            </div>
+            <div class="chart-box">
+              <div id="short-mag"></div>
+              <div class="legend">
+                <span><span class="swatch blue"></span><span data-label="Short return on equity (slope $-1/\text{margin}$)"></span></span>
+                <span><span class="swatch grey-dash"></span>Long, unlevered (for contrast)</span>
+                <span><span class="box navy"></span><span data-label="Deck $+6\%$ scenario"></span></span>
+                <span><span class="box gold"></span><span data-label="Current $P_1$"></span></span>
+                <span><span class="swatch red-dash"></span>Margin-call region</span>
+              </div>
+              <p class="chart-caption" data-label="Gains are capped — the price can only fall to zero — but as $P_1 \to \infty$ equity $\to -\infty$: short losses are unbounded, the mechanism behind the deck's GameStop (2021) and Volkswagen (2008) short squeezes."></p>
+            </div>
+          </div>
+          <div class="chart-box practice-card">
+            <h3>Short selling in practice</h3>
+            <ul>
+              <li><b>Stock loan fee</b> — you pay to borrow the shares.</li>
+              <li><b>Dividends</b> — you owe any dividends the stock pays while you are short.</li>
+              <li><b>Recall risk</b> — the lender can demand the borrowed shares back at any time.</li>
+              <li><b>Loan-fee risk</b> — borrowing costs can change while the position is open.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

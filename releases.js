@@ -22,6 +22,9 @@
 export const HIDE_LOCKED = false;
 
 const RELEASES = {
+  'compounding-drags': true,   // L1 §4 + §6
+  'order-book': true,          // L2 §3
+  'margin-short': true,        // L2 §4–5
   'two-asset': true,           // L3 §4
   'capital-allocation': true,  // L3 §2–3
   'efficient-frontier': true,  // L3 §5

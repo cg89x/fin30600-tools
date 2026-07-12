@@ -358,3 +358,86 @@ test('forward rates and pricing off the spot curve', () => {
   assertNear(fm.bondPriceFromSpots(0.10, [0.08, 0.08, 0.08], 1000),
     fm.bondPrice(0.10, 0.08, 3, 1000), 1e-9, 'flat curve = flat yield');
 });
+
+/* ----------------------------------------- L1 §4: arithmetic vs geometric */
+
+test('arithmetic vs geometric average (L1 deck +100%/−50% example)', () => {
+  const rets = [1.0, -0.5];
+  assertNear(fm.arithmeticMean(rets), 0.25, 1e-12, 'arithmetic 25%');
+  assertNear(fm.geometricMean(rets), 0.0, 1e-12, 'geometric 0% (wealth unchanged)');
+  // constant series: both averages equal the constant
+  assertNear(fm.geometricMean([0.07, 0.07, 0.07]), 0.07, 1e-12, 'constant series');
+  // volatility-drag approximation, deck table row "Small U.S. stocks":
+  // R_A 14.19%, σ 25.20% ⇒ R_A − σ²/2 = 14.19 − 3.18 = 11.01%
+  assertNear(fm.geometricApprox(0.1419, 0.2520), 0.110148, 1e-6, 'R_A − σ²/2');
+});
+
+/* ------------------------------------------------- L1 §6: fund fee drag */
+
+test('fund fee drag (L1 deck Class A vs Class B anchors)', () => {
+  // Class A: 6% front load, 10% return — 4y $1,376.3 / 15y $3,926.6
+  assertNear(fm.feeWealth(1000, 0.10, 4, { frontLoad: 0.06 }), 1376.3, 0.05, 'A 4y');
+  assertNear(fm.feeWealth(1000, 0.10, 15, { frontLoad: 0.06 }), 3926.6, 0.05, 'A 15y');
+  // Class B: 0.5% 12b-1, exit fee 5% declining 1%/yr — 4y $1,423.3 / 15y $3,901.3
+  assertNear(fm.decliningExitFee(0.05, 0.01, 4), 0.01, 1e-12, 'exit fee year 4');
+  assertNear(fm.decliningExitFee(0.05, 0.01, 5), 0, 1e-12, 'exit fee year 5');
+  assertNear(fm.decliningExitFee(0.05, 0.01, 15), 0, 1e-12, 'exit fee floors at 0');
+  assertNear(fm.feeWealth(1000, 0.10, 4, { annualFee: 0.005, exitFee: 0.01 }),
+    1423.3, 0.05, 'B 4y');
+  assertNear(fm.feeWealth(1000, 0.10, 15, { annualFee: 0.005 }), 3901.3, 0.05, 'B 15y');
+  // Active vs passive example: $100,000, 6%, 30 years, 0.84% vs 0.14%
+  const active = fm.feeWealth(100000, 0.06, 30, { annualFee: 0.0084 });
+  const passive = fm.feeWealth(100000, 0.06, 30, { annualFee: 0.0014 });
+  assertNear(active, 452395, 1, 'active $452,395');
+  assertNear(passive, 552022, 1, 'passive $552,022');
+  assertNear(passive - active, 99628, 2, 'difference $99,628');
+});
+
+/* ------------------------------------------------ L2 §3: limit order book */
+
+test('market order walks the book (L2 deck hypothetical book)', () => {
+  const bids = [{ price: 9.75, size: 15 }, { price: 9.50, size: 10 }, { price: 2.00, size: 10 }];
+  const asks = [{ price: 10.25, size: 15 }, { price: 11.50, size: 10 }, { price: 20.00, size: 10 }];
+  assertNear(fm.walkBook(bids, 10).total, 97.50, 1e-9, 'sell 10');
+  assertNear(fm.walkBook(bids, 20).total, 193.75, 1e-9, 'sell 20');
+  assertNear(fm.walkBook(bids, 30).total, 251.25, 1e-9, 'sell 30');
+  assertNear(fm.walkBook(asks, 10).total, 102.50, 1e-9, 'buy 10');
+  assertNear(fm.walkBook(asks, 20).total, 211.25, 1e-9, 'buy 20');
+  assertNear(fm.walkBook(asks, 30).total, 368.75, 1e-9, 'buy 30');
+  // average price and fills bookkeeping
+  const s30 = fm.walkBook(bids, 30);
+  assertNear(s30.avgPrice, 251.25 / 30, 1e-12, 'sell 30 avg price');
+  assert.equal(s30.fills.length, 3, 'sell 30 hits three levels');
+  // order bigger than the book: fills what is there
+  const s40 = fm.walkBook(bids, 40);
+  assert.equal(s40.sharesFilled, 35, 'book exhausted at 35 shares');
+  assertNear(s40.total, 261.25, 1e-9, 'sell 40 total = whole bid side');
+  assert.equal(fm.walkBook(bids, 0).avgPrice, null, 'zero order has no price');
+});
+
+/* -------------------------------------------- L2 §4–5: margin & short sales */
+
+test('buying on margin (L2 deck SpaceX example)', () => {
+  // $5,500 equity, P=$100, IM 55%, MM 40%
+  assertNear(fm.marginSharesMax(5500, 100, 0.55), 100, 1e-9, 'N = 100 shares');
+  const loan = 100 * 100 - 5500; // 4,500
+  assertNear(fm.longMarginRate(100, 100, loan), 0.55, 1e-12, 'initial margin rate');
+  assertNear(fm.longLeveredReturn(100, 120, loan, 5500), 0.363636, 1e-6, 'good state +36.36%');
+  assertNear(fm.longLeveredReturn(100, 80, loan, 5500), -0.363636, 1e-6, 'bad state −36.36%');
+  // magnification: M = 1/0.55 = 1.8182 times the ±20% stock return
+  assertNear((1 / 0.55) * 0.20, 0.363636, 1e-6, 'M × R_stock');
+  assertNear(fm.longMarginCallPrice(loan, 100, 0.40), 75.00, 1e-9, 'margin call at $75');
+  assertNear(fm.longMarginCallPrice(loan * 1.10, 100, 0.40), 82.50, 1e-9,
+    'margin call at $82.50 with 10% call-loan interest');
+});
+
+test('short sales (L2 deck ATT example)', () => {
+  // short 100 @ $50, IM 50%, MM 30%
+  assertNear(fm.shortCashRequired(100, 50, 0.50), 2500, 1e-9, 'cash in $2,500');
+  assertNear(fm.shortMarginRate(2500, 100, 50, 50), 0.50, 1e-12, 'initial margin rate');
+  assertNear(fm.shortMarginCallPrice(2500, 100, 50, 0.30), 57.6923, 1e-4,
+    'margin call at $57.69');
+  assertNear(fm.shortReturn(2500, 100, 50, 53), -0.12, 1e-12, 'price to $53 → −12%');
+  // −R_stock × 1/im identity: (−6%) × (1/0.5) = −12%
+  assertNear(-((53 - 50) / 50) / 0.50, -0.12, 1e-12, 'magnification identity');
+});
