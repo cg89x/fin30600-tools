@@ -49,6 +49,10 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - **No presenter mode** (removed 2026-07-11) — projector scaling is per-tool
   via `--stroke-scale` on `.chart-box`.
 - **Landing page** = one card per tool, in lecture order.
+- **Release gating**: `releases.js` controls which tools students see
+  (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
+  self-gate via `lib/release.js` `gateTool()`; `#preview` = instructor
+  bypass. Edit + push to release a tool.
 - **Tests:** `node --test tests/finmath.test.js`, 25 passing (incl. BS,
   parity, bond price/duration, forward-rate anchor tests).
 - **Deploy:** push to `main` → GitHub Pages → christiankontz.com/fin30600-tools.
@@ -95,6 +99,14 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-07-11 — RELEASE GATING added: `releases.js` (repo root) maps each tool
+  to true / false / 'YYYY-MM-DD' (auto-release on the lecture date). Landing
+  cards grey out + unlink when locked (or vanish if HIDE_LOCKED=true); every
+  tool's main.js awaits `gateTool(key)` (lib/release.js) which swaps in a
+  lock screen and suspends the module when unreleased. Instructor bypass:
+  `#preview` in the tool URL. All 8 tools currently released. Also:
+  beauty-contest rules card + equilibrium-math fonts +20%.
 
 - 2026-07-11 — Beauty-contest layout rework (Christian): level-k markers
   option REMOVED (debrief math covers it); game controls (New session, sim

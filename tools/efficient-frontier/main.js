@@ -30,6 +30,11 @@ import {
   renderWeights, makeHoverTip,
 } from './view.js';
 
+// release gate: if this tool is unreleased (see /releases.js), swap in a
+// lock screen and suspend here — nothing below runs. `#preview` bypasses.
+import { gateTool } from '../../lib/release.js';
+await gateTool('efficient-frontier');
+
 /* --------------------------------------------------------- defaults ------- */
 
 const N = 5;

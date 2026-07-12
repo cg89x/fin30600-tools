@@ -26,6 +26,11 @@ import { Chart, pct, fixed } from '../../lib/chart.js';
 import { slider, numberInput, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
+// release gate: if this tool is unreleased (see /releases.js), swap in a
+// lock screen and suspend here — nothing below runs. `#preview` bypasses.
+import { gateTool } from '../../lib/release.js';
+await gateTool('capm-sml');
+
 /* ---- Fixed, documented market-model parameters (monthly) ------------------
  * The simulated market's excess return each month is drawn N(MKT_MEAN_EXCESS,
  * MKT_SIGMA²). These are plausible monthly-scaled figures: a ~0.5%/mo market

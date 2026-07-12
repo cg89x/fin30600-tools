@@ -21,6 +21,11 @@ import {
 import { slider, numberInput, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
+// release gate: if this tool is unreleased (see /releases.js), swap in a
+// lock screen and suspend here — nothing below runs. `#preview` bypasses.
+import { gateTool } from '../../lib/release.js';
+await gateTool('black-scholes');
+
 hydrateLabels();
 
 /* ----------------------------------------------------------------- state -- */

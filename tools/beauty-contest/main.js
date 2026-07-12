@@ -28,6 +28,11 @@ import {
 } from './game.js';
 import { rtdbClient } from './rtdb.js';
 
+// release gate: if this tool is unreleased (see /releases.js), swap in a
+// lock screen and suspend here — nothing below runs. `#preview` bypasses.
+import { gateTool } from '../../lib/release.js';
+await gateTool('beauty-contest');
+
 hydrateLabels();
 
 /* ------------------------------------------------------------- config ---- */

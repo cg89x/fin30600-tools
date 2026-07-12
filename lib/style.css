@@ -349,6 +349,14 @@ svg.finchart .marker { /* radius handled inline; scaled by --point-scale where u
 /* --------------------------------------------------- landing (index) ------ */
 
 .landing { max-width: 1500px; margin: 0 auto; padding: 1.75rem 1.4rem 3rem; }
+/* unreleased tool (release gating — see releases.js) */
+.tool-card.locked {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+  cursor: default;
+  pointer-events: none;
+}
+.tool-card.locked .lecture-ref { color: var(--muted); }
 .landing .lead { color: var(--muted); font-size: 1.02rem; margin: 0 0 1.5rem; }
 .card-grid {
   display: grid;

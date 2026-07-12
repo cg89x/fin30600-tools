@@ -27,6 +27,15 @@ dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self
 | [`tools/duration/`](tools/duration/) | L7 §3–4 | Price–yield curve with the duration tangent vs. exact repricing, the PV cash-flow fulcrum at t = D, and spot-curve/forward-rate pricing. |
 | [`tools/black-scholes/`](tools/black-scholes/) | L8 §3–4 | Black–Scholes calls and puts: intrinsic vs. time value, delta hedge ratio, comparative statics in σ and T, put–call parity (deck's discrete-rate form). |
 
+## Releasing tools to students
+
+[`releases.js`](releases.js) (repo root) controls which tools students can
+see — set each tool to `true`, `false`, or an auto-release date
+`'YYYY-MM-DD'` (the lecture date), then `git push`. Locked tools show a
+greyed-out "unlocks in class" card on the landing page (or disappear
+entirely with `HIDE_LOCKED = true`) and a lock screen at their URL.
+Instructor bypass: append `#preview` to any tool URL.
+
 ## Run locally
 
 No install step. Serve the repo root over HTTP (ES modules and `fetch` need a
