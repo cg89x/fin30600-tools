@@ -27,7 +27,7 @@ const RELEASES = {
   'volatility-drag': true,     // L1 §4
   'fee-drag': true,            // L1 §6
   'market-depth': true,        // L2 §3 (ex order-book; order-types tool to follow)
-  'margin-short': true,        // L2 §4–5
+  'margin-short': true,        // L2 §4–5 — REMOVED from live 2026-07-12; folder kept locally (untracked), key kept so the local copy isn't lock-screened
   'two-asset': true,           // L3 §4
   'capital-allocation': true,  // L3 §2–3
   'efficient-frontier': true,  // L3 §5

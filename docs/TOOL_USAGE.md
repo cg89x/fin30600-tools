@@ -44,7 +44,7 @@ orders execute for sure at an uncertain price; limit and stop orders name a
 price but may never fill — and a stop that's gapped through can execute far
 below its trigger.
 
-## Margin & short sales (L2 §4–5)
+## Margin & short sales (L2 §4–5 — removed from live 2026-07-12, kept locally)
 
 Two mirror-image panels. In the margin panel, buy stock with borrowed money,
 then drag the price: the balance-sheet bar shows your equity shrinking twice

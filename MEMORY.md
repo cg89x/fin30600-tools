@@ -6,7 +6,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Current state
 
-- **Thirteen tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
+- **Twelve tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
   tool-local modules where noted), listed in lecture order:
   1. `volatility-drag` — L1 §4: 25 seeded wealth paths
      vs the "arithmetic promise" (1+μ)^t and geometric expectation,
@@ -26,26 +26,21 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      revealed line by line with a trade headline "SELL 30 · MARKET ORDER…"),
      one-row readouts, ladder + equally-sized depth-cost curve side by side,
      book editor in a disclosure. "shares" written out, never "sh".
-  4. `margin-short` — L2 §4–5, two stacked mirror sections: margin buy (deck
-     SpaceX: N=100, loan $4,500, M=1.8182, call $75.00 / $82.50 w/ 10%
-     interest, ±20% → ±36.36%; balance bar + magnification line + MARGIN
-     CALL badge) and short sale (deck ATT: C₀ $2,500, call $57.69, $53 →
-     −12%, slope −1/margin; danger is UP).
-  5. `two-asset` — two-asset diversification, opportunity set vs ρ and weight
+  4. `two-asset` — two-asset diversification, opportunity set vs ρ and weight
      (L3 §4). Deck example A 8/13, B 16/20; Rule 2 shown in correlation form.
-  6. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
+  5. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
      from y\*), borrowing kink (L3 §2–3). Deck 7/15/22; w\* = 0.8264 at A = 2.
-  7. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
+  6. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
      tangency-weights bar (L3 §5). Defaults = 5 broad asset classes with
      realistic Sharpes (stocks 0.28–0.38, tangency ~0.47), NOT Jorion 1989.
-  8. `capm-sml` — SML + alpha and a simulated market-model OLS regression, two
+  7. `capm-sml` — SML + alpha and a simulated market-model OLS regression, two
      side-by-side sections (L4 §2–3). Deck β = 1.45.
-  9. `diversification` — equal-weight portfolio σ vs N for 3 cases
+  8. `diversification` — equal-weight portfolio σ vs N for 3 cases
      (uncorrelated, common ρ, CAPM single-factor); β²=ρ coincide flag;
      variance-decomposition inset + share bar (L4 Appendix). Web version of
      `PortfolioVarianceAndDiversification.xlsx`. x-axis tracks the N slider;
      charts use `--stroke-scale: 1.5` (thick lines, base-size labels).
-  10. `anomaly-lab` — L5 §1–2 (added 2026-07-12): live CAPM/FF3/Carhart
+  9. `anomaly-lab` — L5 §1–2 (added 2026-07-12): live CAPM/FF3/Carhart
      time-series regressions on 10 VW decile portfolios per sort (beta /
      size / BM / momentum), adjustable 1963–2026 window (deck-window preset
      1963–2023 reproduces the slide tables to vintage tolerance: Mkt prem
@@ -58,7 +53,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      202605 CRSP vintage); engine: finmath `olsMulti` (normal equations,
      pairwise-complete, null on collinear). Anchor tests:
      `tests/anomaly-lab-data.test.js`.
-  11. `beauty-contest` — 2/3-of-the-average game (L6 §3). Instructor/projector
+  10. `beauty-contest` — 2/3-of-the-average game (L6 §3). Instructor/projector
      page (histogram, close-round reveal of mean/target/winner, round-history
      convergence chart, level-k markers) + mobile student page `submit.html`
      reachable by QR (vendored qrcode-generator 1.4.4). Live channel =
@@ -69,12 +64,12 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      as a toggle/fallback.
      Pure game logic in `game.js` (desk-checked vs Loudis's workbook:
      mean 33.179 → target 22.119).
-  12. `duration` — price–yield curve with duration tangent vs exact repricing,
+  11. `duration` — price–yield curve with duration tangent vs exact repricing,
      PV cash-flow fulcrum at t = D, spot-curve/forward panel in `spotpanel.js`
      (L7 §3–4). Defaults = deck Example 1 (8% coupon, 6y, y=8% → B=$1,000,
      D=4.9927); deck slide prints ΔB≈$46.20 from rounded D, tool uses full
      precision ($46.23).
-  13. `black-scholes` — BS call/put pricing (L8 §3–4): time-value band, delta
+  12. `black-scholes` — BS call/put pricing (L8 §3–4): time-value band, delta
      tangent + deck-phrased hedging readout, σ/T comparative statics, parity
      card in the deck's discrete form (anchors $3.29 and deck Ex. 1 $0.35).
      Defaults = deck example S=100, X=95, σ=50%, r=10%, T=0.25 (C=13.695).
@@ -139,6 +134,13 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-12 — `margin-short` REMOVED from live (Christian: "for now"), but
+  KEPT LOCALLY: `git rm --cached` only, so `tools/margin-short/` still exists
+  untracked in the working tree (serves at localhost:8613; a plain
+  `git add tools/` would re-add it — deliberate). Its releases.js key stays
+  `true` so the local copy isn't lock-screened; landing card + README row
+  dropped. finmath margin/short functions + their tests stay (library code).
+  L2 live coverage is now market-depth only. Suite at TWELVE live tools.
 - 2026-07-12 — `order-book` REMOVED (Christian's call; earlier than the
   "after A2 ships" plan): tool folder, releases.js entry, and landing card
   deleted. Its depth half lives on as `market-depth`; the order-types half is
