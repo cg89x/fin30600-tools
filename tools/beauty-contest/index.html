@@ -30,6 +30,11 @@
     /* deck-quoted rules card */
     .rules-card .rules-lead { margin: 0 0 0.4rem; font-size: 1.02rem; }
     .rules-card strong { color: var(--navy); }
+    .rules-card .rules-example {
+      margin: 0 0 0.4rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
 
     /* dismissible simulation notice */
     .sim-notice {
@@ -201,15 +206,17 @@
       <div class="group">
         <div class="group-title">Simulation</div>
         <div id="ctrl-sim"></div>
-        <div id="ctrl-simn"></div>
-        <div id="ctrl-seed"></div>
-        <p class="note" data-label="A seeded class of level-$k$ reasoners. Each simulated round the class reasons one level deeper, so repeated play converges toward 0. Changing the class size or re-seeding restarts at round 1."></p>
+        <div id="sim-extras" hidden>
+          <div id="ctrl-simn"></div>
+          <div id="ctrl-seed"></div>
+          <p class="note" data-label="A seeded class of level-$k$ reasoners. Each simulated round the class reasons one level deeper, so repeated play converges toward 0. Changing the class size or re-seeding restarts at round 1."></p>
+        </div>
       </div>
 
       <div class="group">
         <div class="group-title">Display</div>
         <div id="ctrl-lk"></div>
-        <p class="note" data-label="Marks level-1 (33.3), level-2 (22.2), level-3 (14.8), and the Nash equilibrium (0) on the axis. Shown only after the round closes."></p>
+        <p class="note" data-label="Dashed guides at the level-$k$ reasoning steps: 33.3 (one step), 22.2 (two), 14.8 (three); the Nash equilibrium 0 is the left edge. Revealed only after the round closes."></p>
       </div>
     </section>
 
@@ -221,11 +228,16 @@
 
       <div class="formula-strip rules-card">
         <p class="rules-lead"><strong>Let&rsquo;s play a game.</strong>
-          On your phone, enter your name and a number between
-          <strong>0 and 100</strong>. The person who guesses the number that is
-          <strong>2/3 of the class average</strong> wins a prize!</p>
+          Pick a number between <strong>0 and 100</strong> and submit it from
+          your phone. We take the <strong>average</strong> of everyone&rsquo;s
+          numbers and multiply it by <strong>2/3</strong> &mdash; that&rsquo;s
+          the <strong>target</strong>. Whoever came
+          <strong>closest to the target wins a prize!</strong></p>
+        <p class="rules-example">Example: if the class average turns out to be
+          60, the target is 2/3&thinsp;&times;&thinsp;60&nbsp;=&nbsp;40 &mdash;
+          the guess closest to 40 wins.</p>
         <div class="formula-row" id="f-target"></div>
-        <div class="formula-row" id="f-iter"></div>
+        <div class="formula-row" id="f-iter" hidden></div>
         <div class="formula-row" id="f-reveal"></div>
       </div>
 

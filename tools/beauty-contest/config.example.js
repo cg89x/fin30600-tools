@@ -11,4 +11,8 @@
  */
 export default {
   databaseURL: 'https://YOUR-PROJECT-default-rtdb.firebaseio.com',
+  // Optional: a short typed-in join URL to display on the projector instead
+  // of the full submit.html address (set up a redirect page on your domain;
+  // the QR code always deep-links directly). Omit to show the full URL.
+  // shortJoinUrl: 'yourdomain.com/play',
 };

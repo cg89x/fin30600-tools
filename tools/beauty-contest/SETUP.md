@@ -36,6 +36,13 @@ Students `POST` guesses; the instructor page live-subscribes via
    paste the URL into `config.js`, and **commit `config.js`** — the URL is
    public by design (every student's phone fetches against it); all security
    lives in the database rules.
+6. Optional: set `shortJoinUrl` in `config.js` to a short typed-in address to
+   display on the projector (Christian's: `christiankontz.com/play`, a tiny
+   redirect page at `play/index.html` in the `cg89x.github.io` repo that
+   forwards to this tool's `submit.html`, preserving `#s=CODE` / `?s=CODE`).
+   The QR code always deep-links directly with the session code; the short
+   URL is for students who type instead of scan — they enter the code on the
+   submit page.
 
 ## Security rules
 

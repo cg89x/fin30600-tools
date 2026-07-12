@@ -96,6 +96,16 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-11 — Beauty-contest polish (Christian's feedback): the iterated-
+  reasoning 50→33.3→…→0 line was a strategy GIVEAWAY — now revealed only
+  after close (with the mean/target); rules rewritten in plain student
+  English + a worked micro-example; sim controls (class size/seed/note)
+  hidden unless simulation mode is on; level-k markers were invisible
+  6%-height axis ticks → now full-height dashed navy guides w/ white-halo
+  labels ("L1 = 33.3"…); short typed join URL **christiankontz.com/play**
+  (redirect page `play/index.html` in the cg89x.github.io repo, preserves
+  #s=CODE; shown via config.shortJoinUrl — QR still deep-links).
+
 - 2026-07-11 — Beauty-contest live polling ENABLED: Christian created Firebase
   project `ckontz-fin30600`, rules published; `config.js` committed. Verified
   end-to-end on the live site (session P8TT: two REST guesses streamed into

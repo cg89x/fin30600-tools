@@ -62,7 +62,9 @@ const el = {
   simNotice: $('sim-notice'),
   simNoticeText: $('sim-notice-text'),
   simNoticeDismiss: $('sim-notice-dismiss'),
+  simExtras: $('sim-extras'),
   fTarget: $('f-target'),
+  fIter: $('f-iter'),
   fReveal: $('f-reveal'),
   joinCard: $('join-card'),
   studentUrl: $('student-url'),
@@ -230,14 +232,18 @@ function drawHistogram(v) {
         shape: 'star', r: 10, fill: 'var(--gold)', stroke: 'var(--navy)',
       });
     }
-    // optional level-k markers
+    // optional level-k markers: full-height dashed guides with haloed labels
+    // (Nash = 0 is the left edge of the plot; no extra line needed there)
     if (S.lk) {
-      for (const mk of LEVEL_MARKS) {
-        histChart.segment(mk.v, 0, mk.v, yMax * 0.06, { stroke: 'var(--navy)', width: 2 });
-        histChart.text(mk.v, yMax * 0.06, mk.label, {
-          dy: -5, anchor: 'middle', fill: 'var(--navy)',
-        });
-      }
+      LEVEL_MARKS.filter((mk) => mk.v > 0).forEach((mk, i) => {
+        histChart.vline(mk.v, { stroke: 'var(--navy)', dash: '3 5', width: 1.6 });
+        const label = histChart.text(mk.v, yMax * (0.74 - i * 0.08),
+          `${mk.label} = ${mk.v.toFixed(1)}`, { anchor: 'middle', fill: 'var(--navy)' });
+        // white halo so the label survives sitting on a bar
+        label.setAttribute('paint-order', 'stroke');
+        label.setAttribute('stroke', '#fff');
+        label.setAttribute('stroke-width', '3.5');
+      });
     }
   }
 }
@@ -333,9 +339,17 @@ function drawFormulas(v) {
       `\\bar{g} = ${stats.mean.toFixed(2)} \\;\\Rightarrow\\; ` +
       `\\tfrac{2}{3}\\times${stats.mean.toFixed(2)} = \\mathbf{${stats.target.toFixed(2)}}`);
     el.fReveal.hidden = false;
+    // debrief line — the strategy giveaway, so it only appears AFTER close
+    if (!el.fIter.childNodes.length) {
+      renderTeX(el.fIter,
+        '\\text{iterated reasoning: } 50 \\to 33.3 \\to 22.2 \\to 14.8 '
+        + '\\to \\cdots \\to 0 \\text{ (the Nash equilibrium)}');
+    }
+    el.fIter.hidden = false;
   } else {
     el.fReveal.hidden = true;
     el.fReveal.replaceChildren();
+    el.fIter.hidden = true;
   }
 }
 
@@ -354,7 +368,9 @@ function drawJoinCard() {
   if (!show) { lastQrCode = ''; return; }
   el.codeDisplay.textContent = code.split('').join(' ');
   const url = studentUrlFor(code);
-  el.studentUrl.textContent = url;
+  // typed-in URL: prefer the short redirect (config.shortJoinUrl) — students
+  // land on submit.html and type the session code. The QR deep-links w/ code.
+  el.studentUrl.textContent = (config && config.shortJoinUrl) || url;
   if (code !== lastQrCode) {
     const qrFactory = /** @type {any} */ (globalThis).qrcode;
     if (typeof qrFactory === 'function') {
@@ -406,6 +422,7 @@ function renderStatusLine() {
 /* ------------------------------------------------------------ render ----- */
 function render() {
   const v = view();
+  el.simExtras.hidden = !isSim(); // class-size/seed only matter in sim mode
   drawJoinCard();
   drawRoundBar(v);
   drawHistogram(v);
@@ -546,10 +563,9 @@ el.btnNext.addEventListener('click', nextRound);
 el.simNoticeDismiss.addEventListener('click', () => { el.simNotice.hidden = true; });
 
 /* ----------------------------------------------------------- startup ----- */
-renderTeX(el.fTarget, '\\text{winner: closest to } \\tfrac{2}{3}\\times\\text{class mean}');
-renderTeX($('f-iter'),
-  '\\text{iterated reasoning: } 50 \\to 33.3 \\to 22.2 \\to 14.8 \\to \\cdots \\to 0' +
-  '\\text{ (the Nash equilibrium)}');
+renderTeX(el.fTarget,
+  '\\text{target} = \\tfrac{2}{3}\\times\\text{class average}'
+  + '\\qquad \\text{winner: closest guess to the target}');
 
 if (!HAS_LIVE) {
   el.simNoticeText.textContent =
