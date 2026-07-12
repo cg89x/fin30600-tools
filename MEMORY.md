@@ -83,7 +83,14 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - **Release gating**: `releases.js` controls which tools students see
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
   self-gate via `lib/release.js` `gateTool()`; `#preview` = instructor
-  bypass. Edit + push to release a tool.
+  bypass. Edit + push to release a tool. SINCE 2026-07-12 every live tool
+  carries its Fall-2026 lecture date (syllabus schedule): volatility-drag
+  8/25 · fee-drag 9/1 · market-depth 9/3 · capital-allocation 9/15 ·
+  two-asset 9/17 · efficient-frontier 9/22 · diversification 9/24 ·
+  capm-sml 9/29 · anomaly-lab 10/15 · beauty-contest 11/3 · duration 11/10 ·
+  black-scholes 12/1. ALL LOCKED until the semester; within-module day
+  picks are judgment calls (comments in releases.js) — nudge as pacing
+  becomes clear. margin-short stays `true` (local-only, no live effect).
 - **Tests:** `node --test tests/*.test.js` — finmath.test.js (37: BS, parity,
   bond price/duration, forward-rate, L1 fee/average, L2 order-book/margin/
   short anchors, olsMulti numpy cross-check) + anomaly-lab-data.test.js
@@ -134,6 +141,10 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-12 — RELEASE DATES SET (Christian: "set the release timing to the
+  dates listed in the syllabus"): every live tool's releases.js entry is now
+  its Fall-2026 lecture date (see Current state → Release gating for the
+  full list). Site shows all-locked cards until 8/25; #preview bypasses.
 - 2026-07-12 — `margin-short` REMOVED from live (Christian: "for now"), but
   KEPT LOCALLY: `git rm --cached` only, so `tools/margin-short/` still exists
   untracked in the working tree (serves at localhost:8613; a plain

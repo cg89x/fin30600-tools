@@ -24,19 +24,19 @@
 export const HIDE_LOCKED = false;
 
 const RELEASES = {
-  'volatility-drag': true,     // L1 §4
-  'fee-drag': true,            // L1 §6
-  'market-depth': true,        // L2 §3 (ex order-book; order-types tool to follow)
-  'margin-short': true,        // L2 §4–5 — REMOVED from live 2026-07-12; folder kept locally (untracked), key kept so the local copy isn't lock-screened
-  'two-asset': true,           // L3 §4
-  'capital-allocation': true,  // L3 §2–3
-  'efficient-frontier': true,  // L3 §5
-  'capm-sml': true,            // L4 §2–3
-  'diversification': true,     // L4 appendix
-  'anomaly-lab': true,         // L5 §1–2
-  'beauty-contest': true,      // L6 §3
-  'duration': true,             // L7 §3–4
-  'black-scholes': true,       // L8 §3–4
+  'volatility-drag': '2026-08-25',  // L1 §4 — L1 day 1 (Tu 8/25)
+  'fee-drag': '2026-09-01',         // L1 §6 — L1 day 2 (Tu 9/1)
+  'market-depth': '2026-09-03',     // L2 §3 — L2 day 1 (Th 9/3); ex order-book, order-types tool to follow
+  'margin-short': true,             // L2 §4–5 — REMOVED from live 2026-07-12; folder kept locally (untracked), key kept TRUE so the local copy isn't lock-screened (if restored to live, gate it '2026-09-08')
+  'two-asset': '2026-09-17',        // L3 §4 — L3 day 3 (Th 9/17)
+  'capital-allocation': '2026-09-15', // L3 §2–3 — L3 day 2 (Tu 9/15)
+  'efficient-frontier': '2026-09-22', // L3 §5 — L3 day 4 (Tu 9/22)
+  'capm-sml': '2026-09-29',         // L4 §2–3 — L4 day 2 (Tu 9/29)
+  'diversification': '2026-09-24',  // L4 appendix — L4 day 1 (Th 9/24)
+  'anomaly-lab': '2026-10-15',      // L5 §1–2 — L5 day 1 (Th 10/15)
+  'beauty-contest': '2026-11-03',   // L6 §3 — L6 day 2 (Tu 11/3, behavioral day; game is played IN class)
+  'duration': '2026-11-10',         // L7 §3–4 — L7 day 2 (Tu 11/10)
+  'black-scholes': '2026-12-01',    // L8 §3–4 — L8 day 2 (Tu 12/1, BKM 16.1 valuation day)
 };
 export default RELEASES;
 
