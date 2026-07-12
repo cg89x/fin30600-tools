@@ -6,7 +6,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Current state
 
-- **Thirteen tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
+- **Fourteen tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
   tool-local modules where noted), listed in lecture order:
   1. `volatility-drag` — L1 §4: 25 seeded wealth paths
      vs the "arithmetic promise" (1+μ)^t and geometric expectation,
@@ -17,12 +17,22 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      (anchors T=4 → $1,376.25/$1,423.28 B wins, T=15 → $3,926.61/$3,901.30
      A wins; crossover marker), active-vs-passive preset → $99,628 gap.
      Other half of the split; cross-links to volatility-drag.
-  3. `order-book` — L2 §3: editable deck book (bids 9.75×15/9.50×10/2.00×10,
+  3. `market-depth` — L2 §3 (added 2026-07-12, the order-book redesign's
+     depth half, née prototype "A1"): quiz-chip strip (sell/buy 10-20-30 +
+     inline order ticket) drives an animated walk (555 ms/level) of a
+     FOUR-level book — default asks 10.25×4/10.75×10/11.60×5/13.00×15, bids
+     9.75×5/9.30×9/8.50×6/7.25×12 (sell 30 → $255.95, avg $8.5317); the deck's
+     3-level book is the "Deck example" preset. Arithmetic panel (left,
+     revealed line by line with a trade headline "SELL 30 · MARKET ORDER…"),
+     one-row readouts, ladder + equally-sized depth-cost curve side by side,
+     book editor in a disclosure. "shares" written out, never "sh".
+  4. `order-book` — L2 §3: editable deck book (bids 9.75×15/9.50×10/2.00×10,
      asks 10.25×15/11.50×10/20.00×10), animated market-order walk (sell 30 →
      $251.25, avg $8.375; buy 30 → $368.75), depth-cost staircase, thin-book
      preset (flash-crash caption), ABC $55.25/$55.50 order-type card (deck
      wording), resting limit/stop vs a seeded price path w/ gap risk (extra
-     module `paths.js`).
+     module `paths.js`). RETIRES once the order-types redesign (local
+     prototype `proto-a-types`) ships.
   4. `margin-short` — L2 §4–5, two stacked mirror sections: margin buy (deck
      SpaceX: N=100, loan $4,500, M=1.8182, call $75.00 / $82.50 w/ 10%
      interest, ±20% → ±36.36%; balance bar + magnification line + MARGIN
@@ -136,6 +146,18 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-12 — NEW TOOL: `market-depth` (L2 §3) — the order-book redesign.
+  Christian judged three local prototypes (A: split & focus, B: unified
+  ladder w/ order-flow sim, C: four-act story) and picked A; A1 shipped
+  after iterations (2×2→1-row readouts, ticket into the quiz strip,
+  arithmetic into the left panel, 4-level default book, 555 ms/level,
+  "shares" spelled out, thin-book + round-trip cards cut). The order-types
+  half (A2, `tools/proto-a-types/`) is approved but still LOCAL — untracked,
+  along with `proto-a-depth/` (superseded), `proto-b-unified/`,
+  `proto-c-acts/` (not chosen; delete when Christian confirms). `order-book`
+  stays live until A2 ships, then retires. Also new: `docs/TOOL_USAGE.md`
+  (≤100-word how-to-use blurb per tool, Canvas-ready). Suite now FOURTEEN
+  tools.
 - 2026-07-12 — NEW TOOL: `anomaly-lab` (L5 §1–2, Christian picked the
   proposal) — live CAPM/FF3/Carhart decile regressions on baked Ken French
   data (`data.js` 182 KB, `code/make_data.py` reads the zips cached in the

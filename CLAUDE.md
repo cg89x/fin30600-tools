@@ -11,7 +11,7 @@ superseded artifacts (they carry banners pointing back to the README).
 
 Static site of browser-based interactive explorers for **FIN 30600 Investment
 Theory** (Notre Dame, Christian Kontz), accompanying the beamer lecture decks —
-13 tools spanning Lectures 1–8 (returns/fees, trading, portfolio theory, CAPM,
+14 tools spanning Lectures 1–8 (returns/fees, trading, portfolio theory, CAPM,
 factor models, behavioral, fixed income, derivatives). Dual-purpose: driven live on the
 classroom projector AND used by students on their laptops (Canvas links).
 
