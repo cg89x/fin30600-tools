@@ -24,7 +24,7 @@ import { slider, toggle, renderTeX, renderLabel, hydrateLabels } from '../../lib
 import { bindState } from '../../lib/state.js';
 import {
   computeStats, pickWinners, histogram, guessList, makeSessionCode,
-  simulateRound, LEVEL_MARKS,
+  simulateRound,
 } from './game.js';
 import { rtdbClient } from './rtdb.js';
 
@@ -49,7 +49,6 @@ const defaults = {
   sim: !HAS_LIVE,                           // simulation mode
   seed: 20260811,                           // sim class seed
   n: 45,                                    // sim class size
-  lk: false,                                // level-k markers toggle
 };
 const store = bindState(defaults, () => {}, { debounce: 150 });
 const S = store.state;
@@ -251,19 +250,6 @@ function drawHistogram(v) {
     for (const w of winners) {
       histChart.point(w.v, yMax * 0.025, {
         shape: 'star', r: 10, fill: 'var(--gold)', stroke: 'var(--navy)',
-      });
-    }
-    // optional level-k markers: full-height dashed guides with haloed labels
-    // (Nash = 0 is the left edge of the plot; no extra line needed there)
-    if (S.lk) {
-      LEVEL_MARKS.filter((mk) => mk.v > 0).forEach((mk, i) => {
-        histChart.vline(mk.v, { stroke: 'var(--navy)', dash: '3 5', width: 1.6 });
-        const label = histChart.text(mk.v, yMax * (0.74 - i * 0.08),
-          `${mk.label} = ${mk.v.toFixed(1)}`, { anchor: 'middle', fill: 'var(--navy)' });
-        // white halo so the label survives sitting on a bar
-        label.setAttribute('paint-order', 'stroke');
-        label.setAttribute('stroke', '#fff');
-        label.setAttribute('stroke-width', '3.5');
       });
     }
   }
@@ -553,7 +539,7 @@ async function nextRound() {
 /* ----------------------------------------------------------- controls ---- */
 const sessionHost = $('ctrl-session');
 const btnNew = document.createElement('button');
-btnNew.className = 'btn btn-block';
+btnNew.className = 'btn';
 btnNew.id = 'btn-new-session';
 btnNew.textContent = HAS_LIVE ? 'New session' : 'New session (needs config.js)';
 btnNew.disabled = !HAS_LIVE;
@@ -578,7 +564,7 @@ if (!HAS_LIVE) simToggle.input.disabled = true;
 $('ctrl-sim').appendChild(simToggle);
 
 const nCtrl = slider({
-  label: 'Simulated class size $n$', min: 10, max: 100, step: 1, value: Number(S.n),
+  label: 'class size $n$', min: 10, max: 100, step: 1, value: Number(S.n),
   fmt: (v) => String(Math.round(v)),
   onChange: (v) => { store.set('n', Math.round(v)); resetSimGame(); render(); },
 });
@@ -586,21 +572,16 @@ $('ctrl-simn').appendChild(nCtrl);
 
 const seedHost = $('ctrl-seed');
 const btnSeed = document.createElement('button');
-btnSeed.className = 'btn btn-block';
+btnSeed.className = 'btn';
 btnSeed.id = 'btn-reseed';
-btnSeed.textContent = 'Re-seed the simulated class';
+btnSeed.title = 'Draw a new simulated class (restarts at round 1)';
+btnSeed.textContent = '↻ Re-seed';
 btnSeed.addEventListener('click', () => {
   store.set('seed', Math.floor(Math.random() * 2 ** 31));
   resetSimGame();
   render();
 });
 seedHost.appendChild(btnSeed);
-
-const lkCtrl = toggle({
-  label: 'Show level-$k$ markers', value: Boolean(S.lk),
-  onChange: (v) => { store.set('lk', v); render(); },
-});
-$('ctrl-lk').appendChild(lkCtrl);
 
 el.btnPlay.addEventListener('click', playSimRound);
 el.btnClose.addEventListener('click', closeRound);

@@ -96,6 +96,14 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-11 — Beauty-contest layout rework (Christian): level-k markers
+  option REMOVED (debrief math covers it); game controls (New session, sim
+  toggle, compact class-size/re-seed) moved into the header line next to
+  "Back to all tools"; row 1 = rules card | join card (URL/code/QR); row 2 =
+  stacked readout boxes | histogram; debrief panel now full-width below with
+  its own two columns (history chart | winners + equilibrium math).
+  Breakpoint 980px collapses each row to one column.
+
 - 2026-07-11 — Beauty-contest classroom choreography (Christian): first name
   now REQUIRED on the student page (winner announced by name); in live mode
   the histogram is hidden while a round is open ("N submissions in —

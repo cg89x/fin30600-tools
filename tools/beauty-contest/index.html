@@ -174,7 +174,58 @@
       letter-spacing: 0.04em;
       margin: 0 0 0.1rem 0.2rem;
     }
-    .btn-block { width: 100%; text-align: center; }
+    /* game controls in the header line */
+    .game-controls { flex-wrap: wrap; justify-content: flex-end; gap: 0.9rem; }
+    .game-controls .ctrl { margin: 0; }
+    .game-controls .ctrl-slider {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .game-controls .ctrl-slider .ctrl-head { display: flex; gap: 0.3rem; align-items: baseline; }
+    .game-controls .ctrl-slider .ctrl-label { font-size: 0.8rem; }
+    .game-controls .ctrl-slider .ctrl-readout { font-size: 0.8rem; }
+    .game-controls .ctrl-range { width: 110px; }
+    #sim-extras { display: inline-flex; align-items: center; gap: 0.9rem; }
+    #sim-extras[hidden] { display: none !important; }
+
+    /* single-column main (controls live in the header) */
+    .bc-main .chart-area { width: 100%; }
+
+    /* rules | join card in one row */
+    .top-row {
+      display: grid;
+      grid-template-columns: 1fr minmax(360px, auto);
+      gap: 1.1rem;
+      align-items: stretch;
+    }
+    .top-row .formula-strip { margin: 0; }
+    @media (max-width: 980px) { .top-row { grid-template-columns: 1fr; } }
+
+    /* readout stack | histogram in one row */
+    .result-row {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 1.1rem;
+      align-items: start;
+    }
+    .result-row .readouts { grid-template-columns: 1fr; }
+    @media (max-width: 980px) {
+      .result-row { grid-template-columns: 1fr; }
+      .result-row .readouts { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+    }
+
+    .live-note { align-self: center; }
+
+    /* debrief panel: history chart | winners + math */
+    .debrief-cols {
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) 1fr;
+      gap: 1.4rem;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .debrief-cols { grid-template-columns: 1fr; } }
+
     .round-winners { margin: 0.6rem 0.2rem 0; font-size: 0.92rem; }
     .round-winners .rw-row { display: flex; gap: 0.6rem; padding: 0.15rem 0; }
     .round-winners .rw-round { color: var(--muted); min-width: 4.5rem; }
@@ -199,72 +250,55 @@
       <h1>Keynesian Beauty Contest</h1>
       <p class="subtitle">FIN 30600 · Investment Theory — Lecture 6 · Behavioral Finance</p>
     </div>
-    <div class="header-actions">
+    <div class="header-actions game-controls">
+      <span id="ctrl-session"></span>
+      <span id="ctrl-sim"></span>
+      <span id="sim-extras" hidden>
+        <span id="ctrl-simn"></span>
+        <span id="ctrl-seed"></span>
+      </span>
       <a class="btn" href="../../">&larr; Back to all tools</a>
     </div>
   </header>
 
-  <main class="tool-main">
-    <section class="controls-panel" aria-label="Controls">
-      <h2>Game Controls</h2>
-
-      <div class="group">
-        <div class="group-title">Session</div>
-        <div id="ctrl-session"></div>
-        <p class="note" id="live-status"></p>
-      </div>
-
-      <div class="group">
-        <div class="group-title">Simulation</div>
-        <div id="ctrl-sim"></div>
-        <div id="sim-extras" hidden>
-          <div id="ctrl-simn"></div>
-          <div id="ctrl-seed"></div>
-          <p class="note" data-label="A seeded class of level-$k$ reasoners. Each simulated round the class reasons one level deeper, so repeated play converges toward 0. Changing the class size or re-seeding restarts at round 1."></p>
-        </div>
-      </div>
-
-      <div class="group">
-        <div class="group-title">Display</div>
-        <div id="ctrl-lk"></div>
-        <p class="note" data-label="Dashed guides at the level-$k$ reasoning steps: 33.3 (one step), 22.2 (two), 14.8 (three); the Nash equilibrium 0 is the left edge. Revealed only after the round closes."></p>
-      </div>
-    </section>
-
+  <main class="tool-main bc-main">
     <section class="chart-area">
       <div class="sim-notice" id="sim-notice" hidden>
         <span id="sim-notice-text"></span>
         <button class="dismiss" id="sim-notice-dismiss" aria-label="Dismiss">&times;</button>
       </div>
 
-      <div class="formula-strip rules-card">
-        <p class="rules-lead"><strong>Let&rsquo;s play a game.</strong>
-          Pick a number between <strong>0 and 100</strong> and submit it from
-          your phone. We take the <strong>average</strong> of everyone&rsquo;s
-          numbers and multiply it by <strong>2/3</strong> &mdash; that&rsquo;s
-          the <strong>target</strong>. Whoever came
-          <strong>closest to the target wins a prize!</strong></p>
-        <p class="rules-example">Example: if the class average turns out to be
-          60, the target is 2/3&thinsp;&times;&thinsp;60&nbsp;=&nbsp;40 &mdash;
-          the guess closest to 40 wins.</p>
-        <div class="formula-row" id="f-target"></div>
-        <div class="formula-row" id="f-reveal"></div>
-      </div>
-
-      <div class="join-row" id="join-card" hidden>
-        <div class="join-info">
-          <div class="join-label">Join at</div>
-          <div class="join-url" id="student-url"></div>
-          <div class="join-label">Session code</div>
-          <div class="join-code" id="code-display"></div>
+      <div class="top-row">
+        <div class="formula-strip rules-card">
+          <p class="rules-lead"><strong>Let&rsquo;s play a game.</strong>
+            Pick a number between <strong>0 and 100</strong> and submit it from
+            your phone. We take the <strong>average</strong> of everyone&rsquo;s
+            numbers and multiply it by <strong>2/3</strong> &mdash; that&rsquo;s
+            the <strong>target</strong>. Whoever came
+            <strong>closest to the target wins a prize!</strong></p>
+          <p class="rules-example">Example: if the class average turns out to be
+            60, the target is 2/3&thinsp;&times;&thinsp;60&nbsp;=&nbsp;40 &mdash;
+            the guess closest to 40 wins.</p>
+          <div class="formula-row" id="f-target"></div>
+          <div class="formula-row" id="f-reveal"></div>
         </div>
-        <div class="join-qr" id="qr-box" aria-label="QR code of the student join link"></div>
+
+        <div class="join-row" id="join-card" hidden>
+          <div class="join-info">
+            <div class="join-label">Join at</div>
+            <div class="join-url" id="student-url"></div>
+            <div class="join-label">Session code</div>
+            <div class="join-code" id="code-display"></div>
+          </div>
+          <div class="join-qr" id="qr-box" aria-label="QR code of the student join link"></div>
+        </div>
       </div>
 
       <div class="round-bar chart-box">
         <span class="round-label" id="round-label">Round 1</span>
         <span class="round-status open" id="round-status">Open</span>
         <span class="round-n" id="n-count">n = 0</span>
+        <span class="live-note note" id="live-status"></span>
         <span class="round-actions">
           <button class="btn btn-big" id="btn-play">Play round</button>
           <button class="btn btn-big btn-close-round" id="btn-close">Close round</button>
@@ -274,10 +308,10 @@
 
       <div class="winner-card" id="winner-card" hidden></div>
 
-      <div class="readouts" id="readouts"></div>
+      <div class="result-row">
+        <div class="readouts" id="readouts"></div>
 
-      <div class="chart-row">
-        <div class="chart-box chart-col-main">
+        <div class="chart-box">
           <div id="hist-chart"></div>
           <div class="legend">
             <span><span class="swatch blue"></span>Guesses (bin width 5)</span>
@@ -285,24 +319,30 @@
             <span><span class="swatch red-dash"></span><span data-label="Target $\tfrac{2}{3}\times$ mean (after close)"></span></span>
           </div>
         </div>
+      </div>
 
-        <div class="chart-box chart-col-side" id="history-panel" hidden>
-          <p class="side-title">Round history — converging on the Nash equilibrium</p>
-          <div id="history-chart"></div>
-          <div class="legend">
-            <span><span class="swatch blue"></span>Class mean</span>
-            <span><span class="swatch gold"></span><span data-label="$\tfrac{2}{3}\times$ mean target"></span></span>
-            <span><span class="swatch red-dash"></span>Nash equilibrium (0)</span>
+      <div class="chart-box debrief-panel" id="history-panel" hidden>
+        <p class="side-title">Round history — converging on the Nash equilibrium</p>
+        <div class="debrief-cols">
+          <div>
+            <div id="history-chart"></div>
+            <div class="legend">
+              <span><span class="swatch blue"></span>Class mean</span>
+              <span><span class="swatch gold"></span><span data-label="$\tfrac{2}{3}\times$ mean target"></span></span>
+              <span><span class="swatch red-dash"></span>Nash equilibrium (0)</span>
+            </div>
           </div>
-          <div id="round-winners" class="round-winners"></div>
-          <div class="nash-box">
-            <p class="side-title">Why zero? The equilibrium math</p>
-            <div class="formula-row" id="f-nash-iter"></div>
-            <div class="formula-row" id="f-nash-eq"></div>
-            <p class="note">Whatever everyone guesses, the target is only 2/3 of
-              it — so the best response always undercuts. The only guess that is
-              a best response to itself is 0. Keynes: prices work the same way —
-              what matters is what average opinion expects average opinion to be.</p>
+          <div>
+            <div id="round-winners" class="round-winners"></div>
+            <div class="nash-box">
+              <p class="side-title">Why zero? The equilibrium math</p>
+              <div class="formula-row" id="f-nash-iter"></div>
+              <div class="formula-row" id="f-nash-eq"></div>
+              <p class="note">Whatever everyone guesses, the target is only 2/3 of
+                it — so the best response always undercuts. The only guess that is
+                a best response to itself is 0. Keynes: prices work the same way —
+                what matters is what average opinion expects average opinion to be.</p>
+            </div>
           </div>
         </div>
       </div>
