@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Volatility Drag: Arithmetic vs. Geometric · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* tool-local tweaks */
+    /* `hidden` must beat any author display rule (house gotcha) */
+    [hidden] { display: none !important; }
+    .page-lead {
+      max-width: 1500px; margin: 0.85rem auto 0; padding: 0 1.4rem;
+      color: var(--muted); font-size: 0.95rem;
+    }
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.1rem 0 0;
+      line-height: 1.3;
+    }
+    .chart-caption {
+      font-size: 0.82rem;
+      color: var(--label);
+      margin: 0.25rem 0.2rem 0.1rem;
+      line-height: 1.35;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.blue-faint { border-color: var(--blue); opacity: 0.28; }
+    .legend .swatch.gold { border-color: var(--gold); }
+    .legend .swatch.gray-dash { border-color: var(--axis); border-top-style: dashed; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .preset-row .btn { text-align: left; }
+    .btn.redraw { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .btn.redraw:hover { background: #016198; }
+
+    /* the deck's +100%/−50% hook — a static card, always visible */
+    .deck-card {
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-left: 3px solid var(--gold);
+      border-radius: 8px;
+      padding: 0.6rem 1rem 0.7rem;
+      overflow-x: auto;
+    }
+    .deck-card .dc-title {
+      font-size: 0.72rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.3rem;
+    }
+    .deck-card .dc-math { font-size: 0.95rem; margin: 0 0 0.3rem; line-height: 1.7; }
+    .deck-card .dc-note { font-size: 0.82rem; color: var(--muted); margin: 0; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Volatility Drag: Arithmetic vs. Geometric</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 1 · §4</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <p class="page-lead">
+    <span data-label="The arithmetic mean overstates the return you actually compound at: $R_G \approx R_A - \tfrac{1}{2}\sigma^2$ — variance is a drag on growth."></span>
+    Volatility is one compounding drag —
+    <a href="../fee-drag/">fees are the other</a>.
+  </p>
+
+  <main class="tool-main">
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Return process</h2>
+      <div class="group">
+        <div class="group-title">Distribution</div>
+        <div id="ctrl-mu"></div>
+        <div id="ctrl-sg"></div>
+        <div id="ctrl-ny"></div>
+      </div>
+      <div class="group">
+        <div class="group-title">Simulation</div>
+        <button type="button" class="btn redraw" id="btn-redraw">&#8635; re-draw</button>
+        <p class="note">25 seeded paths — the seed lives in the URL, so a shared link reproduces the exact picture.</p>
+      </div>
+      <div class="group">
+        <div class="group-title">Deck presets (1991–2025 table)</div>
+        <div class="preset-row">
+          <button type="button" class="btn" id="btn-small">Small U.S. stocks</button>
+          <button type="button" class="btn" id="btn-large">Large U.S. stocks</button>
+          <button type="button" class="btn" id="btn-dev">Developed markets</button>
+        </div>
+        <p class="note" id="vol-preset-note" hidden></p>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="formula-strip">
+        <div class="formula-row" id="vol-f-defs"></div>
+        <div class="formula-row" id="vol-f-approx"></div>
+      </div>
+      <div class="deck-card">
+        <p class="dc-title">Deck example — the hook</p>
+        <p class="dc-math" id="deck-hook"></p>
+        <p class="dc-note">$1 doubles to $2, then halves right back to $1 —
+          terminal wealth is unchanged, no matter what the 25% arithmetic
+          average promises.</p>
+      </div>
+      <div class="readouts" id="vol-readouts"></div>
+      <div class="readouts" id="vol-readouts2"></div>
+      <div class="chart-box">
+        <div id="vol-chart"></div>
+        <div class="legend">
+          <span><span class="swatch blue"></span>One simulated path (bold)</span>
+          <span><span class="swatch blue-faint"></span>24 more paths</span>
+          <span><span class="swatch gray-dash"></span><span data-label="Arithmetic promise $(1+\mu)^t$"></span></span>
+          <span><span class="swatch gold"></span><span data-label="Geometric expectation $(1+\mu-\tfrac{1}{2}\sigma^2)^t$"></span></span>
+        </div>
+        <p class="chart-caption" id="vol-caption"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

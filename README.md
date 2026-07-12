@@ -18,7 +18,8 @@ dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self
 
 | Tool | Lecture | What it does |
 |------|---------|--------------|
-| [`tools/compounding-drags/`](tools/compounding-drags/) | L1 §4+§6 | Two columns, one lesson: fund-fee drag (Class A front load vs. Class B level load, active vs. passive) and volatility drag (arithmetic vs. geometric average, R_G ≈ R_A − ½σ², simulated wealth paths). |
+| [`tools/volatility-drag/`](tools/volatility-drag/) | L1 §4 | Volatility drag: arithmetic vs. geometric average, R_G ≈ R_A − ½σ², the +100%/−50% hook, simulated wealth paths vs. the "arithmetic promise," 1991–2025 table presets. |
+| [`tools/fee-drag/`](tools/fee-drag/) | L1 §6 | Fund-fee drag: Class A front load vs. Class B level load + declining exit fee, crossover horizon, active-vs-passive preset ($99,628 gap). |
 | [`tools/order-book/`](tools/order-book/) | L2 §3 | Limit order book: market orders walk the book level by level (deck's hypothetical book), depth-cost staircase, and limit/stop orders against a static quote and a moving price path (gap risk). |
 | [`tools/margin-short/`](tools/margin-short/) | L2 §4–5 | Buying on margin and short sales as mirror images: balance-sheet bar, return magnified by 1/margin, margin-call prices, unbounded short losses. |
 | [`tools/two-asset/`](tools/two-asset/) | L3 §4 | Two-asset opportunity set as ρ and weight vary; minimum-variance portfolio. |
