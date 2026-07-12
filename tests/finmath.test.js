@@ -492,3 +492,50 @@ test('walkBook clamps a negative order size to zero fills', () => {
   assert.equal(w.total, 0, 'no dollars');
   assert.equal(w.avgPrice, null, 'no price');
 });
+
+/* ---------------------------------------------- L5: multi-factor OLS */
+
+test('olsMulti matches a numpy reference (3 regressors)', () => {
+  // python3 + numpy cross-check (2026-07-12):
+  //   x1 = [1,2,3,4,5,6,7,8]; x2 = [2,1,4,3,6,5,8,7]
+  //   x3 = [0.3,-0.1,0.4,0.15,-0.2,0.35,0.1,-0.3]
+  //   y  = [3.1,2.9,7.2,6.8,11.1,10.9,15.2,14.8]
+  //   b  = [-0.027542, 0.858494, 1.145624, 0.102960]
+  //   se = [0.056900, 0.024304, 0.023229, 0.101093]
+  //   r2 = 0.99990086
+  const X = [
+    [1, 2, 3, 4, 5, 6, 7, 8],
+    [2, 1, 4, 3, 6, 5, 8, 7],
+    [0.3, -0.1, 0.4, 0.15, -0.2, 0.35, 0.1, -0.3],
+  ];
+  const y = [3.1, 2.9, 7.2, 6.8, 11.1, 10.9, 15.2, 14.8];
+  const f = fm.olsMulti(X, y);
+  assertNear(f.alpha, -0.027542, 1e-6, 'alpha');
+  assertNear(f.betas[0], 0.858494, 1e-6, 'b1');
+  assertNear(f.betas[1], 1.145624, 1e-6, 'b2');
+  assertNear(f.betas[2], 0.10296, 1e-6, 'b3');
+  assertNear(f.seAlpha, 0.0569, 1e-4, 'se alpha');
+  assertNear(f.seBetas[0], 0.024304, 1e-6, 'se b1');
+  assertNear(f.seBetas[2], 0.101093, 1e-6, 'se b3');
+  assertNear(f.r2, 0.99990086, 1e-8, 'r2');
+  assert.equal(f.n, 8, 'n');
+});
+
+test('olsMulti with one regressor agrees with ols; guards degenerate input', () => {
+  const x = [1, 2, 4, 5];
+  const y = [3, 5, 8, 11];
+  const a = fm.ols(x, y);
+  const b = fm.olsMulti([x], y);
+  assertNear(b.alpha, a.intercept, 1e-12, 'intercept');
+  assertNear(b.betas[0], a.slope, 1e-12, 'slope');
+  assertNear(b.seAlpha, a.seIntercept, 1e-12, 'se intercept');
+  assertNear(b.seBetas[0], a.seSlope, 1e-12, 'se slope');
+  assertNear(b.r2, a.r2, 1e-12, 'r2');
+  // pairwise-complete: a NaN row is dropped, not propagated
+  const c = fm.olsMulti([[1, 2, NaN, 4, 5]], [2, 4, 9, 8, 10]);
+  assert.equal(c.n, 4, 'NaN row dropped');
+  // collinear regressors -> null, not garbage
+  assert.equal(fm.olsMulti([[1, 2, 3, 4], [2, 4, 6, 8]], [1, 2, 3, 4]), null, 'collinear');
+  // too few observations -> null
+  assert.equal(fm.olsMulti([[1, 2]], [1, 2]), null, 'n <= k+1');
+});

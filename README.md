@@ -3,7 +3,8 @@
 Browser-based interactive explorers accompanying the FIN 30600 (Investment
 Theory, University of Notre Dame — Christian Kontz) lecture decks. They cover
 Returns & Fees (L1), Securities Trading (L2), Portfolio Theory (L3), CAPM
-(L4), Behavioral Finance (L6), Fixed Income (L7), and Derivatives (L8), and
+(L4), Factor Models (L5), Behavioral Finance (L6), Fixed Income (L7), and
+Derivatives (L8), and
 are meant to be driven live on the classroom projector **and** used by
 students on their own laptops (linked from Canvas).
 
@@ -32,6 +33,7 @@ talks to a Firebase Realtime Database (plain REST/SSE, no SDK).
 | [`tools/efficient-frontier/`](tools/efficient-frontier/) | L3 §5 | N-asset minimum-variance frontier, global MVP, and max-Sharpe tangency. |
 | [`tools/capm-sml/`](tools/capm-sml/) | L4 §2–3 | Security market line + alpha, and a simulated market-model OLS regression. |
 | [`tools/diversification/`](tools/diversification/) | L4 App. | Equal-weight portfolio risk vs. N: the 1/N term vanishes, correlation sets the systematic floor (web version of PortfolioVarianceAndDiversification.xlsx). |
+| [`tools/anomaly-lab/`](tools/anomaly-lab/) | L5 §1–2 | Anomaly lab: live CAPM / FF3 / Carhart time-series regressions on 10 value-weighted decile portfolios per sort (beta, size, book-to-market, momentum) over an adjustable 1963–2026 window — SML scatter, alpha plots, factor loadings, RMS-alpha scoreboard, return decomposition, information-ratio card. Data baked from the Ken French library (`data.js`, regenerate with `code/make_data.py`). |
 | [`tools/beauty-contest/`](tools/beauty-contest/) | L6 §3 | The 2/3-of-the-average game, live in class: students submit by QR code (Firebase RTDB via plain REST/SSE — see its SETUP.md), instructor screen reveals mean/target/winner per round; built-in simulation mode needs no backend. |
 | [`tools/duration/`](tools/duration/) | L7 §3–4 | Price–yield curve with the duration tangent vs. exact repricing, the PV cash-flow fulcrum at t = D, and spot-curve/forward-rate pricing. |
 | [`tools/black-scholes/`](tools/black-scholes/) | L8 §3–4 | Black–Scholes calls and puts: intrinsic vs. time value, delta hedge ratio, comparative statics in σ and T, put–call parity (deck's discrete-rate form). |
@@ -78,7 +80,12 @@ the bond math (price/duration hand-computed case, the deck's −D·Δy/(1+y)
 anchor of +1.16%, forward rates), the L1 fee/average math (Class A vs. B
 share-class anchors, the +100%/−50% arithmetic-vs-geometric example), and the
 L2 trading math (order-book walks — sell 30 → $251.25, margin magnification
-±36.36%, margin-call prices $75/$82.50 and $57.69, short return −12%).
+±36.36%, margin-call prices $75/$82.50 and $57.69, short return −12%), and
+the multi-factor OLS engine against a pasted numpy cross-check.
+`tests/anomaly-lab-data.test.js` re-runs the anomaly lab's baked Ken French
+data through the deck's 1963–2023 window and checks the Lecture 5 anchor
+numbers (market premium, beta-sort alphas, Carhart loadings, RMS-alpha
+table) to data-vintage tolerance.
 
 Syntax-check every module with:
 

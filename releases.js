@@ -33,6 +33,7 @@ const RELEASES = {
   'efficient-frontier': true,  // L3 §5
   'capm-sml': true,            // L4 §2–3
   'diversification': true,     // L4 appendix
+  'anomaly-lab': true,         // L5 §1–2
   'beauty-contest': true,      // L6 §3
   'duration': true,             // L7 §3–4
   'black-scholes': true,       // L8 §3–4

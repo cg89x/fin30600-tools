@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anomaly Lab: The CAPM on Trial · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* tool-local tweaks */
+    .page-lead {
+      max-width: 1500px; margin: 0.85rem auto 0; padding: 0 1.4rem;
+      color: var(--muted); font-size: 0.95rem;
+    }
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.15rem 0 0;
+      line-height: 1.35;
+    }
+    .inset-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0.1rem 0 0.15rem 0.2rem;
+    }
+    /* segmented button groups (sort / model / view pickers) */
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+    .btn-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .btn-row .btn { flex: 1 1 auto; text-align: center; }
+    .btn-grid .btn { text-align: center; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    /* chart legends */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.gold { border-color: var(--gold); }
+    .legend .swatch.gray-dash { border-color: var(--axis); border-top-style: dashed; }
+    .legend .swatch.red-dash { border-color: var(--red); border-top-style: dashed; }
+    .legend .swatch.navy-line { border-color: var(--navy); }
+    .legend .swatch.sq {
+      width: 0.62rem; height: 0.62rem;
+      border: 2px solid var(--blue); background: #fff;
+      border-radius: 1px;
+    }
+    .legend .swatch.block {
+      width: 0.85rem; height: 0.62rem;
+      border: none; border-radius: 2px;
+    }
+    .legend .swatch.block.f-mkt { background: var(--blue); }
+    .legend .swatch.block.f-smb { background: var(--gold); }
+    .legend .swatch.block.f-hml { background: var(--navy); }
+    .legend .swatch.block.f-wml { background: #7A8699; }
+    .legend .swatch.block.f-alpha {
+      background:
+        repeating-linear-gradient(45deg, #7A8699 0 1px, transparent 1px 5px);
+      border: 1px solid var(--panel-border);
+    }
+    /* scoreboard table */
+    .score-wrap { overflow-x: auto; }
+    .score-table {
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      min-width: 560px;
+      margin: 0.2rem 0.2rem 0.3rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .score-table th, .score-table td {
+      padding: 0.42rem 0.85rem;
+      text-align: right;
+      border-bottom: 1px solid var(--panel-border);
+    }
+    .score-table thead th {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: none;
+      border-bottom: 2px solid var(--navy);
+      white-space: nowrap;
+    }
+    .score-table th.rowhead { text-align: left; color: var(--navy); }
+    .score-table tr.cur-sort td, .score-table tr.cur-sort th { background: var(--softblue); }
+    .score-table td.cur-model, .score-table th.cur-model { background: rgba(201, 151, 0, 0.16); }
+    .score-table tr.cur-sort td.cur-model { background: rgba(201, 151, 0, 0.30); font-weight: 700; }
+    /* decomposition panel */
+    .decomp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1.2rem; }
+    @media (max-width: 1150px) { .decomp-grid { grid-template-columns: 1fr; } }
+    .decomp-cell .cell-title {
+      font-size: 0.82rem; font-weight: 700; color: var(--navy);
+      margin: 0.2rem 0 0.1rem 0.2rem;
+    }
+    .decomp-cell .formula-row { margin: 0.15rem 0.2rem 0.3rem; overflow-x: auto; font-size: 0.92rem; }
+    /* information-ratio card */
+    .ir-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.4rem;
+      margin: 0.3rem 0.2rem 0.5rem;
+    }
+    @media (max-width: 700px) { .ir-grid { grid-template-columns: 1fr; } }
+    .ir-box .formula-row { margin: 0.4rem 0.2rem 0.1rem; overflow-x: auto; }
+    .ir-box .readouts { margin: 0.35rem 0.2rem 0.1rem; }
+    .source-note {
+      font-size: 0.78rem; color: var(--muted); margin: 0 0.2rem; line-height: 1.4;
+    }
+    /* grid items default to min-width:auto — long formulas must scroll inside */
+    .chart-area > .chart-box { min-width: 0; }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Anomaly Lab: The CAPM on Trial</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 5 · §1&ndash;2 · Notre Dame</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <p class="page-lead">
+    <span data-label="Sort stocks into decile portfolios, regress each on the factors, and see whether $\alpha$ survives — the SML is too flat, and the size, value, and momentum spreads are the classic anomalies."></span>
+  </p>
+
+  <main class="tool-main" hidden>
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Anomaly Lab</h2>
+
+      <div class="group">
+        <div class="group-title">Sort (decile portfolios)</div>
+        <div class="btn-grid" role="group" aria-label="Sort variable">
+          <button class="btn" type="button" data-sort="beta">Beta</button>
+          <button class="btn" type="button" data-sort="size">Size</button>
+          <button class="btn" type="button" data-sort="bm">Value (B/M)</button>
+          <button class="btn" type="button" data-sort="mom">Momentum</button>
+        </div>
+        <p class="note">D1 = lowest decile, D10 = highest, value-weighted, rebalanced per Ken French's methodology.</p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Factor model</div>
+        <div class="btn-row" role="group" aria-label="Factor model">
+          <button class="btn" type="button" data-model="capm">CAPM</button>
+          <button class="btn" type="button" data-model="ff3">FF3</button>
+          <button class="btn" type="button" data-model="ff3c">Carhart</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Sample window</div>
+        <div id="ctrl-y0"></div>
+        <div id="ctrl-y1"></div>
+        <div class="preset-row">
+          <button class="btn" type="button" id="preset-deck">Deck window (1963&ndash;2023)</button>
+          <button class="btn" type="button" id="preset-full">Full sample</button>
+        </div>
+        <p class="note">Calendar years, inclusive; the data starts 1963-07 and ends 2026-05. The window is held to at least 5 years (the end year clamps up if needed).</p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">View</div>
+        <div class="btn-grid" role="group" aria-label="View">
+          <button class="btn" type="button" data-view="sml">SML</button>
+          <button class="btn" type="button" data-view="alphas">Alphas</button>
+          <button class="btn" type="button" data-view="loadings">Loadings</button>
+          <button class="btn" type="button" data-view="scoreboard">Scoreboard</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="formula-strip" id="formula-strip">
+        <div class="formula-row" id="f-model"></div>
+        <div class="formula-row" id="f-premia"></div>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="chart-box" id="scatter-box">
+        <p class="inset-title" id="scatter-title"></p>
+        <div id="main-chart"></div>
+        <div class="legend">
+          <span><span class="swatch sq"></span><span id="legend-deciles">Decile portfolios D1&ndash;D10</span></span>
+          <span id="legend-reg-wrap"><span class="swatch gray-dash"></span><span id="legend-reg"></span></span>
+          <span id="legend-model-wrap"><span class="swatch gold"></span><span id="legend-model"></span></span>
+          <span id="legend-zero-wrap" hidden><span class="swatch red-dash"></span><span data-label="$\alpha = 0$: what the model predicts"></span></span>
+        </div>
+      </div>
+
+      <div class="chart-box" id="loadings-box" hidden>
+        <p class="inset-title">Factor loadings by decile</p>
+        <div id="loadings-chart"></div>
+        <div class="legend" id="loadings-legend">
+          <span><span class="swatch block f-mkt"></span><span data-label="Mkt $\beta$"></span></span>
+          <span id="ll-smb"><span class="swatch block f-smb"></span><span data-label="SMB $s$"></span></span>
+          <span id="ll-hml"><span class="swatch block f-hml"></span><span data-label="HML $h$"></span></span>
+          <span id="ll-wml"><span class="swatch block f-wml"></span><span data-label="WML $m$"></span></span>
+        </div>
+      </div>
+
+      <div class="chart-box" id="score-box" hidden>
+        <p class="inset-title">Scoreboard &mdash; RMS pricing errors across the ten deciles (annual %)</p>
+        <div class="score-wrap"><div id="score-table"></div></div>
+        <p class="note" data-label="Deck tables (1963–2023, older CRSP vintage), same numbers arranged as $E[R_i-R_f]$ / $\alpha_{CAPM}$ / $\alpha_{FF3}$ / $\alpha_{FF3C}$ per sort: Beta 7.72 / 1.50 / 1.39 / 0.83 · Size 8.31 / 0.87 / 0.63 / 0.64 · B/M 8.04 / 1.81 / 1.04 / 0.98 · Momentum 7.52 / 4.20 / 4.92 / 1.82. Small differences from the live numbers are CRSP data revisions, not errors."></p>
+      </div>
+
+      <div class="chart-box" id="decomp-box">
+        <p class="inset-title">Where does the return come from?</p>
+        <p class="note" data-label="Deck §2 worked example: each factor contributes $\beta_j \times \lambda_j$ (loading times the factor's window premium); whatever is left of the actual average excess return is $\alpha$."></p>
+        <div class="decomp-grid">
+          <div class="decomp-cell">
+            <p class="cell-title" id="decomp-d1-title"></p>
+            <div id="decomp-d1-chart"></div>
+            <div class="formula-row" id="decomp-d1-tex"></div>
+          </div>
+          <div class="decomp-cell">
+            <p class="cell-title" id="decomp-d10-title"></p>
+            <div id="decomp-d10-chart"></div>
+            <div class="formula-row" id="decomp-d10-tex"></div>
+          </div>
+        </div>
+        <div class="legend">
+          <span><span class="swatch block f-mkt"></span><span data-label="Mkt $\beta_i \lambda_M$"></span></span>
+          <span id="dl-smb"><span class="swatch block f-smb"></span><span data-label="SMB $s_i \lambda_{SMB}$"></span></span>
+          <span id="dl-hml"><span class="swatch block f-hml"></span><span data-label="HML $h_i \lambda_{HML}$"></span></span>
+          <span id="dl-wml"><span class="swatch block f-wml"></span><span data-label="WML $m_i \lambda_{WML}$"></span></span>
+          <span><span class="swatch block f-alpha"></span><span data-label="$\alpha$ (unexplained)"></span></span>
+          <span><span class="swatch navy-line"></span>actual avg. excess return</span>
+        </div>
+      </div>
+
+      <div class="chart-box ir-box" id="ir-box">
+        <p class="inset-title">Information ratio &mdash; does an anomaly fund help a market investor?</p>
+        <p class="note" data-label="Deck §2: mix an active fund (alpha $\alpha$, residual risk $\sigma_\varepsilon$) with the market and the best attainable Sharpe ratio satisfies $SR_P^2 = SR_M^2 + IR^2$, where $IR = \alpha/\sigma_\varepsilon$."></p>
+        <div class="ir-grid">
+          <div id="ctrl-irm"></div>
+          <div id="ctrl-irs"></div>
+          <div id="ctrl-ira"></div>
+          <div id="ctrl-ire"></div>
+        </div>
+        <div class="readouts" id="ir-readouts"></div>
+        <div class="formula-row" id="ir-tex"></div>
+      </div>
+
+      <p class="source-note">
+        Source: Ken French data library, value-weighted decile portfolios, monthly 07/1963&ndash;05/2026
+        (202605 CRSP vintage); the deck tables use a 2023 vintage &mdash; small differences are data
+        revisions, not errors.
+      </p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
