@@ -96,6 +96,15 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-11 — Beauty-contest classroom choreography (Christian): first name
+  now REQUIRED on the student page (winner announced by name); in live mode
+  the histogram is hidden while a round is open ("N submissions in —
+  revealed when the round closes" placeholder; bars appear on close; sim
+  keeps its streaming animation); the round-history panel is now the DEBRIEF
+  — hidden until 3 rounds have closed (both modes), then shows the
+  convergence chart + winners of each round + the equilibrium math
+  (50→33.3→22.2→⋯→0 and g* = (2/3)g* ⇒ g* = 0 + Keynes line).
+
 - 2026-07-11 — Beauty-contest polish (Christian's feedback): the iterated-
   reasoning 50→33.3→…→0 line was a strategy GIVEAWAY — now revealed only
   after close (with the mean/target); rules rewritten in plain student

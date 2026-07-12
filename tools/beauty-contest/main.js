@@ -64,8 +64,9 @@ const el = {
   simNoticeDismiss: $('sim-notice-dismiss'),
   simExtras: $('sim-extras'),
   fTarget: $('f-target'),
-  fIter: $('f-iter'),
   fReveal: $('f-reveal'),
+  historyPanel: $('history-panel'),
+  roundWinners: $('round-winners'),
   joinCard: $('join-card'),
   studentUrl: $('student-url'),
   codeDisplay: $('code-display'),
@@ -169,10 +170,8 @@ function view() {
     else if (simPlayed) guesses = all.slice(0, Math.min(simShown, all.length));
     else guesses = [];
     const history = [];
-    for (let k = 1; k < round; k++) {
-      history.push({ round: k, ...computeStats(simGuessesFor(k)) });
-    }
-    if (closed) history.push({ round, ...computeStats(all) });
+    for (let k = 1; k < round; k++) history.push(historyEntry(k, simGuessesFor(k)));
+    if (closed) history.push(historyEntry(round, all));
     return { round, open: !closed, guesses, history, hasSession: true };
   }
   // live
@@ -188,15 +187,37 @@ function view() {
   for (let k = 1; k <= lastClosed; k++) {
     const node = roundNode(liveTree, k);
     const list = guessList(node && node.guesses);
-    if (list.length) history.push({ round: k, ...computeStats(list) });
+    if (list.length) history.push(historyEntry(k, list));
   }
   return { round, open, guesses, history, hasSession: true };
+}
+
+/** A closed round's stats + its winners. @param {number} k @param {any[]} list */
+function historyEntry(k, list) {
+  const stats = computeStats(list);
+  return { round: k, ...stats, winners: pickWinners(list, stats.target) };
 }
 
 /* -------------------------------------------------------- histogram ------ */
 let lastHistYMax = 0;
 function drawHistogram(v) {
   const closed = v.hasSession && !v.open;
+  // LIVE mode: never show the distribution while the round is open — students
+  // could chase it. The bars appear on Close round. (Sim keeps its streaming
+  // animation: the data is fake, and it demos what close will look like.)
+  if (!isSim() && v.hasSession && v.open) {
+    if (lastHistYMax !== 5) {
+      const xTicks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+      histChart.setDomain(0, 100, 0, 5).renderAxes({ xTicks, yTickCount: 5 });
+      lastHistYMax = 5;
+    }
+    histChart.clearData();
+    const note = histChart.text(50, 2.5,
+      `${v.guesses.length} submission${v.guesses.length === 1 ? '' : 's'} in — histogram revealed when the round closes`,
+      { anchor: 'middle', fill: 'var(--muted)' });
+    note.setAttribute('font-size', '15');
+    return;
+  }
   const values = v.guesses.map((g) => g.v);
   const bins = histogram(values, 5, 0, 100);
   const maxCount = Math.max(...bins, 0);
@@ -339,17 +360,41 @@ function drawFormulas(v) {
       `\\bar{g} = ${stats.mean.toFixed(2)} \\;\\Rightarrow\\; ` +
       `\\tfrac{2}{3}\\times${stats.mean.toFixed(2)} = \\mathbf{${stats.target.toFixed(2)}}`);
     el.fReveal.hidden = false;
-    // debrief line — the strategy giveaway, so it only appears AFTER close
-    if (!el.fIter.childNodes.length) {
-      renderTeX(el.fIter,
-        '\\text{iterated reasoning: } 50 \\to 33.3 \\to 22.2 \\to 14.8 '
-        + '\\to \\cdots \\to 0 \\text{ (the Nash equilibrium)}');
-    }
-    el.fIter.hidden = false;
   } else {
     el.fReveal.hidden = true;
     el.fReveal.replaceChildren();
-    el.fIter.hidden = true;
+  }
+}
+
+/* --------------------------------------- history panel (round >= 3 debrief) */
+let nashRendered = false;
+function drawHistoryPanel(v) {
+  // The panel is the DEBRIEF: it exposes the convergence and the equilibrium
+  // math, so it stays hidden until three rounds have closed.
+  const show = v.history.length >= 3;
+  el.historyPanel.hidden = !show;
+  if (!show) return;
+  drawHistory(v);
+  // winners of the closed rounds
+  el.roundWinners.replaceChildren();
+  for (const h of v.history) {
+    const row = document.createElement('div');
+    row.className = 'rw-row';
+    const names = h.winners.map((w) => `${w.name || 'anonymous'} (${w.v})`).join(', ');
+    row.innerHTML =
+      `<span class="rw-round">Round ${h.round}</span>` +
+      `<span class="rw-name">🏆 ${escapeHtml(names)}</span>` +
+      `<span class="rw-detail">target ${h.target.toFixed(1)}</span>`;
+    el.roundWinners.appendChild(row);
+  }
+  // equilibrium math (render once)
+  if (!nashRendered) {
+    renderTeX($('f-nash-iter'),
+      '\\text{iterated reasoning: } 50 \\;\\to\\; \\tfrac{2}{3}\\cdot 50 = 33.3 '
+      + '\\;\\to\\; 22.2 \\;\\to\\; 14.8 \\;\\to\\; \\cdots \\;\\to\\; 0');
+    renderTeX($('f-nash-eq'),
+      '\\text{equilibrium: } g^{*} = \\tfrac{2}{3}\\,g^{*} \\;\\Longrightarrow\\; g^{*} = 0');
+    nashRendered = true;
   }
 }
 
@@ -426,7 +471,7 @@ function render() {
   drawJoinCard();
   drawRoundBar(v);
   drawHistogram(v);
-  drawHistory(v);
+  drawHistoryPanel(v);
   drawReadouts(v);
   drawWinner(v);
   drawFormulas(v);

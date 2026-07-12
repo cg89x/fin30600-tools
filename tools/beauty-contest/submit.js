@@ -136,13 +136,16 @@ if (!HAS_LIVE) {
         errorLine.textContent = 'Please enter a number between 0 and 100.';
         return;
       }
+      const name = nameInput.value.trim().slice(0, 24);
+      if (!name) {
+        errorLine.textContent = 'Please enter your first name — the winner is announced by name.';
+        nameInput.focus();
+        return;
+      }
       if (!open || round === 0) { refresh(); return; }
       btnSubmit.disabled = true;
       errorLine.textContent = '';
-      const name = nameInput.value.trim().slice(0, 24);
-      /** @type {{v:number, t:number, name?:string}} */
-      const payload = { v, t: Date.now() };
-      if (name) payload.name = name;
+      const payload = { v, t: Date.now(), name };
       try {
         await client.post(`/beauty/${code}/rounds/${round}/guesses`, payload);
         localStorage.setItem(lockKey(), String(v));

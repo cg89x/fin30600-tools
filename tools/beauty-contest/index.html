@@ -175,6 +175,17 @@
       margin: 0 0 0.1rem 0.2rem;
     }
     .btn-block { width: 100%; text-align: center; }
+    .round-winners { margin: 0.6rem 0.2rem 0; font-size: 0.92rem; }
+    .round-winners .rw-row { display: flex; gap: 0.6rem; padding: 0.15rem 0; }
+    .round-winners .rw-round { color: var(--muted); min-width: 4.5rem; }
+    .round-winners .rw-name { color: var(--navy); font-weight: 700; }
+    .round-winners .rw-detail { color: var(--muted); }
+    .nash-box {
+      margin: 0.8rem 0.2rem 0;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--panel-border);
+    }
+    .nash-box .formula-row { margin: 0.25rem 0; }
     .code-inline {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-weight: 700;
@@ -237,7 +248,6 @@
           60, the target is 2/3&thinsp;&times;&thinsp;60&nbsp;=&nbsp;40 &mdash;
           the guess closest to 40 wins.</p>
         <div class="formula-row" id="f-target"></div>
-        <div class="formula-row" id="f-iter" hidden></div>
         <div class="formula-row" id="f-reveal"></div>
       </div>
 
@@ -276,13 +286,23 @@
           </div>
         </div>
 
-        <div class="chart-box chart-col-side">
+        <div class="chart-box chart-col-side" id="history-panel" hidden>
           <p class="side-title">Round history — converging on the Nash equilibrium</p>
           <div id="history-chart"></div>
           <div class="legend">
             <span><span class="swatch blue"></span>Class mean</span>
             <span><span class="swatch gold"></span><span data-label="$\tfrac{2}{3}\times$ mean target"></span></span>
             <span><span class="swatch red-dash"></span>Nash equilibrium (0)</span>
+          </div>
+          <div id="round-winners" class="round-winners"></div>
+          <div class="nash-box">
+            <p class="side-title">Why zero? The equilibrium math</p>
+            <div class="formula-row" id="f-nash-iter"></div>
+            <div class="formula-row" id="f-nash-eq"></div>
+            <p class="note">Whatever everyone guesses, the target is only 2/3 of
+              it — so the best response always undercuts. The only guess that is
+              a best response to itself is 0. Keynes: prices work the same way —
+              what matters is what average opinion expects average opinion to be.</p>
           </div>
         </div>
       </div>
