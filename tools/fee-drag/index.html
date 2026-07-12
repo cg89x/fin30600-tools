@@ -52,6 +52,7 @@
     .preset-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .preset-row .btn { text-align: left; }
   </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 </head>
 <body>
   <header class="app-header">
@@ -70,7 +71,7 @@
     drag — <a href="../volatility-drag/">volatility is the other</a>.
   </p>
 
-  <main class="tool-main">
+  <main class="tool-main" hidden>
     <section class="controls-panel" aria-label="Controls">
       <h2>Two share classes</h2>
       <div class="group">
@@ -88,7 +89,7 @@
         <div class="group-title">Fund B — level load</div>
         <div id="ctrl-bl"></div>
         <div id="ctrl-bf"></div>
-        <div id="ctrl-bx"></div>
+        <div id="ctrl-bxf"></div>
       </div>
       <div class="group">
         <div class="group-title">Presets</div>
@@ -96,7 +97,6 @@
           <button type="button" class="btn" id="btn-fee-deck">Deck example: Class A vs Class B</button>
           <button type="button" class="btn" id="btn-fee-active">Active vs passive funds</button>
         </div>
-        <p class="note" data-label="The slide's punchline: at $T = 4$ Fund B wins; at $T = 15$ Fund A wins — drag the horizon to check."></p>
       </div>
     </section>
 
@@ -115,7 +115,7 @@
           <span><span class="swatch gray-dash"></span>No-fee reference</span>
           <span><span class="swatch red-dash"></span>Crossover</span>
         </div>
-        <p class="chart-caption" data-label="Each point is the wealth if you cashed out in year $t$ — Fund B's exit fee applies only at the point of sale, so its curve nets out the back-end load as of that year (it declines with the holding period and vanishes after year 5). Grey dashed: the same $X_0$ compounding fee-free."></p>
+        <p class="chart-caption" data-label="Each point is the wealth if you cashed out in year $t$ — Fund B's exit fee applies only at the point of sale, so its curve nets out the back-end load as of that year (it declines 1 pp per year of holding until it hits zero). Grey dashed: the same $X_0$ compounding fee-free."></p>
       </div>
     </section>
   </main>

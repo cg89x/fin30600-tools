@@ -11,9 +11,7 @@
   </script>
   <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
   <style>
-    /* tool-local tweaks */
-    /* `hidden` must beat any author display rule (house gotcha) */
-    [hidden] { display: none !important; }
+    /* tool-local tweaks ([hidden] guard now global in lib/style.css) */
     .page-lead {
       max-width: 1500px; margin: 0.85rem auto 0; padding: 0 1.4rem;
       color: var(--muted); font-size: 0.95rem;
@@ -55,23 +53,8 @@
     .preset-row .btn { text-align: left; }
     .btn.redraw { background: var(--blue); border-color: var(--blue); color: #fff; }
     .btn.redraw:hover { background: #016198; }
-
-    /* the deck's +100%/−50% hook — a static card, always visible */
-    .deck-card {
-      background: var(--card-bg);
-      border: 1px solid var(--panel-border);
-      border-left: 3px solid var(--gold);
-      border-radius: 8px;
-      padding: 0.6rem 1rem 0.7rem;
-      overflow-x: auto;
-    }
-    .deck-card .dc-title {
-      font-size: 0.72rem; font-weight: 700; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.3rem;
-    }
-    .deck-card .dc-math { font-size: 0.95rem; margin: 0 0 0.3rem; line-height: 1.7; }
-    .deck-card .dc-note { font-size: 0.82rem; color: var(--muted); margin: 0; }
   </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 </head>
 <body>
   <header class="app-header">
@@ -90,7 +73,7 @@
     <a href="../fee-drag/">fees are the other</a>.
   </p>
 
-  <main class="tool-main">
+  <main class="tool-main" hidden>
     <section class="controls-panel" aria-label="Controls">
       <h2>Return process</h2>
       <div class="group">
@@ -119,13 +102,6 @@
       <div class="formula-strip">
         <div class="formula-row" id="vol-f-defs"></div>
         <div class="formula-row" id="vol-f-approx"></div>
-      </div>
-      <div class="deck-card">
-        <p class="dc-title">Deck example — the hook</p>
-        <p class="dc-math" id="deck-hook"></p>
-        <p class="dc-note">$1 doubles to $2, then halves right back to $1 —
-          terminal wealth is unchanged, no matter what the 25% arithmetic
-          average promises.</p>
       </div>
       <div class="readouts" id="vol-readouts"></div>
       <div class="readouts" id="vol-readouts2"></div>

@@ -35,7 +35,10 @@ const DEFAULTS = {
   seed: 20260711, // PRNG seed (URL-shareable → reproducible picture)
 };
 
-const store = bindState(DEFAULTS);
+// Numeric ranges mirror the sliders; hash values clamp to these (state.js) —
+// a shared `#ny=1e9` must not run 25 billion-step simulations.
+const BOUNDS = { mu: [0, 20], sg: [0, 40], ny: [5, 50], seed: [0, 4294967295] };
+const store = bindState(DEFAULTS, undefined, { bounds: BOUNDS });
 const S = store.state;
 
 /* ------------------------------------------------------------ formatting -- */
@@ -236,13 +239,6 @@ function renderVol() {
     note.hidden = true;
   }
 }
-
-// the static +100%/−50% hook card (deck §4): arithmetic 25%, geometric 0%.
-// renderLabel (not renderTeX) so the line can WRAP between math segments.
-renderLabel(/** @type {HTMLElement} */ (document.getElementById('deck-hook')),
-  '$R_1 = +100\\%$, $R_2 = -50\\%$: '
-  + 'arithmetic $\\bar{R}_A = \\tfrac{100\\% - 50\\%}{2} = \\mathbf{25\\%}$ '
-  + 'but geometric $\\bar{R}_G = \\bigl[(1{+}1)(1{-}\\tfrac{1}{2})\\bigr]^{1/2} - 1 = \\mathbf{0\\%}$');
 
 /* --------------------------------------------------------------- controls -- */
 

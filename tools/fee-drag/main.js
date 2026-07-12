@@ -17,7 +17,7 @@
 
 import { feeWealth, decliningExitFee } from '../../lib/finmath.js';
 import { Chart, fixed, niceTicks } from '../../lib/chart.js';
-import { slider, numberInput, toggle, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
+import { slider, numberInput, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
 import { gateTool } from '../../lib/release.js';
@@ -35,10 +35,16 @@ const DEFAULTS = {
   af: 0,      // Fund A annual fee, %
   bl: 0,      // Fund B front-end load, %
   bf: 0.5,    // Fund B annual fee, %
-  bx: true,   // Fund B declining exit fee (5% − 1%/yr) on/off
+  bxf: 5,     // Fund B starting exit fee, % (declines 1 pp/yr of holding; 0 = none)
 };
 
-const store = bindState(DEFAULTS);
+// Numeric ranges mirror the controls; hash values clamp to these (state.js) —
+// negative fees or a `#T=1e9` horizon must not NaN the curves or hang the tab.
+const BOUNDS = {
+  x0: [1, 10000000], r: [0, 15], T: [1, 40],
+  al: [0, 8], af: [0, 2], bl: [0, 8], bf: [0, 2], bxf: [0, 6],
+};
+const store = bindState(DEFAULTS, undefined, { bounds: BOUNDS });
 const S = store.state;
 
 /* ------------------------------------------------------------ formatting -- */
@@ -102,13 +108,13 @@ function feeModel() {
   const aFee = Number(S.af) / 100;
   const bLoad = Number(S.bl) / 100;
   const bFee = Number(S.bf) / 100;
-  const bDecl = Boolean(S.bx);
-  /** Fund B's exit fee AS OF a cash-out in year t (0 when toggled off). */
-  const exitAt = (t) => (bDecl ? decliningExitFee(0.05, 0.01, t) : 0);
+  const bExit0 = Number(S.bxf) / 100; // starting exit fee (0 = none)
+  /** Fund B's exit fee AS OF a cash-out in year t (declines 1 pp/yr). */
+  const exitAt = (t) => decliningExitFee(bExit0, 0.01, t);
   const wA = (t) => feeWealth(x0, r, t, { frontLoad: aLoad, annualFee: aFee });
   const wB = (t) => feeWealth(x0, r, t, { frontLoad: bLoad, annualFee: bFee, exitFee: exitAt(t) });
   const wFree = (t) => x0 * Math.pow(1 + r, t);
-  return { x0, r, T, aLoad, aFee, bLoad, bFee, bDecl, exitAt, wA, wB, wFree };
+  return { x0, r, T, aLoad, aFee, bLoad, bFee, bExit0, exitAt, wA, wB, wFree };
 }
 
 /**
@@ -121,6 +127,10 @@ function feeModel() {
  */
 function findCrossovers(f, T, samples = 480) {
   const out = [];
+  const minGap = T / samples; // dedupe: a sampled zero next to a sign flip is one crossing
+  const push = (t) => {
+    if (!out.length || t - out[out.length - 1] > minGap) out.push(t);
+  };
   let prevT = 0;
   let prevD = f(0);
   for (let i = 1; i <= samples && out.length < 3; i++) {
@@ -133,10 +143,12 @@ function findCrossovers(f, T, samples = 480) {
         const mid = (lo + hi) / 2;
         if ((f(mid) > 0) === (d > 0)) hi = mid; else lo = mid;
       }
-      out.push((lo + hi) / 2);
+      push((lo + hi) / 2);
+    } else if (d === 0 && prevD !== 0) {
+      push(t); // curves meet EXACTLY on a grid point — still a crossing
     }
     prevT = t;
-    prevD = d;
+    if (d !== 0) prevD = d; // hold the last nonzero sign across a sampled zero
   }
   return out;
 }
@@ -268,9 +280,10 @@ const cBf = slider({
   fmt: (v) => `${v.toFixed(2)}%`,
   onChange: (v) => { store.set('bf', v); renderFee(); },
 });
-const cBx = toggle({
-  label: 'Declining exit fee (5% − 1% per yr)', value: Boolean(S.bx),
-  onChange: (v) => { store.set('bx', v); renderFee(); },
+const cBxf = slider({
+  label: 'Exit fee, year-1 (declines 1%/yr)', min: 0, max: 6, step: 0.25, value: Number(S.bxf),
+  fmt: (v) => (v === 0 ? 'none' : `${v.toFixed(2)}%`),
+  onChange: (v) => { store.set('bxf', v); renderFee(); },
 });
 
 document.getElementById('ctrl-x0').appendChild(cX0);
@@ -280,25 +293,25 @@ document.getElementById('ctrl-al').appendChild(cAl);
 document.getElementById('ctrl-af').appendChild(cAf);
 document.getElementById('ctrl-bl').appendChild(cBl);
 document.getElementById('ctrl-bf').appendChild(cBf);
-document.getElementById('ctrl-bx').appendChild(cBx);
+document.getElementById('ctrl-bxf').appendChild(cBxf);
 
 /** Push a preset into the state AND the controls, then render. */
 function applyFeePreset(p) {
   store.patch(p);
   cX0.set(p.x0); cR.set(p.r); cT.set(p.T);
   cAl.set(p.al); cAf.set(p.af);
-  cBl.set(p.bl); cBf.set(p.bf); cBx.set(p.bx);
+  cBl.set(p.bl); cBf.set(p.bf); cBxf.set(p.bxf);
   renderFee();
 }
 
 // deck anchors (L1 §6): A $1,376.25 / B $1,423.28 at T=4;
 // A $3,926.61 / B $3,901.32 at T=15
 document.getElementById('btn-fee-deck').addEventListener('click', () => {
-  applyFeePreset({ x0: 1000, r: 10, T: 15, al: 6, af: 0, bl: 0, bf: 0.5, bx: true });
+  applyFeePreset({ x0: 1000, r: 10, T: 15, al: 6, af: 0, bl: 0, bf: 0.5, bxf: 5 });
 });
 // active vs passive: gap ≈ $99,628 after 30 years
 document.getElementById('btn-fee-active').addEventListener('click', () => {
-  applyFeePreset({ x0: 100000, r: 6, T: 30, al: 0, af: 0.84, bl: 0, bf: 0.14, bx: false });
+  applyFeePreset({ x0: 100000, r: 6, T: 30, al: 0, af: 0.84, bl: 0, bf: 0.14, bxf: 0 });
 });
 
 /* ------------------------------------------------------------ first paint -- */
