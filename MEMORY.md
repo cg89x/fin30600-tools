@@ -13,10 +13,14 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      R_G ≈ R_A − ½σ², 1991–2025 deck-table presets. Split from the original
      two-column `compounding-drags` on Christian's request (2026-07-11);
      cross-links to fee-drag.
-  2. `fee-drag` — L1 §6: deck Class A 6% load vs Class B 0.5%+declining exit
-     (anchors T=4 → $1,376.25/$1,423.28 B wins, T=15 → $3,926.61/$3,901.30
+  2. `fee-drag` — L1 §6: deck Class A 6% load vs Class B 0.5%+exit fee
+     (anchors T=4 → $1,376.25/$1,423.28 B wins, T=15 → $3,926.61/$3,901.32
      A wins; crossover marker), active-vs-passive preset → $99,628 gap.
-     Other half of the split; cross-links to volatility-drag.
+     Exit fee is FLAT by default (always visible in the B formula); the
+     "declines 1 pp per year held" behavior is a TOGGLE (key `bxd`, default
+     0 per Christian 2026-07-12) — the deck preset switches it ON (the deck
+     anchors need it). Other half of the split; cross-links to
+     volatility-drag.
   3. `market-depth` — L2 §3 (added 2026-07-12, the order-book redesign's
      depth half, née prototype "A1"): quiz-chip strip (sell/buy 10-20-30 +
      inline order ticket) drives an animated walk (555 ms/level) of a
@@ -141,6 +145,12 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-12 — fee-drag: the exit fee's 1 pp/yr decline is now an opt-in
+  TOGGLE (new hash key `bxd`, default OFF) instead of always-on; fixes the
+  "exit fee doesn't show up in the maths" confusion (at the default T=15 the
+  declining fee had already hit 0%, so the B formula printed (1−0.0%)). Flat
+  mode shows the fee in the formula at every T; the deck preset sets bxd=1
+  and reproduces the slide anchors exactly (verified $1,423.28 / $3,901.32).
 - 2026-07-12 — RELEASE DATES SET (Christian: "set the release timing to the
   dates listed in the syllabus"): every live tool's releases.js entry is now
   its Fall-2026 lecture date (see Current state → Release gating for the

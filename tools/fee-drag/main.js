@@ -3,11 +3,12 @@
  * Fee Drag: mutual fund fees (FIN 30600, Lecture 1 §6).
  *
  * X_T = X_0 (1 − f_entry)(1 + r − f_annual)^T (1 − f_exit).
- * Fund A (front-end load) vs Fund B (level load + declining exit fee)
- * against a no-fee reference; the plotted curve at year t is the wealth
- * IF YOU CASHED OUT in year t (the exit fee applies at the point of
- * sale). Deck anchors: T=4 → A $1,376.25 / B $1,423.28 (B wins);
- * T=15 → A $3,926.61 / B $3,901.32 (A wins; the slide rounds to $3,901.3).
+ * Fund A (front-end load) vs Fund B (level load + exit fee — flat by
+ * default; a toggle makes it decline 1 pp per year held, the deck's Class B
+ * structure) against a no-fee reference; the plotted curve at year t is the
+ * wealth IF YOU CASHED OUT in year t (the exit fee applies at the point of
+ * sale). Deck anchors (declining toggle ON): T=4 → A $1,376.25 / B $1,423.28
+ * (B wins); T=15 → A $3,926.61 / B $3,901.32 (A wins; slide rounds $3,901.3).
  *
  * Split out of the original two-column "compounding-drags" tool 2026-07-11
  * (Christian: separate tools); its sibling is tools/volatility-drag/.
@@ -17,7 +18,7 @@
 
 import { feeWealth, decliningExitFee } from '../../lib/finmath.js';
 import { Chart, fixed, niceTicks } from '../../lib/chart.js';
-import { slider, numberInput, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
+import { slider, numberInput, toggle, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
 import { gateTool } from '../../lib/release.js';
@@ -35,14 +36,17 @@ const DEFAULTS = {
   af: 0,      // Fund A annual fee, %
   bl: 0,      // Fund B front-end load, %
   bf: 0.5,    // Fund B annual fee, %
-  bxf: 5,     // Fund B starting exit fee, % (declines 1 pp/yr of holding; 0 = none)
+  bxf: 5,     // Fund B exit fee, % (0 = none)
+  bxd: 0,     // 1 = the exit fee declines 1 pp/yr of holding (toggle, default OFF
+              // per Christian 2026-07-12 — a flat exit fee always shows in the math;
+              // the deck preset turns declining ON to reproduce the slide anchors)
 };
 
 // Numeric ranges mirror the controls; hash values clamp to these (state.js) —
 // negative fees or a `#T=1e9` horizon must not NaN the curves or hang the tab.
 const BOUNDS = {
   x0: [1, 10000000], r: [0, 15], T: [1, 40],
-  al: [0, 8], af: [0, 2], bl: [0, 8], bf: [0, 2], bxf: [0, 6],
+  al: [0, 8], af: [0, 2], bl: [0, 8], bf: [0, 2], bxf: [0, 6], bxd: [0, 1],
 };
 const store = bindState(DEFAULTS, undefined, { bounds: BOUNDS });
 const S = store.state;
@@ -108,9 +112,10 @@ function feeModel() {
   const aFee = Number(S.af) / 100;
   const bLoad = Number(S.bl) / 100;
   const bFee = Number(S.bf) / 100;
-  const bExit0 = Number(S.bxf) / 100; // starting exit fee (0 = none)
-  /** Fund B's exit fee AS OF a cash-out in year t (declines 1 pp/yr). */
-  const exitAt = (t) => decliningExitFee(bExit0, 0.01, t);
+  const bExit0 = Number(S.bxf) / 100; // exit fee (0 = none)
+  const bxDecl = Math.round(Number(S.bxd)) === 1; // declining-exit-fee toggle
+  /** Fund B's exit fee AS OF a cash-out in year t (flat, or −1 pp/yr held). */
+  const exitAt = bxDecl ? (t) => decliningExitFee(bExit0, 0.01, t) : () => bExit0;
   const wA = (t) => feeWealth(x0, r, t, { frontLoad: aLoad, annualFee: aFee });
   const wB = (t) => feeWealth(x0, r, t, { frontLoad: bLoad, annualFee: bFee, exitFee: exitAt(t) });
   const wFree = (t) => x0 * Math.pow(1 + r, t);
@@ -281,9 +286,14 @@ const cBf = slider({
   onChange: (v) => { store.set('bf', v); renderFee(); },
 });
 const cBxf = slider({
-  label: 'Exit fee, year-1 (declines 1%/yr)', min: 0, max: 6, step: 0.25, value: Number(S.bxf),
+  label: 'Exit fee', min: 0, max: 6, step: 0.25, value: Number(S.bxf),
   fmt: (v) => (v === 0 ? 'none' : `${v.toFixed(2)}%`),
   onChange: (v) => { store.set('bxf', v); renderFee(); },
+});
+const cBxd = toggle({
+  label: 'Exit fee declines 1 pp per year held',
+  value: Math.round(Number(S.bxd)) === 1,
+  onChange: (v) => { store.set('bxd', v ? 1 : 0); renderFee(); },
 });
 
 document.getElementById('ctrl-x0').appendChild(cX0);
@@ -294,24 +304,26 @@ document.getElementById('ctrl-af').appendChild(cAf);
 document.getElementById('ctrl-bl').appendChild(cBl);
 document.getElementById('ctrl-bf').appendChild(cBf);
 document.getElementById('ctrl-bxf').appendChild(cBxf);
+document.getElementById('ctrl-bxd').appendChild(cBxd);
 
 /** Push a preset into the state AND the controls, then render. */
 function applyFeePreset(p) {
   store.patch(p);
   cX0.set(p.x0); cR.set(p.r); cT.set(p.T);
   cAl.set(p.al); cAf.set(p.af);
-  cBl.set(p.bl); cBf.set(p.bf); cBxf.set(p.bxf);
+  cBl.set(p.bl); cBf.set(p.bf); cBxf.set(p.bxf); cBxd.set(p.bxd === 1);
   renderFee();
 }
 
 // deck anchors (L1 §6): A $1,376.25 / B $1,423.28 at T=4;
-// A $3,926.61 / B $3,901.32 at T=15
+// A $3,926.61 / B $3,901.32 at T=15 — the deck's Class B exit fee DECLINES,
+// so this preset turns the toggle on.
 document.getElementById('btn-fee-deck').addEventListener('click', () => {
-  applyFeePreset({ x0: 1000, r: 10, T: 15, al: 6, af: 0, bl: 0, bf: 0.5, bxf: 5 });
+  applyFeePreset({ x0: 1000, r: 10, T: 15, al: 6, af: 0, bl: 0, bf: 0.5, bxf: 5, bxd: 1 });
 });
 // active vs passive: gap ≈ $99,628 after 30 years
 document.getElementById('btn-fee-active').addEventListener('click', () => {
-  applyFeePreset({ x0: 100000, r: 6, T: 30, al: 0, af: 0.84, bl: 0, bf: 0.14, bxf: 0 });
+  applyFeePreset({ x0: 100000, r: 6, T: 30, al: 0, af: 0.84, bl: 0, bf: 0.14, bxf: 0, bxd: 0 });
 });
 
 /* ------------------------------------------------------------ first paint -- */
