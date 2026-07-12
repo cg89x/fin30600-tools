@@ -37,7 +37,12 @@ const defaults = {
   rB: 9,         // borrowing rate (%), default r_f + 2pp
 };
 
-const store = bindState(defaults, () => {}, { debounce: 150 });
+// Numeric ranges mirror the controls; hash values clamp to these (state.js) —
+// `#A=-3` (convex "utility") would otherwise mark the utility MINIMUM as w*.
+const BOUNDS = {
+  rf: [0, 20], erp: [0, 40], sp: [1, 60], A: [1, 10], y: [0, 2], rB: [0, 25],
+};
+const store = bindState(defaults, () => {}, { debounce: 150, bounds: BOUNDS });
 const S = store.state;
 
 const pscale = () => 1; // point-radius scale factor (fixed)
@@ -140,6 +145,7 @@ function indiffCurve(U, m, dom, n = 90) {
     const s = (dom.xHi * i) / n;
     const e = U + 0.5 * m.A * s * s;
     if (e > dom.yHi) break;         // stop at the top edge — no drawing in margins
+    if (e < dom.yLo) continue;      // enter from below without painting the margin
     pts.push({ x: s, y: e });
   }
   return pts;

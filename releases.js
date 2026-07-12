@@ -11,8 +11,10 @@
  *                 to the lecture date and forget about it.
  *
  * Instructor bypass: append `#preview` to any tool URL (or `&preview=1` if
- * the URL already has a hash) — the lock screen is skipped. Students would
- * only know this if you show them this file, so don't share preview links.
+ * the URL already has a hash) — the lock screen is skipped. The repo is
+ * public, so treat gating as a courtesy curtain (a determined student can
+ * read this file); it keeps honest students from spoiling class demos, no
+ * more. Still: don't put preview links in Canvas or on slides.
  *
  * HIDE_LOCKED: false shows locked tools as greyed "unlocks in class" cards
  * on the landing page (students see what's coming); true removes them from
@@ -45,7 +47,13 @@ export function isReleased(key) {
   if (v === true) return true;
   if (typeof v === 'string') {
     const [y, m, d] = v.split('-').map(Number);
-    if (y && m && d) return new Date() >= new Date(y, m - 1, d);
+    // Reject dates JS would silently roll over ('2026-13-05' → Jan 2027):
+    // a malformed date must fail CLOSED (locked), not release in the wrong month.
+    if (y && m && d) {
+      const dt = new Date(y, m - 1, d);
+      const valid = dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+      return valid && new Date() >= dt;
+    }
   }
   return false;
 }

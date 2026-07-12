@@ -46,7 +46,13 @@ const defaults = {
 };
 const PARITY_DECK = { pp: 4.2, ps: 26, px: 30, pr: 6, pt: 0.0833 }; // Example 1, T = 1/12
 
-const store = bindState(defaults, () => {}, { debounce: 150 });
+// Numeric ranges mirror the controls; hash values clamp to these (state.js) —
+// σ and T floors keep bsD1D2's readouts finite (`#v=0` → d1 = Infinity).
+const BOUNDS = {
+  s: [20, 200], x: [20, 200], v: [5, 60], r: [0, 12], t: [0.05, 3], q: [0, 6],
+  pp: [0, 1000], ps: [0.01, 10000], px: [0.01, 10000], pr: [0, 20], pt: [0.01, 3],
+};
+const store = bindState(defaults, () => {}, { debounce: 150, bounds: BOUNDS });
 const S = store.state;
 
 /* --------------------------------------------------------------- helpers -- */

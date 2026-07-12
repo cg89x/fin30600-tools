@@ -13,7 +13,6 @@
   <style>
     /* tool-local: two FULL-WIDTH sections stacked (long margin buy, then the
        short sale — deliberately parallel, mirror-image geometry). */
-    [hidden] { display: none !important; }
 
     .page-lead {
       max-width: 1500px; margin: 0.9rem auto 0; padding: 0 1.4rem;
@@ -117,6 +116,7 @@
     .practice-card b { color: var(--navy); }
     @media (max-width: 700px) { .practice-card ul { columns: 1; } }
   </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 </head>
 <body>
   <header class="app-header">
@@ -134,7 +134,7 @@
     mirror image — with the margin call <em>above</em> you instead of below.
   </p>
 
-  <main class="sections-col">
+  <main class="sections-col" hidden>
     <!-- ==================== SECTION 1 — BUYING ON MARGIN ==================== -->
     <section class="tool-section" id="long-section">
       <div class="section-head">

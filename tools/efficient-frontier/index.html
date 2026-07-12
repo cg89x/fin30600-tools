@@ -75,6 +75,7 @@
     .subtle-btn:hover { background: var(--panel-bg); }
     .hint { font-size: 0.76rem; color: var(--muted); margin: 0.15rem 0 0; }
   </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 </head>
 <body>
   <header class="app-header">
@@ -88,7 +89,7 @@
     </div>
   </header>
 
-  <main class="tool-main">
+  <main class="tool-main" hidden>
     <section class="controls-panel">
       <h2>Controls</h2>
 
@@ -129,6 +130,13 @@
       <div class="formula-strip">
         <div class="formula-row" id="formula-w"></div>
         <div class="formula-row" id="formula-s"></div>
+      </div>
+
+      <div class="pd-warning" id="tan-warning" hidden>
+        No tangency portfolio exists here: the risk-free rate is at or above
+        the global-MVP expected return, so no line from (0,&nbsp;r<sub>f</sub>)
+        is tangent to the efficient branch. Lower r<sub>f</sub> (or raise the
+        asset means) to bring the tangency back.
       </div>
 
       <div class="readouts">

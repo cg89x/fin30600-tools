@@ -41,6 +41,11 @@
   font-weight: 400; font-style: italic; font-display: swap;
 }
 
+/* The HTML `hidden` attribute must beat any author `display` rule (a plain
+   [hidden] loses to e.g. `.ctrl { display:flex }` in this very stylesheet —
+   that bug shipped once per-tool; the guard now lives here for every page). */
+[hidden] { display: none !important; }
+
 :root {
   /* House palette (locked in DESIGN.md) */
   --blue:   #0072B2;   /* primary series */

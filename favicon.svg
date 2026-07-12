@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- House palette: ND navy chrome, web-gold series (lib/style.css). -->
+  <rect width="64" height="64" rx="12" fill="#0A234B"/>
+  <polyline points="11,46 25,31 35,39 52,17" fill="none" stroke="#C99700"
+    stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="52" cy="17" r="5.5" fill="#C99700"/>
+</svg>

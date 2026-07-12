@@ -14,7 +14,6 @@
   <style>
     /* tool-local tweaks */
     /* the flex/grid display rules below would beat the UA [hidden] style */
-    [hidden] { display: none !important; }
     .chart-box { --stroke-scale: 1.5; }
     .chart-box svg.finchart .tick { font-size: 12px; }
     .chart-box svg.finchart .axis-title { font-size: 13px; }
@@ -247,6 +246,7 @@
       color: var(--navy);
     }
   </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 </head>
 <body>
   <header class="app-header">
@@ -265,7 +265,7 @@
     </div>
   </header>
 
-  <main class="tool-main bc-main">
+  <main class="tool-main bc-main" hidden>
     <section class="chart-area">
       <div class="sim-notice" id="sim-notice" hidden>
         <span id="sim-notice-text"></span>

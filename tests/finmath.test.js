@@ -1,6 +1,8 @@
 // @ts-check
 /**
- * finmath.test.js — zero-dependency unit tests. Run with:  node --test tests/
+ * finmath.test.js — zero-dependency unit tests.
+ * Run with:  node --test tests/finmath.test.js
+ * (NOT `node --test tests/` — the bare directory form breaks under Node 25.)
  *
  * The check values come from the FIN 30600 lecture decks (Lecture 3 §3–4,
  * Lecture 4) plus one 3-asset frontier/tangency case computed independently
@@ -440,4 +442,53 @@ test('short sales (L2 deck ATT example)', () => {
   assertNear(fm.shortReturn(2500, 100, 50, 53), -0.12, 1e-12, 'price to $53 → −12%');
   // −R_stock × 1/im identity: (−6%) × (1/0.5) = −12%
   assertNear(-((53 - 50) / 50) / 0.50, -0.12, 1e-12, 'magnification identity');
+});
+
+/* ------------------------------------------ headline tool-default anchors */
+
+test('Black–Scholes deck anchor (L8 tool default): S=100, X=95, σ=50%, r=10%, T=0.25', () => {
+  // The black-scholes tool's default configuration — the slide computes C = 13.70.
+  assertNear(fm.bsCall(100, 95, 0.50, 0.10, 0.25), 13.6953, 5e-4, 'C = 13.695');
+  const { d1 } = fm.bsD1D2(100, 95, 0.50, 0.10, 0.25);
+  assertNear(d1, 0.4302, 5e-4, 'd1 = 0.43');
+  assertNear(fm.normCdf(d1), 0.6665, 5e-4, 'hedge ratio N(d1) ≈ 0.67');
+});
+
+test('Macaulay duration deck anchor (L7 Example 1): 8% coupon, 6y, y=8%', () => {
+  assertNear(fm.bondPrice(0.08, 0.08, 6, 1000), 1000, 1e-6, 'par bond');
+  assertNear(fm.macaulayDuration(0.08, 0.08, 6, 1000), 4.9927, 5e-5, 'D = 4.9927');
+  // full-precision D: y 8% → 7% gives ΔB/B ≈ +4.62% (the slide's rounded D prints +4.62%)
+  assertNear(fm.durationApproxRel(4.9927, 0.08, -0.01), 0.046229, 1e-5, '+$46.23 per $1,000');
+});
+
+/* --------------------------------------------------- degenerate-case guards */
+
+test('tangencyPortfolio returns null when rf >= the global-MVP mean', () => {
+  // 2 assets, MVP mean sits between the asset means
+  const mu = [0.05, 0.09];
+  const Sigma = fm.covMatrix([0.05, 0.16], [[1, 0.1], [0.1, 1]]);
+  const mvpMean = fm.portfolioMean(fm.globalMVP(Sigma), mu);
+  const ok = fm.tangencyPortfolio(mu, Sigma, mvpMean - 0.01);
+  assert.ok(Array.isArray(ok), 'tangency exists below the MVP mean');
+  assertNear(ok.reduce((a, b) => a + b, 0), 1, 1e-9, 'weights sum to 1');
+  assert.ok(fm.portfolioMean(ok, mu) > mvpMean - 0.01, 'tangency mean exceeds rf');
+  assert.equal(fm.tangencyPortfolio(mu, Sigma, mvpMean), null, 'null AT the MVP mean');
+  assert.equal(fm.tangencyPortfolio(mu, Sigma, mvpMean + 0.01), null, 'null above it');
+});
+
+test('BS deltas hit their intrinsic limits at T=0 / σ=0 (no NaN)', () => {
+  // ATM with T=0, r=q=0 was the 0/0 case: bsCall returns 0, delta must not NaN
+  assert.ok(Number.isFinite(fm.bsCallDelta(100, 100, 0, 0, 1)), 'σ=0 ATM call delta finite');
+  assert.equal(fm.bsCallDelta(120, 100, 0.5, 0.05, 0), 1, 'ITM call delta → 1');
+  assert.equal(fm.bsCallDelta(80, 100, 0.5, 0.05, 0), 0, 'OTM call delta → 0');
+  assert.equal(fm.bsPutDelta(80, 100, 0.5, 0.05, 0), -1, 'ITM put delta → −1');
+  assert.equal(fm.bsPutDelta(120, 100, 0.5, 0.05, 0), 0, 'OTM put delta → 0');
+});
+
+test('walkBook clamps a negative order size to zero fills', () => {
+  const bids = [{ price: 9.75, size: 15 }];
+  const w = fm.walkBook(bids, -5);
+  assert.equal(w.sharesFilled, 0, 'nothing filled');
+  assert.equal(w.total, 0, 'no dollars');
+  assert.equal(w.avgPrice, null, 'no price');
 });

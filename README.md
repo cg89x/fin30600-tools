@@ -2,13 +2,18 @@
 
 Browser-based interactive explorers accompanying the FIN 30600 (Investment
 Theory, University of Notre Dame — Christian Kontz) lecture decks. They cover
-Portfolio Theory (L3), CAPM (L4), Behavioral Finance (L6), Fixed Income (L7),
-and Derivatives (L8), and are meant to be driven live on the classroom
-projector **and** used by students on their own laptops (linked from Canvas).
+Returns & Fees (L1), Securities Trading (L2), Portfolio Theory (L3), CAPM
+(L4), Behavioral Finance (L6), Fixed Income (L7), and Derivatives (L8), and
+are meant to be driven live on the classroom projector **and** used by
+students on their own laptops (linked from Canvas).
 
 This is a **static site with zero build step**: plain HTML + ES-module
 JavaScript, no framework, no bundler, no npm install. The only third-party
-dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self-hosted in `vendor/`.
+code is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle, Apache-2.0)
+and [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 1.4.4
+(MIT), both self-hosted in `vendor/` alongside the Libertinus webfonts (SIL
+OFL 1.1); license texts sit next to each. The beauty-contest tool optionally
+talks to a Firebase Realtime Database (plain REST/SSE, no SDK).
 
 > Working on this repo with Claude? Start with [`CLAUDE.md`](CLAUDE.md)
 > (operating guide + invariants) and [`MEMORY.md`](MEMORY.md) (living state log,
@@ -18,7 +23,7 @@ dependency is [MathJax](https://www.mathjax.org/) v3 (tex-svg-full bundle), self
 
 | Tool | Lecture | What it does |
 |------|---------|--------------|
-| [`tools/volatility-drag/`](tools/volatility-drag/) | L1 §4 | Volatility drag: arithmetic vs. geometric average, R_G ≈ R_A − ½σ², the +100%/−50% hook, simulated wealth paths vs. the "arithmetic promise," 1991–2025 table presets. |
+| [`tools/volatility-drag/`](tools/volatility-drag/) | L1 §4 | Volatility drag: arithmetic vs. geometric average, R_G ≈ R_A − ½σ², simulated wealth paths vs. the "arithmetic promise," 1991–2025 table presets. |
 | [`tools/fee-drag/`](tools/fee-drag/) | L1 §6 | Fund-fee drag: Class A front load vs. Class B level load + declining exit fee, crossover horizon, active-vs-passive preset ($99,628 gap). |
 | [`tools/order-book/`](tools/order-book/) | L2 §3 | Limit order book: market orders walk the book level by level (deck's hypothetical book), depth-cost staircase, and limit/stop orders against a static quote and a moving price path (gap risk). |
 | [`tools/margin-short/`](tools/margin-short/) | L2 §4–5 | Buying on margin and short sales as mirror images: balance-sheet bar, return magnified by 1/margin, margin-call prices, unbounded short losses. |
@@ -47,8 +52,8 @@ real origin — opening `index.html` as a `file://` URL will not work):
 
 ```bash
 cd fin30600-tools
-python3 -m http.server 8000
-# then open http://localhost:8000/
+python3 -m http.server 8613   # same port .claude/launch.json uses
+# then open http://localhost:8613/
 ```
 
 ## Run the tests

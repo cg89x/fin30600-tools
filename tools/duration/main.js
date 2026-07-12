@@ -49,7 +49,13 @@ const defaults = {
   sc: 5,    // illustrative 5-year bond's coupon, percent
 };
 
-const store = bindState(defaults, () => {}, { debounce: 150 });
+// Numeric ranges mirror the controls; hash values clamp to these (state.js) —
+// `#y=-150` (i.e. 1+y < 0) or `#n=1000` must not render garbage.
+const BOUNDS = {
+  c: [0, 15], n: [1, 30], y: [0, 15], dy: [-300, 300],
+  s1: [0, 15], s2: [0, 15], s3: [0, 15], s4: [0, 15], s5: [0, 15], sc: [0, 15],
+};
+const store = bindState(defaults, () => {}, { debounce: 150, bounds: BOUNDS });
 const S = store.state;
 
 /* --------------------------------------------------------------- helpers -- */

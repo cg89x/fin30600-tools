@@ -54,7 +54,16 @@ const defaults = {
   seed: 212,   // Part B path seed — 212 gaps from $55.13 THROUGH the $54.50
                // stop at bar 30 and prints $53.90 (the gap-risk preset)
 };
-const store = bindState(defaults, () => {}, { debounce: 150 });
+// Numeric ranges for hash/typed values (state.js clamps): prices and sizes
+// stay sane, order size mirrors its slider.
+const BOUNDS = {
+  ap1: [0, 10000], ap2: [0, 10000], ap3: [0, 10000],
+  bp1: [0, 10000], bp2: [0, 10000], bp3: [0, 10000],
+  as1: [0, 9999], as2: [0, 9999], as3: [0, 9999],
+  bs1: [0, 9999], bs2: [0, 9999], bs3: [0, 9999],
+  q: [0, 40], pa: [0, 10000], pb: [0, 10000], seed: [0, 4294967295],
+};
+const store = bindState(defaults, () => {}, { debounce: 150, bounds: BOUNDS });
 const S = store.state;
 
 /* ------------------------------------------------------------ helpers ---- */
@@ -149,8 +158,10 @@ function view() {
   const levels = side === 'buy' ? b.asks : b.bids;
   const walk = walkBook(levels, q);
   const depth = levels.reduce((s, l) => s + l.size, 0);
-  const bestBid = b.bids[0].price;
-  const bestAsk = b.asks[0].price;
+  // Best quote = best PRICE WITH SIZE: a zeroed-out level is not a quote
+  // (the walk already skips it; the spread/reference line must agree).
+  const bestBid = (b.bids.find((l) => l.size > 0) || b.bids[0]).price;
+  const bestAsk = (b.asks.find((l) => l.size > 0) || b.asks[0]).price;
   const nShown = anim ? Math.min(anim.step, walk.fills.length) : walk.fills.length;
   const shown = walk.fills.slice(0, nShown);
   return {
@@ -529,6 +540,7 @@ function buildBookEditor(host, side) {
       input.value = String(S[key]);
       input.id = `in-${key}`;
       input.addEventListener('input', () => {
+        if (input.value.trim() === '') return; // mid-retype: '' would coerce to $0.00
         const n = Number(input.value);
         if (!Number.isFinite(n)) return;
         cancelAnim();

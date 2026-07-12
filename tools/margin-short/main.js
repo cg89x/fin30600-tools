@@ -60,7 +60,14 @@ const DEFAULTS = {
   smm: 30,    // maintenance margin, %
   sp1: 53,    // current price P₁
 };
-const store = bindState(DEFAULTS);
+// Numeric ranges mirror the sliders; hash values clamp to these (state.js) —
+// e.g. `#im=0` must not produce N = ∞ shares and Infinity readouts.
+const BOUNDS = {
+  e0: [100, 1000000], p0: [1, 10000], im: [50, 100], mm: [25, 50],
+  c: [0, 12], p1: [40, 160],
+  sn: [1, 100000], sp0: [1, 10000], sim: [50, 100], smm: [25, 50], sp1: [20, 80],
+};
+const store = bindState(DEFAULTS, undefined, { bounds: BOUNDS });
 const S = store.state;
 
 const P1_MIN = 40, P1_MAX = 160;   // long P₁ slider range

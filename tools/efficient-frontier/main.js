@@ -77,6 +77,16 @@ function buildDefaults() {
   return d;
 }
 
+/** Numeric ranges per state key — hash values and edits clamp to these
+ * (state.js), so a crafted URL can't inject σ ≤ 0, |ρ| > 1, etc. */
+function buildBounds() {
+  /** @type {Record<string, [number, number]>} */
+  const b = { rf: [0, 0.08], seed: [0, 4294967295] };
+  DEFAULT_ASSETS.forEach((_, i) => { b['m' + i] = [-0.5, 1]; b['s' + i] = [0.0001, 2]; });
+  PAIRS.forEach(([i, j]) => { b['c' + i + j] = [-0.99, 0.99]; });
+  return b;
+}
+
 /* ------------------------------------------------------- model + math ----- */
 
 /** Assemble names / mu / sigma / corr from the flat state object. */
@@ -132,12 +142,18 @@ function computeAll(raw, rf, seed) {
   return model;
 }
 
-/** (Re)compute the tangency portfolio + Sharpe on an existing model for rf. */
+/** (Re)compute the tangency portfolio + Sharpe on an existing model for rf.
+ * When rf >= the global-MVP mean no tangency exists (tangencyPortfolio
+ * returns null) — model.tangency is set to null and the UI explains. */
 function attachTangency(model, rf) {
+  model.rf = rf;
   const wT = tangencyPortfolio(model.mu, model.Sigma, rf);
+  if (!wT) {
+    model.tangency = null;
+    return model;
+  }
   const mean = portfolioMean(wT, model.mu);
   const std = portfolioStd(wT, model.Sigma);
-  model.rf = rf;
   model.tangency = { w: wT, mean, std, sharpe: sharpe(mean, rf, std) };
   return model;
 }
@@ -146,8 +162,6 @@ function attachTangency(model, rf) {
 
 function main() {
   const defaults = buildDefaults();
-
-  const params = new URLSearchParams(location.search);
   const pointScale = () => 1; // point-radius scale factor (fixed)
 
   // Chart.
@@ -173,7 +187,7 @@ function main() {
   /** overlay nodes (CAL + star) to remove on the next overlay redraw */
   let overlayNodes = [];
 
-  const store = bindState(defaults);
+  const store = bindState(defaults, undefined, { bounds: buildBounds() });
 
   const hoverTip = makeHoverTip(chart, () => (lastValid ? lastValid.names : DEFAULT_ASSETS.map((a) => a.name)));
   chart.onHover(hoverTip, { radius: 18 });
@@ -193,7 +207,13 @@ function main() {
   function recomputeAll() {
     const raw = readModel(store.state);
     const model = computeAll(raw, Number(store.get('rf')), Number(store.get('seed')));
-    if (!model) { flagNotPD(true); return; }
+    if (!model) {
+      flagNotPD(true);
+      // First load with a bad hash: still draw the axes so the chart area
+      // isn't a blank white rectangle next to the warning.
+      if (!lastValid) setDomainFor(raw);
+      return;
+    }
     flagNotPD(false);
     lastValid = model;
     setDomainFor(raw);
@@ -201,7 +221,8 @@ function main() {
     // pass the previous overlay nodes so the old CAL/star are removed —
     // an empty array here leaves ghost stars behind on every asset edit
     overlayNodes = renderOverlay(chart, model, pointScale(), overlayNodes);
-    renderWeights(weightsHost, model.names, model.tangency.w, pointScale());
+    flagNoTan(!model.tangency);
+    renderWeights(weightsHost, model.names, model.tangency ? model.tangency.w : null, pointScale());
     renderReadouts(tiles, model);
     renderFormula(fRowW, fRowS, model);
   }
@@ -212,7 +233,8 @@ function main() {
     attachTangency(lastValid, Number(store.get('rf')));
     // rf can shift yHi only marginally; keep the domain stable during a drag.
     overlayNodes = renderOverlay(chart, lastValid, pointScale(), overlayNodes);
-    renderWeights(weightsHost, lastValid.names, lastValid.tangency.w, pointScale());
+    flagNoTan(!lastValid.tangency);
+    renderWeights(weightsHost, lastValid.names, lastValid.tangency ? lastValid.tangency.w : null, pointScale());
     renderReadouts(tiles, lastValid);
     renderFormula(fRowW, fRowS, lastValid);
   }
@@ -220,6 +242,14 @@ function main() {
   function flagNotPD(bad) {
     warnBox.hidden = !bad;
     corrGrid.classList.toggle('corr-invalid', bad);
+  }
+
+  // "No tangency" notice: rf at/above the global-MVP mean means the CAL has
+  // no tangent point on the efficient branch — the naive formula would mark
+  // a MINIMUM-Sharpe portfolio, so we hide the star/CAL and say why.
+  const tanWarn = document.getElementById('tan-warning');
+  function flagNoTan(bad) {
+    if (tanWarn) tanWarn.hidden = !bad;
   }
 
   /* ---- controls ---- */

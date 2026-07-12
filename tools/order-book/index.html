@@ -12,8 +12,6 @@
   <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
   <style>
     /* tool-local tweaks */
-    /* the flex/grid display rules below would beat the UA [hidden] style */
-    [hidden] { display: none !important; }
     .chart-box { --stroke-scale: 1.5; }
     .chart-box svg.finchart .tick { font-size: 12px; }
     .chart-box svg.finchart .axis-title { font-size: 13px; }
@@ -211,6 +209,7 @@
     .ot-result .exec-no { color: var(--red); font-weight: 700; }
     .ot-partb { margin-top: 1.1rem; padding-top: 0.8rem; border-top: 1px solid var(--panel-border); }
   </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 </head>
 <body>
   <header class="app-header">
@@ -228,7 +227,7 @@
       and the depth of the limit order book are the true cost of trading.</p>
   </div>
 
-  <main class="tool-main">
+  <main class="tool-main" hidden>
     <section class="controls-panel" aria-label="Controls">
       <h2>The book &amp; your order</h2>
 

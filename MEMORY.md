@@ -8,7 +8,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 - **Twelve tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
   tool-local modules where noted), listed in lecture order:
-  1. `volatility-drag` — L1 §4: +100%/−50% hook card, 25 seeded wealth paths
+  1. `volatility-drag` — L1 §4: 25 seeded wealth paths
      vs the "arithmetic promise" (1+μ)^t and geometric expectation,
      R_G ≈ R_A − ½σ², 1991–2025 deck-table presets. Split from the original
      two-column `compounding-drags` on Christian's request (2026-07-11);
@@ -73,7 +73,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
   self-gate via `lib/release.js` `gateTool()`; `#preview` = instructor
   bypass. Edit + push to release a tool.
-- **Tests:** `node --test tests/finmath.test.js`, 30 passing (incl. BS,
+- **Tests:** `node --test tests/finmath.test.js`, 35 passing (incl. BS,
   parity, bond price/duration, forward-rate, L1 fee/average and L2
   order-book/margin/short anchor tests).
 - **Deploy:** push to `main` → GitHub Pages → christiankontz.com/fin30600-tools.
@@ -103,8 +103,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - `\$` inside a `$...$` renderLabel segment breaks the splitter; use
   `\unicode{x24}` (`\mathdollar`/`\char` are NOT in tex-svg-full — silent red
   text, no merror).
-- Author `display:flex/grid` beats the `hidden` attribute — pages that toggle
-  such elements need `[hidden]{display:none !important}`.
+- Author `display:flex/grid` beats the `hidden` attribute — a global
+  `[hidden]{display:none !important}` guard now lives in `lib/style.css`
+  (don't remove it; don't re-add per-tool copies).
 - Put–call parity: the DECK discounts at an effective annual rate
   (X/(1+r)^T, `parityCall`); Black–Scholes uses continuous e^{−rT}. Keep the
   two forms straight in any option UI.
@@ -121,6 +122,27 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-07-11 — FULL CODE AUDIT (5 parallel agents) + fix batch. Majors fixed:
+  efficient-frontier hides tangency/CAL with a notice when r_f ≥ global-MVP
+  mean (`tangencyPortfolio` now returns null there); `state.js` survives
+  malformed %-escapes (`#rf=5%` used to URIError-blank the page); beauty-
+  contest projector iterates existing round keys (hostile world-writable
+  `meta.round=1e9` used to freeze the tab); capm-sml snaps `n` to its option
+  set (`#n=-5` used to throw). NEW CONVENTION: per-tool `BOUNDS` passed to
+  `bindState` — hash/typed values clamp to control ranges in all 12 tools.
+  Also: `[hidden]` guard hoisted global; `<main hidden>` + gate reveal kills
+  the locked-page flash; `#preview` survives state writes; `niceTicks`
+  can't infinite-loop; numberInput ignores empty/mid-edit values (order-book
+  $0.00-best-ask bug); order-book best quote skips zero-size levels; ui.js
+  labels htmlFor-linked (a11y); BS deltas guarded at σ=0/T=0; favicon.svg +
+  links on all pages; vendor LICENSE texts added (Apache-2.0/MIT/OFL — root
+  LICENSE still Christian's call); releases.js rejects rollover dates; stale
+  docs fixed. Tests 30 → 35 (adds BS 13.695 + duration 4.9927 anchors,
+  tangency-null, delta guards); dead `solveMany` removed.
+- 2026-07-11 — Christian's content tweaks: volatility-drag's +100%/−50% deck
+  hook card REMOVED; fee-drag's exit-fee toggle replaced by a year-1 exit-fee
+  SLIDER (state key `bx` → `bxf`, 0–6%, still declining 1 pp/yr; deck preset
+  5%, active-passive 0%) and the T=4/T=15 punchline note removed.
 - 2026-07-11 — `compounding-drags` SPLIT into `volatility-drag` (L1 §4) and
   `fee-drag` (L1 §6) at Christian's request — each now a standard
   controls-left/chart-right page (charts widened 540→720), cross-linked in

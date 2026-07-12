@@ -11,7 +11,8 @@ superseded artifacts (they carry banners pointing back to the README).
 
 Static site of browser-based interactive explorers for **FIN 30600 Investment
 Theory** (Notre Dame, Christian Kontz), accompanying the beamer lecture decks —
-Portfolio Theory (L3) and CAPM (L4). Dual-purpose: driven live on the
+12 tools spanning Lectures 1–8 (returns/fees, trading, portfolio theory, CAPM,
+behavioral, fixed income, derivatives). Dual-purpose: driven live on the
 classroom projector AND used by students on their laptops (Canvas links).
 
 - **Live:** https://www.christiankontz.com/fin30600-tools/ (GitHub Pages custom
@@ -35,6 +36,11 @@ classroom projector AND used by students on their laptops (Canvas links).
 - **State in the URL hash** via `lib/state.js` (debounced `replaceState`), so
   every configuration is a shareable/QR-able link. Randomness → seeded
   `mulberry32`, seed is part of the state.
+- **Hash values are untrusted.** Every tool passes a `BOUNDS` map (per-key
+  `[min, max]` mirroring its controls) to `bindState(..., { bounds })`;
+  `state.js` clamps on parse AND on every `set`/`patch`. Without it a crafted
+  URL can freeze the tab (`#ny=1e9`), NaN the charts, or mark a wrong point as
+  "optimal" — this class of bug shipped once across most tools.
 
 ## Conventions that bite if ignored
 
@@ -52,8 +58,8 @@ classroom projector AND used by students on their laptops (Canvas links).
   for a dollar sign inside math use `\unicode{x24}` (note `\mathdollar` and
   `\char` are NOT in tex-svg-full; they fail silently as red literal text).
 - **The `hidden` attribute loses to any author `display:flex/grid` rule** —
-  tool-local CSS that sets display on toggleable elements needs
-  `[hidden]{display:none !important}` (beauty-contest pages carry it).
+  `lib/style.css` carries a global `[hidden]{display:none !important}` guard;
+  don't remove it and don't re-add per-tool copies.
 - **On-chart SVG text stays Arial** (`--font-chart`) to match the lecture
   *figures*; body text is Libertinus Sans, display titles Libertinus Serif
   (deck theme). Don't let chart text inherit the body font.
@@ -63,9 +69,13 @@ classroom projector AND used by students on their laptops (Canvas links).
   chrome, metallic gold `#AE9142` (`--goldmetal`) chrome accents, RED `#D62728`
   dashed references only.
 - **Every tool is release-gated.** A new tool must (1) get an entry in
-  `releases.js` and (2) `await gateTool('<folder>')` (from `lib/release.js`)
-  right after the imports in its `main.js`, plus `data-tool="<folder>"` on its
-  landing card. `#preview` in the URL bypasses the gate (instructor-only).
+  `releases.js`, (2) `await gateTool('<folder>')` (from `lib/release.js`)
+  right after the imports in its `main.js`, (3) ship its `<main>` with the
+  `hidden` attribute (the gate un-hides it — kills the locked-page content
+  flash), and (4) carry `data-tool="<folder>"` on its landing card plus the
+  favicon link every page has. `#preview` in the URL bypasses the gate
+  (instructor-only; state writes preserve it). Gating is a courtesy curtain,
+  not security — the repo and the static HTML are public.
 
 ## Run / test / deploy
 

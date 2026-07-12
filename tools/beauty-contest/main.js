@@ -36,8 +36,9 @@ await gateTool('beauty-contest');
 hydrateLabels();
 
 /* ------------------------------------------------------------- config ---- */
-// config.js is deliberately not shipped; without it we run in simulation
-// mode (see SETUP.md for the one-time Firebase setup).
+// config.js IS committed (it holds only the public RTDB URL — safe by design,
+// see SETUP.md). The dynamic import still degrades to simulation mode if the
+// file is ever removed or left as the placeholder.
 const config = await import('./config.js')
   .then((m) => (m && (m.default ?? m)) || null)
   .catch(() => null);
@@ -55,7 +56,11 @@ const defaults = {
   seed: 20260811,                           // sim class seed
   n: 45,                                    // sim class size
 };
-const store = bindState(defaults, () => {}, { debounce: 150 });
+const store = bindState(defaults, () => {}, {
+  debounce: 150,
+  // hash values clamp to these (state.js) — r/n also guard the sim loops
+  bounds: { r: [1, 500], seed: [0, 4294967295], n: [2, 500] },
+});
 const S = store.state;
 if (!HAS_LIVE) S.sim = true; // no config ⇒ simulation is the only mode
 
@@ -166,7 +171,7 @@ function roundNode(tree, r) {
  */
 function view() {
   if (isSim()) {
-    const round = Math.max(1, Math.round(Number(S.r)));
+    const round = clampRound(Number(S.r));
     const closed = Boolean(S.cl);
     const all = simGuessesFor(round);
     let guesses;
@@ -183,17 +188,32 @@ function view() {
   if (!S.s || !meta) {
     return { round: 1, open: false, guesses: [], history: [], hasSession: false };
   }
-  const round = Math.max(1, Math.round(Number(meta.round) || 1));
+  const round = clampRound(Number(meta.round));
   const open = Boolean(meta.open);
   const guesses = guessList(roundNode(liveTree, round) && roundNode(liveTree, round).guesses);
   const history = [];
   const lastClosed = open ? round - 1 : round;
-  for (let k = 1; k <= lastClosed; k++) {
+  // Iterate the round keys that actually EXIST in the mirror, never 1..round:
+  // meta is world-writable, so a hostile `meta.round = 1e9` must not send the
+  // projector into a billion-iteration loop on every SSE event.
+  const roundsNode = (liveTree && liveTree.rounds) || {};
+  const ks = Object.keys(roundsNode)
+    .map(Number)
+    .filter((k) => Number.isInteger(k) && k >= 1 && k <= lastClosed)
+    .sort((a, b) => a - b);
+  for (const k of ks) {
     const node = roundNode(liveTree, k);
     const list = guessList(node && node.guesses);
     if (list.length) history.push(historyEntry(k, list));
   }
   return { round, open, guesses, history, hasSession: true };
+}
+
+/** Round counters come from state or the (world-writable) live meta — clamp
+ * to something a classroom can actually reach. */
+function clampRound(n) {
+  if (!Number.isFinite(n)) return 1;
+  return Math.min(500, Math.max(1, Math.round(n)));
 }
 
 /** A closed round's stats + its winners. @param {number} k @param {any[]} list */

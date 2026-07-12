@@ -30,7 +30,13 @@ const DEFAULTS = {
   muA: 8, sigA: 13, muB: 16, sigB: 20,
   rho: 0.2, wA: 0.6, shorts: false, refs: false,
 };
-const store = bindState(DEFAULTS);
+// Numeric ranges mirror the controls; hash values clamp to these (state.js) —
+// `#rho=2` would otherwise make the labeled "MVP" a variance MAXIMUM.
+const BOUNDS = {
+  muA: [-20, 50], muB: [-20, 50], sigA: [0, 100], sigB: [0, 100],
+  rho: [-1, 1], wA: [-0.5, 1.5],
+};
+const store = bindState(DEFAULTS, undefined, { bounds: BOUNDS });
 const S = store.state;
 
 /* --------------------------------------------------------------- helpers -- */

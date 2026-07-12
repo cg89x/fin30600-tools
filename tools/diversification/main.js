@@ -42,7 +42,10 @@ const defaults = {
   c3: true,       // show Case 3
 };
 
-const store = bindState(defaults, () => {}, { debounce: 150 });
+// Numeric ranges mirror the sliders; hash values clamp to these (state.js) —
+// `#rho=-1` would otherwise give negative variance → NaN curves.
+const BOUNDS = { n: [1, 100], rho: [0, 0.95], beta: [0, 0.98] };
+const store = bindState(defaults, () => {}, { debounce: 150, bounds: BOUNDS });
 const S = store.state;
 
 /* --------------------------------------------------------------- helpers -- */

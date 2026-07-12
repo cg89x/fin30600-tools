@@ -10,7 +10,7 @@
  * @module efficient-frontier/view
  */
 
-import { pct, svgMathText } from '../../lib/chart.js';
+import { pct, svgMathText, setStrokeWidth } from '../../lib/chart.js';
 import { renderTeX } from '../../lib/ui.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
@@ -103,23 +103,26 @@ export function renderBase(chart, m, pointScale) {
 export function renderOverlay(chart, m, pointScale, prevNodes) {
   for (const n of prevNodes) n.remove();
   const nodes = [];
-  const t = m.tangency;
+  const t = m.tangency; // null when rf >= MVP mean (no tangency exists)
 
-  // CAL: from (0, rf) with slope = Sharpe, clipped to the plot box.
-  const slope = t.sharpe; // (mean - rf) / std
-  let xEnd = chart.xHi;
-  if (slope > 0) {
-    const xAtTop = (chart.yHi - m.rf) / slope;
-    xEnd = Math.min(chart.xHi, xAtTop);
+  if (t) {
+    // CAL: from (0, rf) with slope = Sharpe, clipped to the plot box.
+    const slope = t.sharpe; // (mean - rf) / std — positive whenever t exists
+    let xEnd = chart.xHi;
+    if (slope > 0) {
+      const xAtTop = (chart.yHi - m.rf) / slope;
+      xEnd = Math.min(chart.xHi, xAtTop);
+    }
+    const yEnd = m.rf + slope * xEnd;
+    const cal = el('line', {
+      x1: chart.sx(0), y1: chart.sy(m.rf), x2: chart.sx(xEnd), y2: chart.sy(yEnd),
+      stroke: 'var(--blue)', 'stroke-linecap': 'round',
+      class: 'cal-line',
+    });
+    setStrokeWidth(cal, 1.5 * pointScale);
+    chart.overlayGroup.appendChild(cal);
+    nodes.push(cal);
   }
-  const yEnd = m.rf + slope * xEnd;
-  const cal = el('line', {
-    x1: chart.sx(0), y1: chart.sy(m.rf), x2: chart.sx(xEnd), y2: chart.sy(yEnd),
-    stroke: 'var(--blue)', 'stroke-width': 1.5 * pointScale, 'stroke-linecap': 'round',
-    class: 'cal-line',
-  });
-  chart.overlayGroup.appendChild(cal);
-  nodes.push(cal);
 
   // rf intercept marker on the y-axis.
   const rfDot = el('circle', {
@@ -135,19 +138,21 @@ export function renderOverlay(chart, m, pointScale, prevNodes) {
   nodes.push(rfLbl);
 
   // Tangency portfolio — gold star (stands out against the blue CAL), labeled T.
-  const star = el('path', {
-    d: starPath(chart.sx(t.std), chart.sy(t.mean), 9 * pointScale, 4 * pointScale, 5),
-    fill: 'var(--gold)', stroke: '#fff', 'stroke-width': 1.2, class: 'tangency-star',
-  });
-  chart.overlayGroup.appendChild(star);
-  nodes.push(star);
-  const tLbl = el('text', {
-    x: chart.sx(t.std) + 12, y: chart.sy(t.mean) - 9, fill: 'var(--gold)',
-    class: 'datalabel lbl-strong',
-  });
-  tLbl.textContent = 'T';
-  chart.overlayGroup.appendChild(tLbl);
-  nodes.push(tLbl);
+  if (t) {
+    const star = el('path', {
+      d: starPath(chart.sx(t.std), chart.sy(t.mean), 9 * pointScale, 4 * pointScale, 5),
+      fill: 'var(--gold)', stroke: '#fff', 'stroke-width': 1.2, class: 'tangency-star',
+    });
+    chart.overlayGroup.appendChild(star);
+    nodes.push(star);
+    const tLbl = el('text', {
+      x: chart.sx(t.std) + 12, y: chart.sy(t.mean) - 9, fill: 'var(--gold)',
+      class: 'datalabel lbl-strong',
+    });
+    tLbl.textContent = 'T';
+    chart.overlayGroup.appendChild(tLbl);
+    nodes.push(tLbl);
+  }
 
   return nodes;
 }
@@ -219,6 +224,13 @@ export function makeHoverTip(chart, getNames) {
  */
 export function renderWeights(host, names, weights, pointScale) {
   host.replaceChildren();
+  if (!weights) { // no tangency at this rf — nothing sensible to plot
+    const p = document.createElement('p');
+    p.className = 'hint';
+    p.textContent = 'No tangency portfolio at this risk-free rate.';
+    host.appendChild(p);
+    return;
+  }
   const n = names.length;
   const rowH = 44;
   const padTop = 14;
@@ -297,9 +309,10 @@ export function renderWeights(host, names, weights, pointScale) {
  * @param {object} m computed model
  */
 export function renderReadouts(tiles, m) {
-  tiles.tanEr.textContent = pct1(m.tangency.mean);
-  tiles.tanSd.textContent = pct1(m.tangency.std);
-  tiles.tanSharpe.textContent = m.tangency.sharpe.toFixed(3);
+  const t = m.tangency;
+  tiles.tanEr.textContent = t ? pct1(t.mean) : '—';
+  tiles.tanSd.textContent = t ? pct1(t.std) : '—';
+  tiles.tanSharpe.textContent = t ? t.sharpe.toFixed(3) : '—';
   tiles.mvpEr.textContent = pct1(m.mvp.mean);
   tiles.mvpSd.textContent = pct1(m.mvp.std);
 }
@@ -315,6 +328,10 @@ export function renderFormula(rowW, rowS, m) {
   renderTeX(rowW,
     'w_{\\text{tan}} \\;\\propto\\; \\Sigma^{-1}\\,(\\mu - r_f\\,\\mathbf{1})',
     { displayMode: false });
+  if (!m.tangency) {
+    rowS.textContent = 'No tangency portfolio: r_f is at or above the global-MVP mean.';
+    return;
+  }
   const S = m.tangency.sharpe;
   // NB: % must be escaped as \% in KaTeX (comment character otherwise).
   const texPct = (v, d = 1) => `${(v * 100).toFixed(d).replace(/\.?0+$/, '')}\\%`;

@@ -54,8 +54,19 @@ const DEFAULTS = {
   seed: 20260710, // PRNG seed
 };
 
-const store = bindState(DEFAULTS);
+/** Sample sizes offered by the n <select>; anything else (from the hash) snaps
+ * to the default — `new Array(-5)` throws, and n=0 renders all-NaN axes. */
+const N_OPTIONS = [12, 36, 60, 120, 240];
+
+// Numeric ranges mirror the controls; hash values clamp to these (state.js).
+const BOUNDS = {
+  rf: [0, 8], rm: [4, 14], beta: [-0.5, 2.5], er: [-10, 40],
+  tbeta: [-0.5, 2.5], sigmae: [0, 10], n: [12, 240], seed: [0, 4294967295],
+};
+
+const store = bindState(DEFAULTS, undefined, { bounds: BOUNDS });
 const S = store.state;
+if (!N_OPTIONS.includes(S.n)) store.set('n', DEFAULTS.n);
 
 /* ---- formatting helpers --------------------------------------------------- */
 const pStr = (dec, d = 1) => `${(dec * 100).toFixed(d)}%`;       // decimal → "3.5%"
@@ -203,7 +214,7 @@ const nLabel = document.createElement('label');
 nLabel.className = 'ctrl-label';
 nLabel.textContent = 'Sample size  n (months)';
 const nSelect = document.createElement('select');
-for (const opt of [12, 36, 60, 120, 240]) {
+for (const opt of N_OPTIONS) {
   const o = document.createElement('option');
   o.value = String(opt); o.textContent = String(opt);
   if (opt === S.n) o.selected = true;
@@ -264,11 +275,13 @@ function renderMM() {
   mmChart.text(xHi, fit.intercept + fit.slope * xHi, 'OLS fit', { dx: -4, dy: -6, anchor: 'end', fill: 'var(--blue)' });
   mmChart.text(xLo, tbeta * xLo, `true β=${tbeta.toFixed(2)}`, { dx: 4, dy: 14, anchor: 'start', fill: 'var(--gold)' });
 
-  // readouts: β̂ (±SE), α̂ (±SE), R²
+  // readouts: β̂ (±SE), α̂ (±SE), R² ("—" when degenerate: β=0 AND σ_e=0
+  // makes the asset series identically zero, so R² is 0/0)
+  const r2Str = Number.isFinite(fit.r2) ? fit.r2.toFixed(3) : '—';
   document.getElementById('mm-readouts').replaceChildren(
     readout('$\\hat{\\beta}$ (± SE)', `${fit.slope.toFixed(3)} <small>± ${fit.seSlope.toFixed(3)}</small>`, 'blue'),
     readout('$\\hat{\\alpha}$ (± SE)', `${pStr(fit.intercept, 2)} <small>± ${pStr(fit.seIntercept, 2)}</small>`, 'gold'),
-    readout('$R^2$', fit.r2.toFixed(3)),
+    readout('$R^2$', r2Str),
     readout('$n$', String(n)));
 
   // variance decomposition — uses the TRUE parameters (the population split the
@@ -286,7 +299,7 @@ function renderMM() {
   // KaTeX strips
   renderTeX(document.getElementById('mm-formula-model'),
     `R_i - R_f = \\hat{\\alpha}_i + \\hat{\\beta}_i\\,(R_M - R_f) + \\varepsilon_i` +
-    `\\;:\\; \\hat{\\beta}_i = ${fit.slope.toFixed(3)},\\; \\hat{\\alpha}_i = ${pTeX(fit.intercept, 2)},\\; R^2 = ${fit.r2.toFixed(3)}`,
+    `\\;:\\; \\hat{\\beta}_i = ${fit.slope.toFixed(3)},\\; \\hat{\\alpha}_i = ${pTeX(fit.intercept, 2)},\\; R^2 = ${Number.isFinite(fit.r2) ? fit.r2.toFixed(3) : '\\text{---}'}`,
     { displayMode: false });
   const sigM = pTeX(MKT_SIGMA, 1); // "4.5\%" — TeX-safe
   renderTeX(document.getElementById('mm-formula-r2'),
