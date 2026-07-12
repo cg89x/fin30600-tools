@@ -27,8 +27,10 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      convergence chart, level-k markers) + mobile student page `submit.html`
      reachable by QR (vendored qrcode-generator 1.4.4). Live channel =
      Firebase RTDB via plain REST/EventSource in tool-local `rtdb.js` (NO
-     SDK); `config.js` NOT yet created → runs in seeded level-k SIMULATION
-     mode until Christian follows `SETUP.md` (free Spark tier + paste rules).
+     SDK); LIVE since 2026-07-11 — `config.js` committed, DB
+     `ckontz-fin30600-default-rtdb.firebaseio.com` (Spark tier), rules
+     published + verified end-to-end; seeded level-k SIMULATION mode remains
+     as a toggle/fallback.
      Pure game logic in `game.js` (desk-checked vs Loudis's workbook:
      mean 33.179 → target 22.119).
   7. `duration` — price–yield curve with duration tangent vs exact repricing,
@@ -84,10 +86,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Open threads / backlog
 
-- **Beauty contest live polling is unconfigured**: Christian must create the
-  free Firebase project per `tools/beauty-contest/SETUP.md` and commit
-  `config.js`; until then the tool runs in simulation mode. The live
-  REST/SSE path is desk-checked but needs one real end-to-end smoke test.
+- Stale beauty-contest sessions (write-once guesses) need occasional manual
+  deletion from the Firebase console Data tab (see SETUP.md housekeeping).
 - Repo is public; making it private needs GitHub Pro for private-repo Pages
   (Christian's call, not done).
 - v2 ideas: link tools from Canvas; short-sale-constrained frontier (needs a QP
@@ -95,6 +95,13 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-07-11 — Beauty-contest live polling ENABLED: Christian created Firebase
+  project `ckontz-fin30600`, rules published; `config.js` committed. Verified
+  end-to-end on the live site (session P8TT: two REST guesses streamed into
+  the projector page, close-reveal mean 27.25 / target 18.17 / winner exact;
+  invalid v=150 rejected; root read denied). Playground note: a `get` at `/`
+  correctly shows "read denied" — test at `/beauty/<code>` instead.
 
 - 2026-07-11 — Three new tools (parallel subagent build): `beauty-contest`
   (L6; Firebase-REST live polling + simulation fallback, QR student page,
