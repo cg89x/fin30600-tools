@@ -7,7 +7,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 ## Current state
 
 - **Twelve tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
-  tool-local modules where noted), listed in lecture order:
+  tool-local modules where noted), listed in topic order:
   1. `volatility-drag` — L1 §4: 25 seeded wealth paths
      vs the "arithmetic promise" (1+μ)^t and geometric expectation,
      R_G ≈ R_A − ½σ², 1991–2025 deck-table presets. Split from the original
@@ -83,7 +83,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   metallic gold `#AE9142` chrome accents. On-chart text stays Arial.
 - **No presenter mode** (removed 2026-07-11) — projector scaling is per-tool
   via `--stroke-scale` on `.chart-box`.
-- **Landing page** = one card per tool, in lecture order.
+- **Landing page** = one card per tool, in topic order.
 - **Release gating**: `releases.js` controls which tools students see
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
   self-gate via `lib/release.js` `gateTool()`; `#preview` = instructor
@@ -225,7 +225,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   mirror). finmath grew arithmeticMean/geometricMean/geometricApprox/
   feeWealth/decliningExitFee/walkBook + 8 margin/short functions; tests
   25 → 30. All three registered in releases.js (`true`) with landing cards
-  in lecture order. Suite is now 11 tools spanning L1–L8.
+  in topic order. Suite is now 11 tools spanning L1–L8.
 
 - 2026-07-11 — RELEASE GATING added: `releases.js` (repo root) maps each tool
   to true / false / 'YYYY-MM-DD' (auto-release on the lecture date). Landing

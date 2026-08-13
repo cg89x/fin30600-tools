@@ -1,7 +1,7 @@
 // @ts-check
 /**
  * game.js — pure game math + simulation for the Keynesian beauty contest
- * (FIN 30600, Lecture 6 §3 Behavioral Finance).
+ * (FIN 30600, Topic 6 §3 Behavioral Finance).
  *
  * The game, as the deck states it: everyone writes down a number between
  * 0 and 100; the person who guesses the number that is 2/3 of the class

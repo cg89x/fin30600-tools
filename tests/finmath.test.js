@@ -4,8 +4,8 @@
  * Run with:  node --test tests/finmath.test.js
  * (NOT `node --test tests/` — the bare directory form breaks under Node 25.)
  *
- * The check values come from the FIN 30600 lecture decks (Lecture 3 §3–4,
- * Lecture 4) plus one 3-asset frontier/tangency case computed independently
+ * The check values come from the FIN 30600 lecture decks (Topic 3 §3–4,
+ * Topic 4) plus one 3-asset frontier/tangency case computed independently
  * with python3 + numpy (the snippet + its printed output are pasted inline so
  * the expected numbers are reproducible).
  */
@@ -283,7 +283,7 @@ test('diversification: workbook PortfolioVarianceAndDiversification.xlsx', () =>
   assertNear(Math.sqrt(fm.ewVarCommonCorr(1e9, 0.5)), Math.sqrt(0.5), 1e-4, 'floor');
 });
 
-/* --------------------------------------------- Black–Scholes (Lecture 8) */
+/* --------------------------------------------- Black–Scholes (Topic 8) */
 
 test('normCdf matches standard normal table values', () => {
   assertNear(fm.normCdf(0), 0.5, 1e-7, 'Phi(0)');
@@ -322,7 +322,7 @@ test('put–call parity, deck form (discrete effective-annual rate)', () => {
   assertNear(fm.parityPut(fm.parityCall(3, 10, 10, 0.03, 1), 10, 10, 0.03, 1), 3, 1e-12, 'inverse');
 });
 
-/* ------------------------------------------------ fixed income (Lecture 7) */
+/* ------------------------------------------------ fixed income (Topic 7) */
 
 test('bond price and Macaulay duration: 3y 10% annual coupon at y=8%', () => {
   // B = 100/1.08 + 100/1.08^2 + 1100/1.08^3 = 1051.54

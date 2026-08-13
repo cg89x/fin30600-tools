@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * model.js — pure computation layer for the Anomaly Lab (Lecture 5 §1–2).
+ * model.js — pure computation layer for the Anomaly Lab (Topic 5 §1–2).
  *
  * No DOM: importable from node for numeric verification. Wraps the baked Ken
  * French monthly data (./data.js, percent/month, 1963-07..2026-05) and

@@ -3,7 +3,7 @@
 **Date:** 2026-07-10 · **Author:** Christian Kontz (with Claude Fable)
 **Purpose:** Browser-based interactive explorers accompanying the FIN 30600
 (Investment Theory, Notre Dame) lecture decks, starting with Portfolio Theory
-(Lecture 3) and CAPM (Lecture 4).
+(Topic 3) and CAPM (Topic 4).
 
 > **This file is the original spec (2026-07-10). Since then:** a 5th tool
 > (diversification, §5 below) shipped; **presenter mode was removed** and
@@ -39,11 +39,11 @@ fin30600-tools/
 │   ├── mathjax/            self-hosted MathJax 3.2.2 (tex-svg-full.js)
 │   └── fonts/              self-hosted Libertinus Sans/Serif woff2 (SIL OFL)
 ├── tools/
-│   ├── two-asset/          index.html + main.js  (Lecture 3 §4)
-│   ├── capital-allocation/ index.html + main.js  (Lecture 3 §2–3)
-│   ├── efficient-frontier/ index.html + main.js  (Lecture 3 §5)
-│   ├── capm-sml/           index.html + main.js  (Lecture 4 §2–3)
-│   └── diversification/    index.html + main.js  (Lecture 4 Appendix)
+│   ├── two-asset/          index.html + main.js  (Topic 3 §4)
+│   ├── capital-allocation/ index.html + main.js  (Topic 3 §2–3)
+│   ├── efficient-frontier/ index.html + main.js  (Topic 3 §5)
+│   ├── capm-sml/           index.html + main.js  (Topic 4 §2–3)
+│   └── diversification/    index.html + main.js  (Topic 4 Appendix)
 ├── tests/finmath.test.js   plain `node --test`, zero dependencies
 └── docs/                   DESIGN.md (this file), PLAN.md
 ```

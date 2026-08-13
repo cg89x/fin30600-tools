@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Market Depth & Price Impact (FIN 30600, Lecture 2 §3) — the depth half of
+ * Market Depth & Price Impact (FIN 30600, Topic 2 §3) — the depth half of
  * the retired order-book tool, redesigned 2026-07-12 (prototype "A1"); the
  * order-types half ships separately.
  *

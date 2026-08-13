@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Fee Drag: mutual fund fees (FIN 30600, Lecture 1 §6).
+ * Fee Drag: mutual fund fees (FIN 30600, Topic 1 §6).
  *
  * X_T = X_0 (1 − f_entry)(1 + r − f_annual)^T (1 − f_exit).
  * Fund A (front-end load) vs Fund B (level load + exit fee — flat by

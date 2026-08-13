@@ -1,11 +1,11 @@
 // @ts-check
 /**
- * Capital allocation + utility explorer (FIN 30600, Lecture 3 §2–3).
+ * Capital allocation + utility explorer (FIN 30600, Topic 3 §2–3).
  *
  * Combines one risky portfolio P with the risk-free asset along the Capital
  * Allocation Line (CAL); shows how mean–variance utility and risk aversion A
  * pick the optimal allocation y*. Deck defaults (from
- * Lectures/Lecture 3/content/sec3_capalloc.tex): r_f = 7%, E[r_p] = 15%,
+ * Lectures/Topic 3/content/sec3_capalloc.tex): r_f = 7%, E[r_p] = 15%,
  * σ_p = 22%; the worked example y = 0.70 ⇒ E[r_C] = 12.6%, σ_C = 15.4%; the
  * optimal-allocation example uses A = 2 ⇒ y* = 0.8264. Utility form
  * U = E[r] − ½ A σ² is from sec2_riskpref.tex.

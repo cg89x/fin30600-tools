@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Anomaly Lab: The CAPM on Trial (FIN 30600, Lecture 5 §1–2).
+ * Anomaly Lab: The CAPM on Trial (FIN 30600, Topic 5 §1–2).
  *
  * Portfolio sorts put the CAPM on trial: pick a sort (beta / size / B/M /
  * momentum), a factor model (CAPM / FF3 / Carhart), and a sample window; the

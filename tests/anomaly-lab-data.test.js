@@ -6,7 +6,7 @@
  *
  * Run with:  node --test tests/anomaly-lab-data.test.js
  *
- * Anchors: the Lecture 5 deck tables are a ~202312 CRSP vintage; re-running
+ * Anchors: the Topic 5 deck tables are a ~202312 CRSP vintage; re-running
  * this data through 2023-12 reproduces them to vintage tolerance
  * (~0.1–0.3 pp on premia/alphas, ~0.01–0.03 on loadings). Expected values
  * below were computed independently with python3 + numpy from the same zips

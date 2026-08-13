@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * main.js — Efficient Frontier + Tangency explorer (FIN 30600, Lecture 3 §5).
+ * main.js — Efficient Frontier + Tangency explorer (FIN 30600, Topic 3 §5).
  *
  * Editable N=5 asset table + pairwise correlation editor drive an analytic
  * minimum-variance frontier (short sales allowed), the global MVP, and the

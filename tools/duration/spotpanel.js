@@ -1,7 +1,7 @@
 // @ts-check
 /**
  * Spot-curve / forward-rate panel for the duration & bond pricing explorer
- * (FIN 30600, Lecture 7 §3, sec3_term.tex).
+ * (FIN 30600, Topic 7 §3, sec3_term.tex).
  *
  * Number inputs for the spot (zero-coupon) rates y_1..y_5; a table of the
  * implied one-year forward rates between adjacent years using the deck's

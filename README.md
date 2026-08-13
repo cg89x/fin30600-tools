@@ -22,7 +22,7 @@ talks to a Firebase Realtime Database (plain REST/SSE, no SDK).
 
 ## The tools
 
-| Tool | Lecture | What it does |
+| Tool | Topic | What it does |
 |------|---------|--------------|
 | [`tools/volatility-drag/`](tools/volatility-drag/) | L1 §4 | Volatility drag: arithmetic vs. geometric average, R_G ≈ R_A − ½σ², simulated wealth paths vs. the "arithmetic promise," 1991–2025 table presets. |
 | [`tools/fee-drag/`](tools/fee-drag/) | L1 §6 | Fund-fee drag: Class A front load vs. Class B level load + declining exit fee, crossover horizon, active-vs-passive preset ($99,628 gap). |
@@ -82,7 +82,7 @@ L2 trading math (order-book walks — sell 30 → $251.25, margin magnification
 ±36.36%, margin-call prices $75/$82.50 and $57.69, short return −12%), and
 the multi-factor OLS engine against a pasted numpy cross-check.
 `tests/anomaly-lab-data.test.js` re-runs the anomaly lab's baked Ken French
-data through the deck's 1963–2023 window and checks the Lecture 5 anchor
+data through the deck's 1963–2023 window and checks the Topic 5 anchor
 numbers (market premium, beta-sort alphas, Carhart loadings, RMS-alpha
 table) to data-vintage tolerance.
 

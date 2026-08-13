@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Duration & bond pricing explorer (FIN 30600, Lecture 7).
+ * Duration & bond pricing explorer (FIN 30600, Topic 7).
  *
  * Two linked views of one bond (annual coupons, face $1,000):
  *   (a) the price–yield curve B(y) with the DURATION TANGENT at the current

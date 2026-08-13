@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Diversification & systematic risk explorer (FIN 30600, Lecture 4 appendix).
+ * Diversification & systematic risk explorer (FIN 30600, Topic 4 appendix).
  *
  * Web version of Archive/Lectures (pptx)/Lecture 4/Additional Materials/
  * PortfolioVarianceAndDiversification.xlsx and the deck's appendix

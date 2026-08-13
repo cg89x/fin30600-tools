@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * CAPM / SML + Market Model explorer (FIN 30600, Lecture 4 §2–3).
+ * CAPM / SML + Market Model explorer (FIN 30600, Topic 4 §2–3).
  *
  * Two side-by-side sections (stacking on narrow screens), each
  * controls-left / chart-right:
@@ -8,7 +8,7 @@
  *   2. Market-model single-index regression: simulate n monthly excess returns
  *      from a known beta, estimate by OLS, decompose variance (deck §3).
  *
- * Slide fidelity (…/Lectures/Lecture 4/content/sec2_capm.tex,
+ * Slide fidelity (…/Lectures/Topic 4/content/sec2_capm.tex,
  * sec3_marketmodel.tex):
  *  - SML defaults reproduce the deck's worked alpha example ("Example: CAPM
  *    implications"): r_f = 3.5%, E[r_M] = 11.5%, test asset β = 1.45,

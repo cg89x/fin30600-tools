@@ -38,7 +38,7 @@ Build everything the four tool agents depend on:
    URL + date in `vendor/katex/VERSION.txt`.
 7. `index.html` — landing page: navy header “FIN 30600 · Investment Theory —
    Interactive Tools”, subtitle (Notre Dame, Christian Kontz), 4 cards linking
-   to the tools (title + one-line description + lecture reference).
+   to the tools (title + one-line description + topic reference).
 8. `tests/finmath.test.js` — `node --test`; MUST include the deck check values
    (two-asset: w=0.6, ρ=+0.2 ⇒ 11.2%, 12.24%; ρ=−0.2 ⇒ 9.99%), y* by hand,
    a 3-asset tangency/MVP case verified against an independently computed
@@ -56,15 +56,15 @@ cross-cutting behaviors), read the actual `lib/*.js` source before coding
 against it, and read the relevant lecture content file(s) for slide fidelity:
 
 - Task 1 `tools/two-asset/` — read
-  `…/FIN30600 - Investments/Lectures/Lecture 3/content/sec4_tworisky.tex`
+  `…/FIN30600 - Investments/Topics/Topic 3/content/sec4_tworisky.tex`
 - Task 2 `tools/capital-allocation/` — read `sec2_riskpref.tex` +
   `sec3_capalloc.tex` (same folder); take slide default numbers from there.
 - Task 3 `tools/efficient-frontier/` — read `sec5_manyassets.tex`; use its
   example assets if present, else DESIGN's presets.
 - Task 4 `tools/capm-sml/` — read
-  `…/Lectures/Lecture 4/content/sec2_capm.tex` + `sec3_marketmodel.tex`.
+  `…/Topics/Topic 4/content/sec2_capm.tex` + `sec3_marketmodel.tex`.
 
-Lecture tree root:
+Topic tree root:
 `/Users/ChristianKontz/Library/CloudStorage/Dropbox/Teaching/Notre Dame/FIN30600 - Investments/`
 (READ-ONLY — never write there.)
 

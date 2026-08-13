@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Black–Scholes option pricing explorer (FIN 30600, Lecture 8 §3–4).
+ * Black–Scholes option pricing explorer (FIN 30600, Topic 8 §3–4).
  *
  * Mirrors the deck's worked example (content/sec4_pricing.tex: S=100, X=95,
  * r_f=0.10, dividend δ=0, T=0.25, σ=50% → d1=0.430, d2=0.180, C=13.695,

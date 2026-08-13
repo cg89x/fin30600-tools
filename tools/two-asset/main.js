@@ -1,8 +1,8 @@
 // @ts-check
 /**
- * Two-Asset Diversification Explorer (FIN 30600, Lecture 3 §4).
+ * Two-Asset Diversification Explorer (FIN 30600, Topic 3 §4).
  *
- * Mirrors the deck `Lecture 3/content/sec4_tworisky.tex`: the σ–E[r] opportunity
+ * Mirrors the deck `Topic 3/content/sec4_tworisky.tex`: the σ–E[r] opportunity
  * set of two risky securities, Rule 1 / Rule 2, the ρ = +1 / 0 / −1 cases, and
  * the minimum-variance portfolio. Defaults reproduce the slide example
  * (A: 8%/13%, B: 16%/20%, w_A = 0.6, ρ = +0.2 ⇒ E[r_P] = 11.2%, σ_P = 12.24%).

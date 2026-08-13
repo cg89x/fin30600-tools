@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Volatility Drag: arithmetic vs geometric averages (FIN 30600, Lecture 1 §4).
+ * Volatility Drag: arithmetic vs geometric averages (FIN 30600, Topic 1 §4).
  *
  * R_G ≈ R_A − ½σ². 25 seeded wealth paths of R_t = μ + σz_t against the
  * "arithmetic promise" (1+μ)^t and the geometric expectation (1+μ−½σ²)^t.
