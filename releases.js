@@ -24,8 +24,8 @@
 export const HIDE_LOCKED = false;
 
 const RELEASES = {
-  'volatility-drag': '2026-08-25',  // L1 §4 — L1 day 1 (Tu 8/25)
-  'fee-drag': '2026-09-01',         // L1 §6 — L1 day 2 (Tu 9/1)
+  'volatility-drag': true,          // L1 §4 — released 2026-08-23 (Christian)
+  'fee-drag': true,                 // L1 §6 — released 2026-08-23 (Christian)
   'market-depth': '2026-09-03',     // L2 §3 — L2 day 1 (Th 9/3); ex order-book, order-types tool to follow
   'margin-short': true,             // L2 §4–5 — REMOVED from live 2026-07-12; folder kept locally (untracked), key kept TRUE so the local copy isn't lock-screened (if restored to live, gate it '2026-09-08')
   'two-asset': '2026-09-17',        // L3 §4 — L3 day 3 (Th 9/17)
