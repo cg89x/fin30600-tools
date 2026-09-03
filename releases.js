@@ -12,9 +12,10 @@
  *
  * Instructor bypass: append `#preview` to any tool URL (or `&preview=1` if
  * the URL already has a hash) — the lock screen is skipped. The repo is
- * public, so treat gating as a courtesy curtain (a determined student can
- * read this file); it keeps honest students from spoiling class demos, no
- * more. Still: don't put preview links in Canvas or on slides.
+ * private (since summer 2026) but the site is a public static page, so
+ * treat gating as a courtesy curtain (a determined student can fetch this
+ * file from the live site); it keeps honest students from spoiling class
+ * demos, no more. Still: don't put preview links in Canvas or on slides.
  *
  * HIDE_LOCKED: false shows locked tools as greyed "unlocks in class" cards
  * on the landing page (students see what's coming); true removes them from

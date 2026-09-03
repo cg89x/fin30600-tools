@@ -137,8 +137,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 - Stale beauty-contest sessions (write-once guesses) need occasional manual
   deletion from the Firebase console Data tab (see SETUP.md housekeeping).
-- Repo is public; making it private needs GitHub Pro for private-repo Pages
-  (Christian's call, not done).
+- Repo is PRIVATE (verified 2026-09-02: github.com/cg89x/fin30600-tools returns 404
+  unauthenticated); Pages still serves the site publicly, and releases.js is
+  fetchable from the live site, so gating remains a courtesy curtain.
 - v2 ideas: link tools from Canvas; short-sale-constrained frontier (needs a QP
   solver); APT/multifactor tool tied to the Multifactor Model Project.
 - More than one Claude session sometimes commits here — fetch before push.
