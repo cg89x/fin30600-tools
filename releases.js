@@ -23,20 +23,25 @@
 
 export const HIDE_LOCKED = false;
 
+// RULE (Christian, 2026-09-02): every tool releases at 12:00am LOCAL on the
+// FIRST class day of its topic per the syllabus — the same day the topic's
+// Canvas module opens — never a later within-topic day. Fall 2026 first days:
+// T1 Tu 8/25 · T2 Th 9/3 · T3 Th 9/10 · T4 Th 9/24 · T5 Th 10/15 ·
+// T6 Th 10/29 · T7 Th 11/5 · T8 Tu 11/24.
 const RELEASES = {
-  'volatility-drag': true,          // L1 §4 — released 2026-08-23 (Christian)
-  'fee-drag': true,                 // L1 §6 — released 2026-08-23 (Christian)
-  'market-depth': '2026-09-03',     // L2 §3 — L2 day 1 (Th 9/3); ex order-book, order-types tool to follow
-  'margin-short': true,             // L2 §4–5 — REMOVED from live 2026-07-12; folder kept locally (untracked), key kept TRUE so the local copy isn't lock-screened (if restored to live, gate it '2026-09-08')
-  'two-asset': '2026-09-17',        // L3 §4 — L3 day 3 (Th 9/17)
-  'capital-allocation': '2026-09-15', // L3 §2–3 — L3 day 2 (Tu 9/15)
-  'efficient-frontier': '2026-09-22', // L3 §5 — L3 day 4 (Tu 9/22)
-  'capm-sml': '2026-09-29',         // L4 §2–3 — L4 day 2 (Tu 9/29)
-  'diversification': '2026-09-24',  // L4 appendix — L4 day 1 (Th 9/24)
-  'anomaly-lab': '2026-10-15',      // L5 §1–2 — L5 day 1 (Th 10/15)
-  'beauty-contest': '2026-11-03',   // L6 §3 — L6 day 2 (Tu 11/3, behavioral day; game is played IN class)
-  'duration': '2026-11-10',         // L7 §3–4 — L7 day 2 (Tu 11/10)
-  'black-scholes': '2026-12-01',    // L8 §3–4 — L8 day 2 (Tu 12/1, BKM 16.1 valuation day)
+  'volatility-drag': true,          // T1 — released 2026-08-23 (Christian)
+  'fee-drag': true,                 // T1 — released 2026-08-23 (Christian)
+  'market-depth': '2026-09-03',     // T2 day 1 (Th 9/3); ex order-book, order-types tool to follow
+  'margin-short': true,             // T2 — REMOVED from live 2026-07-12; folder kept locally (untracked), key kept TRUE so the local copy isn't lock-screened (if restored to live, gate it '2026-09-03')
+  'two-asset': '2026-09-10',        // T3 day 1 (Th 9/10)
+  'capital-allocation': '2026-09-10', // T3 day 1 (Th 9/10)
+  'efficient-frontier': '2026-09-10', // T3 day 1 (Th 9/10)
+  'capm-sml': '2026-09-24',         // T4 day 1 (Th 9/24)
+  'diversification': '2026-09-24',  // T4 day 1 (Th 9/24)
+  'anomaly-lab': '2026-10-15',      // T5 day 1 (Th 10/15)
+  'beauty-contest': '2026-10-29',   // T6 day 1 (Th 10/29); the game itself is played in class on Tu 11/3
+  'duration': '2026-11-05',         // T7 day 1 (Th 11/5)
+  'black-scholes': '2026-11-24',    // T8 day 1 (Tu 11/24)
 };
 export default RELEASES;
 
