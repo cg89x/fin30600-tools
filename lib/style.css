@@ -315,7 +315,7 @@ svg.finchart .datalabel { font-size: calc(12px * var(--stroke-scale)); font-fami
 svg.finchart .datalabel.halo {
   paint-order: stroke fill;
   stroke: var(--card-bg);
-  stroke-width: calc(3.5px * var(--stroke-scale));
+  stroke-width: 0.3em; /* follows the label's font size (incl. --stroke-scale) */
   stroke-linejoin: round;
 }
 svg.finchart .marker { /* radius handled inline; scaled by --point-scale where used */ }

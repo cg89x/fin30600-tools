@@ -168,11 +168,14 @@ fin30600-tools/
   register the curves with `avoidPath`, the markers with `avoidPoint`, then
   `label()` each point with a `prefer` quadrant order — upper-left and
   lower-right are the line-free sides of a point on a curve rising to the
-  right. It scores the four diagonal spots (leaves the plot / overlaps a
-  label or marker / crosses a curve) and draws the winner with a white halo
-  (`text({halo: true})`, CSS `.datalabel.halo`) so the label reads even
-  where a curve runs behind it. Capital-allocation uses it since 2026-09-08;
-  the other tools still use fixed offsets (opt-in).
+  right. It scores the four diagonal spots, then the cardinal spots and a
+  farther ring (leaves the plot / overlaps a label or marker / crosses a
+  curve / far ring) and draws the winner with a white halo
+  (`text({halo: true})`, CSS `.datalabel.halo`, `0.3em` so it scales with the
+  font) so the label reads even where a curve runs behind it. `{fontPx}` sets
+  the label size (default 12; capital-allocation uses 18) and `\n` in a label
+  breaks the line (`svgMathText`). Capital-allocation uses it since
+  2026-09-08; the other tools still use fixed offsets (opt-in).
 - **State in the URL hash**: every control serializes into `#key=val` pairs
   (debounced `replaceState`) via `lib/state.js`, so any configuration is a
   shareable, reload-stable link. All randomness runs through a seeded PRNG

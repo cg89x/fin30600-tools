@@ -35,7 +35,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   5. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
      from y\*), borrowing kink (L3 §2–3). Deck 7/15/22; w\* = 0.8264 at A = 2.
      Point labels (C, w\*, P, r_f) placed by `LabelPlacer` with a white halo
-     since 2026-09-08 (they used to print across the CAL).
+     at 18px (C on two lines) since 2026-09-08 (they used to print across the
+     CAL at 12px).
   6. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
      tangency-weights bar (L3 §5). Defaults = 5 broad asset classes with
      realistic Sharpes (stocks 0.28–0.38, tangency ~0.47), NOT Jorion 1989.
@@ -165,7 +166,16 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   registers the CAL + both indifference curves and all four markers, then
   places C first, w*, P, r_f — upper-left / lower-right preferred (line-free
   sides for points on a curve rising to the right). Other tools untouched
-  (opt-in). Tests 37/37.
+  (opt-in). Tests 37/37. Same evening (Christian: "+50%"): the tool's point
+  labels are **18px** (`new LabelPlacer(chart, {fontPx: 18})` sets the size
+  inline via `text({size})`), the C readout is two lines — `svgMathText` now
+  honours `\n` (LINE_EM = 1.15, per-line re-anchoring, em-based subscript
+  shifts) and LabelPlacer sizes multi-line boxes — and the halo is `0.3em`
+  so it scales with the font. Placer refinements from the 18px renders: after
+  the four diagonals it also tries the cardinal spots (b/t/r/l) and a far ring
+  (UL/LR/UR/LL, +25 so a near spot with one curve behind the halo still wins),
+  line crossings score per LINE (11–20) not per segment; at w = 1 the tool
+  prints one "C = P: …" label instead of C and P fighting over the point.
 
 - 2026-07-12 — fee-drag: the exit fee's 1 pp/yr decline is now an opt-in
   TOGGLE (new hash key `bxd`, default OFF) instead of always-on; fixes the

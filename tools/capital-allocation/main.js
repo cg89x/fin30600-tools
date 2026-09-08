@@ -192,16 +192,21 @@ function drawMain(m, dom) {
   // quadrants are the line-free ones: the placer prefers those, skips spots
   // that overlap another label or marker, cross a curve, or leave the plot,
   // and draws each label with a white halo so it reads regardless. C goes
-  // first (longest, most important), then w*, P, r_f.
-  const lp = new LabelPlacer(mainChart);
+  // first (longest, most important), then w*, P, r_f. Labels are 18px, 50%
+  // above the 12px .datalabel size (Christian 2026-09-08), so C's readout is
+  // split over two lines to keep it inside the plot.
+  const lp = new LabelPlacer(mainChart, { fontPx: 18 });
   lp.avoidPath(calPts).avoidPath(optCurve).avoidPath(cCurve);
   const mkRf = lp.avoidPoint(0, m.rf, rRf);
   const mkP = lp.avoidPoint(m.sp, m.erp, rP);
   const mkOpt = lp.avoidPoint(optS, optE, rOpt);
   const mkC = lp.avoidPoint(cS, cE, rC);
-  lp.label(cS, cE, `C: E[r_C]=${fpct1(cE)}, σ_C=${fpct1(cS)}`, { r: rC, own: mkC, fill: 'var(--blue)' });
+  // At w = 1 the complete portfolio IS P: one label says so instead of two
+  // labels competing for the same point.
+  const cIsP = Math.abs(m.y - 1) < 1e-9;
+  lp.label(cS, cE, `${cIsP ? 'C = P' : 'C'}: E[r_C] = ${fpct1(cE)}\nσ_C = ${fpct1(cS)}`, { r: rC, own: mkC, fill: 'var(--blue)' });
   lp.label(optS, optE, `w* = ${opt.y.toFixed(3)}`, { r: rOpt, own: mkOpt, fill: 'var(--gold)' });
-  lp.label(m.sp, m.erp, 'P', { r: rP, own: mkP, fill: 'var(--blue)', prefer: ['lr', 'ul', 'ur', 'll'] });
+  if (!cIsP) lp.label(m.sp, m.erp, 'P', { r: rP, own: mkP, fill: 'var(--blue)', prefer: ['lr', 'ul', 'ur', 'll'] });
   lp.label(0, m.rf, 'r_f', { r: rRf, own: mkRf, fill: 'var(--muted)', prefer: ['lr', 'ur'] });
 }
 
