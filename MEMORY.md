@@ -34,6 +34,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      (L3 §4). Deck example A 8/13, B 16/20; Rule 2 shown in correlation form.
   5. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
      from y\*), borrowing kink (L3 §2–3). Deck 7/15/22; w\* = 0.8264 at A = 2.
+     Point labels (C, w\*, P, r_f) placed by `LabelPlacer` with a white halo
+     since 2026-09-08 (they used to print across the CAL).
   6. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
      tangency-weights bar (L3 §5). Defaults = 5 broad asset classes with
      realistic Sharpes (stocks 0.28–0.38, tangency ~0.47), NOT Jorion 1989.
@@ -133,6 +135,11 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   (X/(1+r)^T, `parityCall`); Black–Scholes uses continuous e^{−rT}. Keep the
   two forms straight in any option UI.
 
+- **A fixed `dx/dy` label offset on a point that sits on a rising line puts
+  the label ON the line** (capital-allocation's "C: …"/"w* = …" until
+  2026-09-08). Use `LabelPlacer` (chart.js): prefer upper-left / lower-right,
+  register curves + markers as obstacles, and the halo covers the rest.
+
 ## Open threads / backlog
 
 - Stale beauty-contest sessions (write-once guesses) need occasional manual
@@ -145,6 +152,20 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-09-08 — Capital-allocation on-chart labels made readable (Christian:
+  "C: …" and "w* = …" sat on top of the CAL and the indifference curves).
+  New in `lib/chart.js`: `text({halo:true})` — white outline painted behind
+  the glyphs (CSS `svg.finchart .datalabel.halo`, paint-order stroke) — and
+  `LabelPlacer`, collision-aware point labels: per label it tries the four
+  diagonal quadrants in a caller-given `prefer` order and scores each spot
+  (+1000 leaves the plot, +100 per overlapped label/marker box, +10 per
+  registered curve segment crossing it, +index tie-break); `estimateTextWidth`
+  approximates Arial widths with `_x` subscripts at 75%. capital-allocation
+  registers the CAL + both indifference curves and all four markers, then
+  places C first, w*, P, r_f — upper-left / lower-right preferred (line-free
+  sides for points on a curve rising to the right). Other tools untouched
+  (opt-in). Tests 37/37.
 
 - 2026-07-12 — fee-drag: the exit fee's 1 pp/yr decline is now an opt-in
   TOGGLE (new hash key `bxd`, default OFF) instead of always-on; fixes the

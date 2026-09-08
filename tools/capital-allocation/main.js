@@ -14,7 +14,7 @@
  * file only wires controls, chart, readouts, and the live KaTeX strip.
  */
 
-import { Chart, pct, fixed } from '../../lib/chart.js';
+import { Chart, LabelPlacer, pct, fixed } from '../../lib/chart.js';
 import { sharpe, utility, optimalY, completeReturn, completeStd } from '../../lib/finmath.js';
 import { slider, numberInput, toggle, renderTeX, renderLabel } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
@@ -156,43 +156,53 @@ function drawMain(m, dom) {
   const ps = pscale();
   mainChart.clearData();
 
-  // risk-free anchor
-  mainChart.point(0, m.rf, { r: 4 * ps, fill: 'var(--blue)' });
-  mainChart.text(0, m.rf, 'r_f', { dx: 6, dy: -6, fill: 'var(--muted)' });
-
-  // CAL (blue), extended to y = 2, kinked at P when borrowing is on
+  // geometry: CAL (kinked at P when borrowing is on), optimum w*, current C
   const calTop = completeReturnKinked(2, m);
   const calPts = m.borrow
     ? [{ x: 0, y: m.rf }, { x: m.sp, y: m.erp }, { x: 2 * m.sp, y: calTop }]
     : [{ x: 0, y: m.rf }, { x: 2 * m.sp, y: calTop }];
-  mainChart.path(calPts, { stroke: 'var(--blue)', width: 2.5 });
-
-  // risky portfolio P
-  mainChart.point(m.sp, m.erp, { r: 5.5 * ps, fill: 'var(--blue)' });
-  mainChart.text(m.sp, m.erp, 'P', { dx: 8, dy: 16, fill: 'var(--blue)' });
-
-  // optimal y* (gold star) + its tangent indifference curve (muted dashed)
   const opt = optimalYKinked(m);
   const optS = completeStd(opt.y, m.sp);
   const optE = completeReturnKinked(opt.y, m);
-  const optU = utility(optE, optS, m.A);
-  mainChart.path(indiffCurve(optU, m, dom), {
-    stroke: 'var(--gold)', width: 1.8, dash: '5 4', opacity: 0.6,
-  });
-  mainChart.point(optS, optE, { r: 7 * ps, shape: 'star', fill: 'var(--gold)' });
-  mainChart.text(optS, optE, `w* = ${opt.y.toFixed(3)}`, {
-    dx: 9, dy: -8, fill: 'var(--gold)',
-  });
-
-  // current complete portfolio C (blue) + its indifference curve (solid gold)
+  const optCurve = indiffCurve(utility(optE, optS, m.A), m, dom);
   const cS = completeStd(m.y, m.sp);
   const cE = completeReturnKinked(m.y, m);
-  const cU = utility(cE, cS, m.A);
-  mainChart.path(indiffCurve(cU, m, dom), { stroke: 'var(--gold)', width: 2 });
-  mainChart.point(cS, cE, { r: 6 * ps, fill: 'var(--blue)', stroke: '#fff' });
-  mainChart.text(cS, cE, `C: E[r_C]=${fpct1(cE)}, σ_C=${fpct1(cS)}`, {
-    dx: 10, dy: -10, fill: 'var(--blue)',
-  });
+  const cCurve = indiffCurve(utility(cE, cS, m.A), m, dom);
+
+  // lines: CAL (blue), the tangent indifference curve at w* (muted dashed
+  // gold), the indifference curve through the current C (solid gold)
+  mainChart.path(calPts, { stroke: 'var(--blue)', width: 2.5 });
+  mainChart.path(optCurve, { stroke: 'var(--gold)', width: 1.8, dash: '5 4', opacity: 0.6 });
+  mainChart.path(cCurve, { stroke: 'var(--gold)', width: 2 });
+
+  // markers: r_f, risky portfolio P, optimum (gold star), current C
+  const rRf = 4 * ps;
+  const rP = 5.5 * ps;
+  const rOpt = 7 * ps;
+  const rC = 6 * ps;
+  mainChart.point(0, m.rf, { r: rRf, fill: 'var(--blue)' });
+  mainChart.point(m.sp, m.erp, { r: rP, fill: 'var(--blue)' });
+  mainChart.point(optS, optE, { r: rOpt, shape: 'star', fill: 'var(--gold)' });
+  mainChart.point(cS, cE, { r: rC, fill: 'var(--blue)', stroke: '#fff' });
+
+  // labels — collision-aware (LabelPlacer, 2026-09-08: the fixed offsets put
+  // "C: …" and "w* = …" straight onto the CAL). Every labelled point sits on
+  // the CAL, which rises to the right, and the indifference curves through C
+  // and w* rise to the right too, so a point's upper-left and lower-right
+  // quadrants are the line-free ones: the placer prefers those, skips spots
+  // that overlap another label or marker, cross a curve, or leave the plot,
+  // and draws each label with a white halo so it reads regardless. C goes
+  // first (longest, most important), then w*, P, r_f.
+  const lp = new LabelPlacer(mainChart);
+  lp.avoidPath(calPts).avoidPath(optCurve).avoidPath(cCurve);
+  const mkRf = lp.avoidPoint(0, m.rf, rRf);
+  const mkP = lp.avoidPoint(m.sp, m.erp, rP);
+  const mkOpt = lp.avoidPoint(optS, optE, rOpt);
+  const mkC = lp.avoidPoint(cS, cE, rC);
+  lp.label(cS, cE, `C: E[r_C]=${fpct1(cE)}, σ_C=${fpct1(cS)}`, { r: rC, own: mkC, fill: 'var(--blue)' });
+  lp.label(optS, optE, `w* = ${opt.y.toFixed(3)}`, { r: rOpt, own: mkOpt, fill: 'var(--gold)' });
+  lp.label(m.sp, m.erp, 'P', { r: rP, own: mkP, fill: 'var(--blue)', prefer: ['lr', 'ul', 'ur', 'll'] });
+  lp.label(0, m.rf, 'r_f', { r: rRf, own: mkRf, fill: 'var(--muted)', prefer: ['lr', 'ur'] });
 }
 
 /* -------------------------------------------------- draw the utility inset -- */

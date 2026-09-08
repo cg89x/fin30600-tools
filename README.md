@@ -114,7 +114,7 @@ fin30600-tools/
 ├── index.html              landing page (course header + one card per tool)
 ├── lib/
 │   ├── style.css           house palette + deck-matched theme + layout skeleton
-│   ├── chart.js            hand-rolled SVG chart helper (despined axes)
+│   ├── chart.js            hand-rolled SVG chart helper (despined axes, halo labels, LabelPlacer)
 │   ├── finmath.js          ALL finance/numerical math (pure, unit-tested)
 │   ├── ui.js               slider / number-input / toggle components + renderTeX
 │   └── state.js            URL-hash state (bookmarkable configs)
@@ -162,6 +162,17 @@ fin30600-tools/
   **Never add a `stroke-width` rule for `.series`/`.refline` to `style.css`** —
   a stylesheet rule beats the inline attribute and silently pins every curve
   to one width (this bug shipped once; that's why widths are inline styles now).
+- **Point labels near curves** — don't hard-code a `dx/dy` for a label whose
+  point sits ON a line (that is how "C: …" and "w* = …" ended up printed across
+  the CAL in the capital-allocation tool). Use `LabelPlacer` from `chart.js`:
+  register the curves with `avoidPath`, the markers with `avoidPoint`, then
+  `label()` each point with a `prefer` quadrant order — upper-left and
+  lower-right are the line-free sides of a point on a curve rising to the
+  right. It scores the four diagonal spots (leaves the plot / overlaps a
+  label or marker / crosses a curve) and draws the winner with a white halo
+  (`text({halo: true})`, CSS `.datalabel.halo`) so the label reads even
+  where a curve runs behind it. Capital-allocation uses it since 2026-09-08;
+  the other tools still use fixed offsets (opt-in).
 - **State in the URL hash**: every control serializes into `#key=val` pairs
   (debounced `replaceState`) via `lib/state.js`, so any configuration is a
   shareable, reload-stable link. All randomness runs through a seeded PRNG
