@@ -81,7 +81,7 @@ const NPATHS = 25;
 
 const volChart = new Chart(/** @type {HTMLElement} */ (document.getElementById('vol-chart')), {
   width: 720, height: 440,
-  margin: { top: 18, right: 26, bottom: 48, left: 68 },
+  margin: { top: 20, right: 26, bottom: 54, left: 76 },
   xLabel: 'Year', yLabel: 'Growth of $1',
   xFmt: fixed(0), yFmt: usdGrowthTick,
 });

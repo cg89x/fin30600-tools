@@ -103,7 +103,7 @@ const histChart = new Chart($('hist-chart'), {
 const historyChart = new Chart($('history-chart'), {
   width: 480,
   height: 330,
-  margin: { top: 16, right: 20, bottom: 44, left: 52 },
+  margin: { top: 18, right: 22, bottom: 50, left: 60 },
   xLabel: 'Round',
   yLabel: 'Value',
   xFmt: fixed(0),
@@ -239,7 +239,7 @@ function drawHistogram(v) {
     const note = histChart.text(50, 2.5,
       `${v.guesses.length} submission${v.guesses.length === 1 ? '' : 's'} in — histogram revealed when the round closes`,
       { anchor: 'middle', fill: 'var(--muted)' });
-    note.setAttribute('font-size', '15');
+    note.setAttribute('font-size', '17');
     return;
   }
   const values = v.guesses.map((g) => g.v);

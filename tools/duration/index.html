@@ -17,11 +17,11 @@
        overrides below undo the --stroke-scale factor baked into the shared
        .tick / .axis-title / .datalabel rules. */
     .chart-box { --stroke-scale: 1.5; }
-    .chart-box svg.finchart .tick { font-size: 12px; }
-    .chart-box svg.finchart .axis-title { font-size: 13px; }
-    .chart-box svg.finchart .datalabel { font-size: 12px; }
+    .chart-box svg.finchart .tick { font-size: var(--chart-tick); }
+    .chart-box svg.finchart .axis-title { font-size: var(--chart-title); }
+    .chart-box svg.finchart .datalabel { font-size: var(--chart-label); }
     .note {
-      font-size: 0.8rem;
+      font-size: 0.86rem;
       color: var(--muted);
       margin: 0.1rem 0 0;
       line-height: 1.3;
@@ -36,7 +36,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.4rem 1rem;
-      font-size: 0.8rem;
+      font-size: 0.86rem;
       color: var(--label);
       margin: 0.1rem 0.2rem 0;
     }
@@ -105,7 +105,7 @@
       text-align: center;
     }
     .fwd-table thead th {
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       color: var(--muted);
       font-weight: 700;
       border-bottom: 2px solid var(--goldmetal);

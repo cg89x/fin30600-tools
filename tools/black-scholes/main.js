@@ -123,7 +123,7 @@ const mainChart = new Chart(/** @type {HTMLElement} */ (document.getElementById(
 const sigChart = new Chart(/** @type {HTMLElement} */ (document.getElementById('sigma-chart')), {
   width: 460,
   height: 300,
-  margin: { top: 14, right: 20, bottom: 44, left: 60 },
+  margin: { top: 16, right: 22, bottom: 50, left: 68 },
   xLabel: 'Volatility σ',
   yLabel: 'Option Price',
   xFmt: pct,
@@ -132,7 +132,7 @@ const sigChart = new Chart(/** @type {HTMLElement} */ (document.getElementById('
 const tChart = new Chart(/** @type {HTMLElement} */ (document.getElementById('t-chart')), {
   width: 460,
   height: 300,
-  margin: { top: 14, right: 20, bottom: 44, left: 60 },
+  margin: { top: 16, right: 22, bottom: 50, left: 68 },
   xLabel: 'Time to Expiration T (years)',
   yLabel: 'Option Price',
   xFmt: fixed(1),

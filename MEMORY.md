@@ -36,7 +36,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      from y\*), borrowing kink (L3 §2–3). Deck 7/15/22; w\* = 0.8264 at A = 2.
      Point labels (C, w\*, P, r_f) placed by `LabelPlacer` with a white halo
      at 18px (C on two lines) since 2026-09-08 (they used to print across the
-     CAL at 12px).
+     CAL at the then-12px default; the site-wide default is 15px since
+     2026-09-14).
   6. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
      tangency-weights bar (L3 §5). Defaults = 5 broad asset classes with
      realistic Sharpes (stocks 0.28–0.38, tangency ~0.47), NOT Jorion 1989.
@@ -46,7 +47,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      (uncorrelated, common ρ, CAPM single-factor); β²=ρ coincide flag;
      variance-decomposition inset + share bar (L4 Appendix). Web version of
      `PortfolioVarianceAndDiversification.xlsx`. x-axis tracks the N slider;
-     charts use `--stroke-scale: 1.5` (thick lines, base-size labels).
+     charts use `--stroke-scale: 1.5` (thick lines, base-size labels via the
+     `--chart-*` variables).
   9. `anomaly-lab` — L5 §1–2 (added 2026-07-12): live CAPM/FF3/Carhart
      time-series regressions on 10 VW decile portfolios per sort (beta /
      size / BM / momentum), adjustable 1963–2026 window (deck-window preset
@@ -85,7 +87,10 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   SIL OFL), white letterhead header (gold rule + grey eyebrow + serif title),
   metallic gold `#AE9142` chrome accents. On-chart text stays Arial.
 - **No presenter mode** (removed 2026-07-11) — projector scaling is per-tool
-  via `--stroke-scale` on `.chart-box`.
+  via `--stroke-scale` on `.chart-box`. Site-wide legibility baseline since
+  2026-09-14: body 18px, chart ticks/titles/labels 15/16/15px
+  (`--chart-tick/-title/-label/-tip` in `lib/style.css`), `chart.js` default
+  margins 20/22/54/68 — change the variables, not per-tool literals.
 - **Landing page** = one card per tool, in topic order.
 - **Release gating**: `releases.js` controls which tools students see
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
@@ -154,6 +159,36 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-09-14 — **Legibility pass for the classroom projector** (Christian:
+  chart axis text and the typeset math were too small from a distance).
+  `lib/style.css`: body `--font-base` 16→18px (every rem size, MathJax
+  included, grows ~12%), `--panel-width` 300→320px, controls/readouts/
+  formula-strip classes nudged up (ctrl-label 0.92rem, readout value
+  1.25rem, formula strip 1.12rem, …); on-chart SVG text now comes from four
+  variables — `--chart-tick 15px`, `--chart-title 16px`, `--chart-label
+  15px`, `--chart-tip 13px` (were 12/13/12/11) — and the five tools that
+  pin chart text against `--stroke-scale` (beauty-contest, black-scholes,
+  diversification, duration, market-depth) reference those variables
+  instead of literal px. `chart.js`: default margins 20/22/54/68 (were
+  18/20/48/60), tick offsets +2, y-title at x=18, `LabelPlacer` default
+  `fontPx` 12→15; every tool with explicit margins got bottom +6 / left
+  +8. Tool-local SVG text +2px (frontier weights bar, market-depth
+  ladder, beauty-contest histogram note). A sweep raised every sub-0.85rem
+  HTML size in the tool pages (0.68–0.78 → 0.78/0.82, 0.8 → 0.86rem:
+  legends, notes, hints, table cells). Knock-on fixes found by a per-page
+  SVG-text audit (bbox clipping + pairwise overlap, run in the Browser
+  pane on all 12 tools): efficient-frontier asset/MVP labels and the
+  anomaly-lab decile labels now go through `LabelPlacer` (halo) instead of
+  fixed offsets; anomaly-lab decomposition bars 108→120px tall for the
+  value label; capm-sml line labels sit where the fitted / true line EXITS
+  the plot box (`exitPt`) — 'OLS fit' used to poke out the top; capm-sml
+  formula strips split into short rows (SML: formula / numbers / alpha;
+  market model: model / estimates / R² symbolic / R² numeric) — the
+  one-liners overflowed the half-width column even at 1920px, before this
+  change too; market-depth best-quote caption 2px lower. The local-only
+  `margin-short` got the margin bump but its stacked-bar segment labels
+  still overlap (pre-existing; not live). 37 finmath tests green. NOT
+  PUSHED — push from Christian's terminal (passphrase key).
 - 2026-09-08 — Capital-allocation on-chart labels made readable (Christian:
   "C: …" and "w* = …" sat on top of the CAL and the indifference curves).
   New in `lib/chart.js`: `text({halo:true})` — white outline painted behind

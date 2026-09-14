@@ -128,7 +128,7 @@ const cfHost = /** @type {HTMLElement} */ (document.getElementById('cf-chart'));
 const pyChart = new Chart(pyHost, {
   width: 720,
   height: 480,
-  margin: { top: 18, right: 22, bottom: 48, left: 74 },
+  margin: { top: 20, right: 22, bottom: 54, left: 82 },
   xLabel: 'Yield to Maturity',
   yLabel: 'Bond Price',
   xFmt: pct,
@@ -138,7 +138,7 @@ const pyChart = new Chart(pyHost, {
 const cfChart = new Chart(cfHost, {
   width: 480,
   height: 400,
-  margin: { top: 16, right: 18, bottom: 46, left: 68 },
+  margin: { top: 18, right: 20, bottom: 52, left: 76 },
   xLabel: 'Year',
   yLabel: 'PV of Cash Flow',
   xFmt: fixed(0),

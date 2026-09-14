@@ -10,7 +10,7 @@
  * @module efficient-frontier/view
  */
 
-import { pct, svgMathText, setStrokeWidth } from '../../lib/chart.js';
+import { pct, svgMathText, setStrokeWidth, LabelPlacer } from '../../lib/chart.js';
 import { renderTeX } from '../../lib/ui.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
@@ -75,17 +75,29 @@ export function renderBase(chart, m, pointScale) {
   }
 
   // (c) global minimum-variance portfolio — gold diamond, labeled.
+  // Labels (MVP + asset names) go through LabelPlacer (white halo, spots
+  // chosen to dodge the frontier, the markers and each other) — since
+  // 2026-09-14, when the 15px names started colliding near the cluster.
+  const lp = new LabelPlacer(chart);
+  if (eff.length > 1) lp.avoidPath(eff.map(toXY));
+  if (ineff.length > 1) lp.avoidPath(ineff.map(toXY));
+  const mvpR = 6 * pointScale;
   chart.point(m.mvp.std, m.mvp.mean, {
-    r: 6 * pointScale, fill: 'var(--gold)', stroke: '#fff', shape: 'diamond',
+    r: mvpR, fill: 'var(--gold)', stroke: '#fff', shape: 'diamond',
   });
-  chart.text(m.mvp.std, m.mvp.mean, 'MVP', {
-    dx: 9, dy: -7, fill: 'var(--gold)', klass: 'lbl-strong',
+  const assetR = 4.2 * pointScale;
+  const assetBoxes = m.names.map((_, i) => lp.avoidPoint(m.sig[i], m.mu[i], assetR));
+  const mvpBox = lp.avoidPoint(m.mvp.std, m.mvp.mean, mvpR);
+  lp.label(m.mvp.std, m.mvp.mean, 'MVP', {
+    r: mvpR, own: mvpBox, fill: 'var(--gold)', klass: 'lbl-strong', prefer: ['ll', 'ul', 'lr', 'ur'],
   });
 
   // (e) individual assets — navy dots + name labels.
   for (let i = 0; i < m.names.length; i++) {
-    chart.point(m.sig[i], m.mu[i], { r: 4.2 * pointScale, fill: 'var(--navy)' });
-    chart.text(m.sig[i], m.mu[i], m.names[i], { dx: 7, dy: 4, fill: 'var(--navy)' });
+    chart.point(m.sig[i], m.mu[i], { r: assetR, fill: 'var(--navy)' });
+    lp.label(m.sig[i], m.mu[i], m.names[i], {
+      r: assetR, own: assetBoxes[i], fill: 'var(--navy)', prefer: ['lr', 'r', 'ur', 'll'],
+    });
   }
 }
 

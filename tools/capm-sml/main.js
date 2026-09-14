@@ -172,13 +172,18 @@ function renderSML() {
       Math.abs(a) < eps ? '' : (a < 0 ? '' : 'blue')),
     readout('Verdict', mispricingVerdict(a, eps)));
 
-  // KaTeX strip with live numbers
-  const tex =
-    `E[r_i] = r_f + \\beta_i\\,(E[r_M] - r_f) = ${S.rf.toFixed(1)}\\% + ` +
-    `${beta.toFixed(2)}\\,(${S.rm.toFixed(1)}\\% - ${S.rf.toFixed(1)}\\%) = ` +
-    `${pTeX(req, 2)}\\quad\\Rightarrow\\quad \\alpha_i = ${pTeX(er, 2)} - ${pTeX(req, 2)} = ` +
-    `${(a >= 0 ? '+' : '') + pTeX(a, 2)}`;
-  renderTeX(document.getElementById('sml-formula'), tex, { displayMode: false });
+  // Formula strip with live numbers — THREE short rows (CAPM formula, its
+  // numbers, alpha) so it fits the half-width column (~470px) at 18px body
+  // text: the old one-liner overflowed the strip and was cut off behind a
+  // scrollbar (split 2026-09-14).
+  renderTeX(document.getElementById('sml-formula'),
+    `E[r_i] = r_f + \\beta_i\\,(E[r_M] - r_f)`, { displayMode: false });
+  renderTeX(document.getElementById('sml-formula-num'),
+    `= ${S.rf.toFixed(1)}\\% + ${beta.toFixed(2)}\\,(${S.rm.toFixed(1)}\\% - ${S.rf.toFixed(1)}\\%) = ${pTeX(req, 2)}`,
+    { displayMode: false });
+  renderTeX(document.getElementById('sml-formula-alpha'), // actual − CAPM-required (the readouts name them)
+    `\\alpha_i = ${pTeX(er, 2)} - ${pTeX(req, 2)} = ${(a >= 0 ? '+' : '') + pTeX(a, 2)}`,
+    { displayMode: false });
 }
 
 function overpricedDy(a) { return a < 0 ? 16 : -8; }
@@ -272,8 +277,19 @@ function renderMM() {
   mmChart.path(
     [{ x: xLo, y: fit.intercept + fit.slope * xLo }, { x: xHi, y: fit.intercept + fit.slope * xHi }],
     { stroke: 'var(--blue)', width: 2.4 });
-  mmChart.text(xHi, fit.intercept + fit.slope * xHi, 'OLS fit', { dx: -4, dy: -6, anchor: 'end', fill: 'var(--blue)' });
-  mmChart.text(xLo, tbeta * xLo, `true β=${tbeta.toFixed(2)}`, { dx: 4, dy: 14, anchor: 'start', fill: 'var(--gold)' });
+  // Labels sit where each line LEAVES the plot box (right edge, or the top /
+  // bottom edge when the line is steep), just below the line so they never
+  // clip — the 15px 'OLS fit' used to poke out above the plot.
+  const exitPt = (a, b, x) => { // point where y = a + b·x exits the domain box
+    let y = a + b * x;
+    if (y > yHi && b !== 0) { y = yHi; x = (yHi - a) / b; }
+    else if (y < yLo && b !== 0) { y = yLo; x = (yLo - a) / b; }
+    return { x, y };
+  };
+  const fe = exitPt(fit.intercept, fit.slope, xHi);
+  mmChart.text(fe.x, fe.y, 'OLS fit', { dx: -6, dy: 18, anchor: 'end', fill: 'var(--blue)' });
+  const te = exitPt(0, tbeta, xLo);
+  mmChart.text(te.x, te.y, `true β=${tbeta.toFixed(2)}`, { dx: 6, dy: 18, anchor: 'start', fill: 'var(--gold)' });
 
   // readouts: β̂ (±SE), α̂ (±SE), R² ("—" when degenerate: β=0 AND σ_e=0
   // makes the asset series identically zero, so R² is 0/0)
@@ -297,14 +313,21 @@ function renderMM() {
     `<div class="vd-seg idio" style="width:${idioPct}%" title="Idiosyncratic σ_e²">${idioPct >= 12 ? idioPct.toFixed(0) + '%' : ''}</div>`;
 
   // KaTeX strips
+  // Model on one row, the OLS estimates on the next (one row overflowed the
+  // half-width strip at 18px; split 2026-09-14).
   renderTeX(document.getElementById('mm-formula-model'),
-    `R_i - R_f = \\hat{\\alpha}_i + \\hat{\\beta}_i\\,(R_M - R_f) + \\varepsilon_i` +
-    `\\;:\\; \\hat{\\beta}_i = ${fit.slope.toFixed(3)},\\; \\hat{\\alpha}_i = ${pTeX(fit.intercept, 2)},\\; R^2 = ${Number.isFinite(fit.r2) ? fit.r2.toFixed(3) : '\\text{---}'}`,
+    `R_i - R_f = \\hat{\\alpha}_i + \\hat{\\beta}_i\\,(R_M - R_f) + \\varepsilon_i`,
+    { displayMode: false });
+  renderTeX(document.getElementById('mm-formula-est'),
+    `\\hat{\\beta}_i = ${fit.slope.toFixed(3)},\\quad \\hat{\\alpha}_i = ${pTeX(fit.intercept, 2)},\\quad R^2 = ${Number.isFinite(fit.r2) ? fit.r2.toFixed(3) : '\\text{---}'}`,
     { displayMode: false });
   const sigM = pTeX(MKT_SIGMA, 1); // "4.5\%" — TeX-safe
+  // R² on two rows (symbolic, then numeric) — see the SML strip note.
   renderTeX(document.getElementById('mm-formula-r2'),
-    `R^2 = \\dfrac{\\beta^2\\sigma_M^2}{\\beta^2\\sigma_M^2 + \\sigma_e^2} = ` +
-    `\\dfrac{${tbeta.toFixed(2)}^2\\,(${sigM})^2}{${tbeta.toFixed(2)}^2\\,(${sigM})^2 + (${S.sigmae.toFixed(1)}\\%)^2} = ${(sysPct / 100).toFixed(3)}`,
+    `R^2 = \\dfrac{\\beta^2\\sigma_M^2}{\\beta^2\\sigma_M^2 + \\sigma_e^2}`,
+    { displayMode: false });
+  renderTeX(document.getElementById('mm-formula-r2-num'),
+    `= \\dfrac{${tbeta.toFixed(2)}^2\\,(${sigM})^2}{${tbeta.toFixed(2)}^2\\,(${sigM})^2 + (${S.sigmae.toFixed(1)}\\%)^2} = ${(sysPct / 100).toFixed(3)}`,
     { displayMode: false });
 }
 

@@ -49,6 +49,13 @@ classroom projector AND used by students on their laptops (Canvas links).
   curve to one width. `chart.js` sets widths as inline `calc(<w>px *
   var(--stroke-scale, 1))`; scale a whole chart for the projector by setting
   `--stroke-scale` on its `.chart-box`. (This bug shipped once.)
+- **Text sizes live in variables.** On-chart SVG text = `--chart-tick` /
+  `--chart-title` / `--chart-label` / `--chart-tip` (15/16/15/13px, set in
+  `lib/style.css` on 2026-09-14 for classroom legibility; body is 18px). A
+  tool that pins chart text against `--stroke-scale` must write
+  `font-size: var(--chart-tick)` etc., never a literal px, and the `chart.js`
+  default margins (20/22/54/68) are sized for these — verify with the SVG
+  overlap/clipping audit after touching sizes (README → Text sizes).
 - **All labels are real typeset math**, never raw pseudo-math like `r_f (%)`.
   HTML labels: `renderLabel`/`hydrateLabels` (`$...$` → MathJax) from `ui.js`.
   On-chart SVG labels: `svgMathText` in `chart.js` (`_x` → tspan subscripts).

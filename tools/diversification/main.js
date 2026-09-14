@@ -123,7 +123,7 @@ const mainChart = new Chart(mainHost, {
 const insetChart = new Chart(insetHost, {
   width: 480,
   height: 320,
-  margin: { top: 14, right: 20, bottom: 44, left: 60 },
+  margin: { top: 16, right: 22, bottom: 50, left: 68 },
   xLabel: 'Number of Assets (N)',
   yLabel: 'Portfolio Variance',
   xFmt: fixed(0),

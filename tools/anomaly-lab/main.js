@@ -17,7 +17,7 @@
  * decimals and is not used.
  */
 
-import { Chart, fixed, niceTicks, setStrokeWidth } from '../../lib/chart.js';
+import { Chart, fixed, niceTicks, setStrokeWidth, LabelPlacer } from '../../lib/chart.js';
 import { slider, renderTeX, renderLabel, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 import {
@@ -185,11 +185,19 @@ function drawAlphas(stats) {
 
 /** Blue path through the deciles in order + open squares + D1..D10 labels. */
 function drawDeciles(stats, yOf) {
-  scatter.path(stats.map((d) => ({ x: d.beta, y: yOf(d) })),
-    { stroke: 'var(--blue)', width: 1.6, opacity: 0.8 });
+  const pts = stats.map((d) => ({ x: d.beta, y: yOf(d) }));
+  scatter.path(pts, { stroke: 'var(--blue)', width: 1.6, opacity: 0.8 });
+  // Labels via LabelPlacer (white halo, dodging the squares, the connecting
+  // path and each other) — since 2026-09-14: at 15px the fixed upper-right
+  // offset made neighbouring deciles (e.g. D4/D5) print over one another.
+  const lp = new LabelPlacer(scatter);
+  lp.avoidPath(pts);
+  const boxes = pts.map((p) => lp.avoidPoint(p.x, p.y, 4.5));
   stats.forEach((d, i) => {
     square(scatter, d.beta, yOf(d));
-    scatter.text(d.beta, yOf(d), `D${i + 1}`, { dx: 7, dy: -7, fill: 'var(--blue)' });
+    lp.label(d.beta, yOf(d), `D${i + 1}`, {
+      r: 4.5, own: boxes[i], fill: 'var(--blue)', prefer: ['ur', 'ul', 'lr', 'll'],
+    });
   });
 }
 
@@ -347,11 +355,11 @@ function drawScoreboard(i0, i1) {
 function drawDecompBar(host, dec, facs, domain, uid) {
   host.replaceChildren();
   const W = 560;
-  const H = 108;
+  const H = 120; // 108 until 2026-09-14: +12 headroom for the 15px value label
   const m = { left: 12, right: 12 };
-  const barY = 16;
+  const barY = 28;
   const barH = 38;
-  const axisY = 82;
+  const axisY = 94;
   const [lo, hi] = domain;
   const sx = (v) => m.left + ((v - lo) / (hi - lo)) * (W - m.left - m.right);
 

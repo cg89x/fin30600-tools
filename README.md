@@ -157,8 +157,20 @@ fin30600-tools/
   style `calc(<w>px * var(--stroke-scale, 1))`, and tick/axis-title/datalabel
   font sizes also carry the `--stroke-scale` factor. Scale a whole chart up
   for the projector by setting `--stroke-scale` on its `.chart-box` (e.g. the
-  diversification tool uses `1.5`); override the per-element `font-size` back
-  if you want thicker lines but base-size labels.
+  diversification tool uses `1.5`); to keep thicker lines but base-size
+  labels, pin the per-element `font-size` to the shared variables
+  (`var(--chart-tick)` / `--chart-title` / `--chart-label` / `--chart-tip`),
+  never a literal px.
+- **Text sizes (legibility baseline, 2026-09-14)** — body `--font-base` is
+  18px; on-chart SVG text is `--chart-tick` 15px, `--chart-title` 16px,
+  `--chart-label` 15px, `--chart-tip` 13px (all in `lib/style.css`), and the
+  `chart.js` default margins (top 20, right 22, bottom 54, left 68) are
+  sized for them — a tool that passes its own `margin` needs at least
+  ~50px bottom / ~60px left. Keep every HTML size in a tool page at
+  ≥ 0.78rem (legends, hints, table cells). After any size change, run the
+  SVG-text audit (bbox clipping + pairwise overlap per `<svg>`) on every
+  tool in the browser; labels that sit near other labels or on a curve go
+  through `LabelPlacer` rather than a fixed `dx/dy`.
   **Never add a `stroke-width` rule for `.series`/`.refline` to `style.css`** —
   a stylesheet rule beats the inline attribute and silently pins every curve
   to one width (this bug shipped once; that's why widths are inline styles now).

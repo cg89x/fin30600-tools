@@ -68,10 +68,10 @@
   --page-bg:  #ffffff;
 
   /* Metrics */
-  --font-base: 16px;
+  --font-base: 18px;   /* was 16px until 2026-09-14 (projector legibility) */
   --stroke-scale: 1;
   --point-scale: 1;
-  --panel-width: 300px;
+  --panel-width: 320px;
 
   /* Body = the deck's sans (Biolinum → Libertinus Sans, self-hosted);
      display = the deck's serif titles; charts = Arial like the lecture
@@ -79,6 +79,15 @@
   --font-stack: 'Libertinus Sans', 'Linux Biolinum O', Arial, Helvetica, sans-serif;
   --font-display: 'Libertinus Serif', 'Linux Libertine O', Georgia, 'Times New Roman', serif;
   --font-chart: Arial, Helvetica, sans-serif;
+
+  /* On-chart SVG text sizes (px, before --stroke-scale). Raised 12/13/12/11
+     → 15/16/15/13 on 2026-09-14 so axis text reads from the back of the
+     classroom; per-tool pins that decouple text from --stroke-scale must
+     reference these variables, never a literal px. */
+  --chart-tick: 15px;
+  --chart-title: 16px;
+  --chart-label: 15px;
+  --chart-tip: 13px;
 }
 
 * { box-sizing: border-box; }
@@ -151,7 +160,7 @@ a:hover { text-decoration: underline; }
 
 .btn {
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--navy);
   background: var(--softgray);
   border: 1px solid var(--panel-border);
@@ -195,7 +204,7 @@ a:hover { text-decoration: underline; }
 }
 .controls-panel .group { display: flex; flex-direction: column; gap: 0.7rem; }
 .controls-panel .group-title {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
@@ -241,7 +250,7 @@ mjx-assistive-mml {
   border-left: 3px solid var(--goldmetal); /* deck's gold vertical-rule motif */
   border-radius: 8px;
   padding: 0.7rem 1rem;
-  font-size: 1rem;
+  font-size: 1.12rem;
   overflow-x: auto;
 }
 .formula-strip .formula-row { margin: 0.25rem 0; }
@@ -258,8 +267,8 @@ mjx-assistive-mml {
   border-radius: 8px;
   padding: 0.45rem 0.6rem;
 }
-.readout .k { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
-.readout .v { font-size: 1.1rem; font-weight: 700; color: var(--navy); }
+.readout .k { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.readout .v { font-size: 1.25rem; font-weight: 700; color: var(--navy); }
 .readout .v.blue { color: var(--blue); }
 .readout .v.gold { color: var(--gold); }
 
@@ -267,9 +276,9 @@ mjx-assistive-mml {
 
 .ctrl { display: flex; flex-direction: column; gap: 0.3rem; }
 .ctrl-head { display: flex; justify-content: space-between; align-items: baseline; }
-.ctrl-label { font-size: 0.85rem; color: var(--label); font-weight: 600; }
+.ctrl-label { font-size: 0.92rem; color: var(--label); font-weight: 600; }
 .ctrl-readout {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--blue);
   font-variant-numeric: tabular-nums;
@@ -278,7 +287,7 @@ mjx-assistive-mml {
 .ctrl-number { flex-direction: row; align-items: center; justify-content: space-between; gap: 0.5rem; }
 .ctrl-numinput {
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   width: 5.5rem;
   padding: 0.25rem 0.4rem;
   border: 1px solid var(--panel-border);
@@ -286,7 +295,7 @@ mjx-assistive-mml {
 }
 .ctrl-toggle { flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer; }
 .ctrl-checkbox { width: 1.1rem; height: 1.1rem; accent-color: var(--blue); cursor: pointer; }
-.ctrl-toggle-label { font-size: 0.85rem; color: var(--label); font-weight: 600; }
+.ctrl-toggle-label { font-size: 0.92rem; color: var(--label); font-weight: 600; }
 
 /* ---------------------------------------------------------------- chart --- */
 
@@ -296,12 +305,12 @@ mjx-assistive-mml {
 svg.finchart { display: block; width: auto; max-width: 100%; height: auto; }
 svg.finchart .grid { stroke: var(--grid); stroke-width: 1; }
 svg.finchart .spine { stroke: var(--axis); stroke-width: calc(1.2px * var(--stroke-scale)); }
-svg.finchart .tick { fill: var(--label); font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-chart); }
+svg.finchart .tick { fill: var(--label); font-size: calc(var(--chart-tick) * var(--stroke-scale)); font-family: var(--font-chart); }
 svg.finchart .tick-x { text-anchor: middle; }
 svg.finchart .tick-y { text-anchor: end; }
 svg.finchart .axis-title {
   fill: var(--label);
-  font-size: calc(13px * var(--stroke-scale));
+  font-size: calc(var(--chart-title) * var(--stroke-scale));
   font-weight: 600;
   text-anchor: middle;
   font-family: var(--font-chart);
@@ -309,7 +318,7 @@ svg.finchart .axis-title {
 /* NB: no stroke-width rule for .series here — a stylesheet rule would
    override the per-path width chart.js sets (inline style, already scaled
    by --stroke-scale). */
-svg.finchart .datalabel { font-size: calc(12px * var(--stroke-scale)); font-family: var(--font-chart); }
+svg.finchart .datalabel { font-size: calc(var(--chart-label) * var(--stroke-scale)); font-family: var(--font-chart); }
 /* .halo (chart.text {halo:true} / LabelPlacer): white outline painted BEHIND
    the glyphs so a data label stays legible where a curve runs behind it. */
 svg.finchart .datalabel.halo {
@@ -323,7 +332,7 @@ svg.finchart .marker { /* radius handled inline; scaled by --point-scale where u
 /* hover tooltip (overlay layer, built by tools) */
 .chart-tooltip {
   fill: var(--navy);
-  font-size: calc(11px * var(--stroke-scale));
+  font-size: calc(var(--chart-tip) * var(--stroke-scale));
   font-family: var(--font-chart);
 }
 .chart-tooltip-bg { fill: #fff; stroke: var(--panel-border); }
@@ -393,7 +402,7 @@ svg.finchart .marker { /* radius handled inline; scaled by --point-scale where u
 .tool-card p { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.9rem; }
 .tool-card .lecture-ref {
   display: inline-block;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--goldmetal);
   background: rgba(201, 151, 0, 0.1);

@@ -98,7 +98,7 @@ const GOLD = '\\textcolor{#C99700}';
 
 const feeChart = new Chart(/** @type {HTMLElement} */ (document.getElementById('fee-chart')), {
   width: 720, height: 440,
-  margin: { top: 18, right: 26, bottom: 48, left: 80 },
+  margin: { top: 20, right: 26, bottom: 54, left: 88 },
   xLabel: 'Year', yLabel: 'Wealth if Cashed Out',
   xFmt: fixed(0), yFmt: usdTick,
 });

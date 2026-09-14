@@ -214,7 +214,7 @@ function renderLadder(v) {
     svg.appendChild(pt);
     if (best) {
       const cap = svgEl('text', {
-        x: X0 - 22, y: yTop + 40, 'text-anchor': 'end', class: 'bestcap',
+        x: X0 - 22, y: yTop + 42, 'text-anchor': 'end', class: 'bestcap', // +40 until the 17px price (2026-09-14)
       });
       cap.textContent = side === 'ask' ? 'best ask' : 'best bid';
       svg.appendChild(cap);
@@ -356,7 +356,7 @@ function renderArithmetic(v) {
 const depthChart = new Chart($('depth-chart'), {
   width: LW,
   height: LH,
-  margin: { top: 18, right: 20, bottom: 48, left: 74 },
+  margin: { top: 20, right: 22, bottom: 54, left: 82 },
   xLabel: 'Order size (shares)',
   yLabel: 'Average execution price',
   xFmt: fixed(0),
