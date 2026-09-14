@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PROTOTYPE C · Trading Costs &amp; Orders — Four Acts</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* ------------------------------ prototype banner ---------------------- */
+    .proto-banner {
+      background: var(--softgray);
+      border-left: 4px solid var(--goldmetal);
+      padding: 0.5rem 1.4rem 0.55rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .proto-banner b { color: var(--navy); letter-spacing: 0.04em; }
+    .proto-banner .proto-links a { margin-left: 0.9rem; white-space: nowrap; }
+    .proto-banner .proto-links .here {
+      margin-left: 0.9rem;
+      font-weight: 700;
+      color: var(--navy);
+      white-space: nowrap;
+    }
+    .proto-banner .proto-anchors a { margin-right: 0.25rem; }
+    .proto-banner .proto-anchors .sep { margin: 0 0.35rem; color: var(--panel-border); }
+
+    /* ------------------------------ page column --------------------------- */
+    .acts-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.4rem 4.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4.75rem;
+    }
+    .acts-lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 46rem;
+    }
+
+    /* ------------------------------ act skeleton -------------------------- */
+    .act { scroll-margin-top: 1rem; }
+    .act-eyebrow {
+      margin: 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--goldmetal);
+    }
+    .act-title {
+      margin: 0.15rem 0 1.1rem;
+      font-family: var(--font-display);
+      font-size: 1.95rem;
+      font-weight: 700;
+      line-height: 1.12;
+      color: var(--navy);
+    }
+    .act-takeaway {
+      font-family: var(--font-display);
+      font-size: 1.28rem;
+      line-height: 1.35;
+      color: var(--navy);
+      border-left: 3px solid var(--goldmetal);
+      padding-left: 0.95rem;
+      margin: 1.6rem 0 0;
+      max-width: 46rem;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .act-takeaway.show { opacity: 1; transform: none; }
+
+    .side-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0 0 0.25rem 0.1rem;
+    }
+    .note { font-size: 0.8rem; color: var(--muted); margin: 0.3rem 0 0; line-height: 1.35; }
+    .btn-navy {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+    }
+    .btn-navy:hover { background: #143766; }
+    .btn-navy:disabled { opacity: 0.55; cursor: default; }
+
+    /* ------------------------------ Act I --------------------------------- */
+    .quote-big {
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-top: 4px solid var(--goldmetal);
+      border-radius: 12px;
+      padding: 1rem 1.4rem 1.2rem;
+      max-width: 620px;
+    }
+    .quote-big .q-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+    .q-cols {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: center;
+    }
+    .q-cell { text-align: center; }
+    .q-cell .q-lab {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .q-cell b { font-size: 2.1rem; font-variant-numeric: tabular-nums; }
+    .q-cell.bid b { color: var(--blue); }
+    .q-cell.ask b { color: var(--gold); }
+    .q-cell .q-sub { display: block; font-size: 0.78rem; color: var(--muted); }
+    .q-mid { text-align: center; }
+    .q-mid .q-spread {
+      display: block;
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 1.15rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .q-mid .q-sub { display: block; font-size: 0.75rem; color: var(--muted); }
+    .q-mid .q-arrows { color: var(--panel-border); font-size: 1.1rem; }
+
+    #a1-btn { margin: 1.1rem 0 0.2rem; }
+    .legs { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.8rem; max-width: 620px; }
+    .leg {
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.98rem;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .leg.show { opacity: 1; transform: none; }
+    .leg .leg-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      color: #fff;
+    }
+    .leg .leg-tag.ask { background: var(--gold); }
+    .leg .leg-tag.bid { background: var(--blue); }
+    .leg b { color: var(--navy); font-variant-numeric: tabular-nums; }
+    .tally {
+      margin-top: 0.85rem;
+      max-width: 620px;
+      background: var(--softgray);
+      border-left: 3px solid var(--goldmetal);
+      border-radius: 6px;
+      padding: 0.65rem 0.95rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .tally.show { opacity: 1; }
+    .tally .lost { color: var(--red); font-weight: 700; }
+    .tally b { color: var(--navy); }
+    .tally .tally-tex { margin-top: 0.3rem; }
+
+    /* ------------------------------ Act II -------------------------------- */
+    .chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .chip {
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 0.42rem 1rem;
+      border-radius: 999px;
+      border: 1.5px solid;
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .chip.blue { color: var(--blue); border-color: var(--blue); }
+    .chip.gold { color: var(--gold); border-color: var(--gold); }
+    .chip.blue.active, .chip.blue:hover { background: var(--blue); color: #fff; }
+    .chip.gold.active, .chip.gold:hover { background: var(--gold); color: #fff; }
+    .chip-gap { flex: 0 0 0.8rem; }
+
+    .a2-grid {
+      display: grid;
+      grid-template-columns: minmax(380px, 3fr) minmax(260px, 2fr);
+      gap: 1.4rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) { .a2-grid { grid-template-columns: 1fr; } }
+    .mathpanel {
+      background: var(--card-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 0.8rem 1rem 1rem;
+      min-height: 12rem;
+    }
+    .mathpanel .mathhint { color: var(--muted); font-size: 0.9rem; margin: 0.4rem 0 0; }
+    .mathline {
+      font-size: 1.05rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+      margin: 0.35rem 0;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .mathline.show { opacity: 1; transform: none; }
+    .mathline.total {
+      border-top: 1px solid var(--panel-border);
+      padding-top: 0.45rem;
+      margin-top: 0.55rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .mathline.avg { font-weight: 700; }
+    .mathline.avg b { color: var(--gold); }
+
+    /* ------------------------------ Act III ------------------------------- */
+    #a3-btn { margin-bottom: 1rem; }
+    .a3-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) { .a3-grid { grid-template-columns: 1fr; } }
+    .ladder-res {
+      font-size: 0.95rem;
+      margin: 0.4rem 0 0 0.1rem;
+      min-height: 2.6em;
+      line-height: 1.4;
+    }
+    .ladder-res b { color: var(--navy); }
+    .ladder-res .warn { color: var(--red); font-weight: 700; }
+
+    /* ------------------------------ ladders (shared) ---------------------- */
+    .ladder-svg { display: block; width: auto; max-width: 100%; height: auto; }
+    .ladder-svg text { font-family: var(--font-chart); }
+    .ladder-svg .colhead { font-size: 11px; fill: var(--muted); }
+    .ladder-svg .price { font-size: 15px; font-weight: 700; }
+    .ladder-svg .price.ask { fill: var(--gold); }
+    .ladder-svg .price.bid { fill: var(--blue); }
+    .ladder-svg .bestcap { font-size: 10px; fill: var(--muted); font-weight: 400; }
+    .ladder-svg .sizelabel { font-size: 13px; fill: var(--label); }
+    .ladder-svg .sizelabel .consumed { fill: var(--red); font-weight: 700; }
+    .ladder-svg .sidecap { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; }
+    .ladder-svg .spread-note { font-size: 14.5px; font-weight: 700; fill: var(--navy); }
+
+    /* ------------------------------ Act IV -------------------------------- */
+    .chart-box { --stroke-scale: 1.5; }
+    .chart-box svg.finchart .tick { font-size: 12px; }
+    .chart-box svg.finchart .axis-title { font-size: 13px; }
+    .chart-box svg.finchart .datalabel { font-size: 12px; }
+    .ot-controls {
+      display: flex;
+      gap: 0.9rem 1.2rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 0 0 0.6rem;
+    }
+    .ot-controls .ctrl { margin: 0; }
+    .ot-controls .ctrl-number { justify-content: flex-start; }
+    .ot-controls .ctrl-numinput { width: 6.2rem; }
+    select.ctrl-select { width: auto; cursor: pointer; background: #fff; }
+    .ot-result {
+      background: var(--softgray);
+      border-left: 3px solid var(--goldmetal);
+      border-radius: 6px;
+      padding: 0.5rem 0.8rem;
+      font-size: 0.95rem;
+      margin: 0.5rem 0 0;
+      line-height: 1.4;
+      max-width: 980px;
+    }
+    .ot-result b { color: var(--navy); }
+    .ot-result .exec-yes { color: var(--blue); font-weight: 700; }
+    .ot-result .exec-no { color: var(--red); font-weight: 700; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--label);
+      margin: 0.2rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.red-dash { border-color: var(--red); border-top-style: dashed; }
+    .legend .dot {
+      display: inline-block;
+      width: 0.7rem;
+      height: 0.7rem;
+      border-radius: 50%;
+      margin-right: 0.35rem;
+      vertical-align: -1px;
+    }
+    .legend .dot.gold { background: var(--gold); border: 1px solid #fff; box-shadow: 0 0 0 1px var(--gold); }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Trading Costs &amp; Orders — in four acts</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Lecture 2 · §3 Trading Costs &amp; Types of Orders</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <div class="proto-banner">
+    <div class="proto-row">
+      <b>LOCAL PROTOTYPE</b> — Direction C (Four Acts) · not deployed
+      <span class="proto-links">
+        <a href="../proto-a-depth/">A1 · Market Depth</a>
+        <a href="../proto-a-types/">A2 · Order Types</a>
+        <a href="../proto-b-unified/">B · Unified Ladder</a>
+        <span class="here">C · Four Acts</span>
+      </span>
+    </div>
+    <div class="proto-row proto-anchors">
+      <a href="#act1">Act 1</a><span class="sep">·</span><a href="#act2">Act 2</a><span class="sep">·</span><a href="#act3">Act 3</a><span class="sep">·</span><a href="#act4">Act 4</a>
+    </div>
+  </div>
+
+  <main class="acts-main">
+    <p class="acts-lead">One idea per act, in the order the lecture builds them:
+      the quote, the book behind it, the depth that can vanish, and the orders
+      that wait.</p>
+
+    <!-- =============================== ACT I ============================== -->
+    <section class="act" id="act1" aria-labelledby="a1-title">
+      <p class="act-eyebrow">Act I</p>
+      <h2 class="act-title" id="a1-title">The quote is two prices</h2>
+
+      <div class="quote-big">
+        <div class="q-name">The deck&rsquo;s book &mdash; best levels only</div>
+        <div class="q-cols">
+          <div class="q-cell bid">
+            <span class="q-lab">best bid</span>
+            <b id="a1-bid"></b>
+            <span class="q-sub">where you can sell now</span>
+          </div>
+          <div class="q-mid">
+            <span class="q-arrows">&#8596;</span>
+            <span class="q-spread" id="a1-spread"></span>
+            <span class="q-sub">the bid&ndash;ask spread</span>
+          </div>
+          <div class="q-cell ask">
+            <span class="q-lab">best ask</span>
+            <b id="a1-ask"></b>
+            <span class="q-sub">where you can buy now</span>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-navy" id="a1-btn">Buy 10, then sell 10 immediately</button>
+      <div class="legs" id="a1-legs"></div>
+      <div class="tally" id="a1-tally"></div>
+
+      <p class="act-takeaway" id="tk1">The spread is a round-trip tax &mdash;
+        your cost, the liquidity provider&rsquo;s profit.</p>
+    </section>
+
+    <!-- =============================== ACT II ============================= -->
+    <section class="act" id="act2" aria-labelledby="a2-title">
+      <p class="act-eyebrow">Act II</p>
+      <h2 class="act-title" id="a2-title">There is no &ldquo;the price&rdquo; &mdash; walk the book</h2>
+
+      <div class="chip-row" id="a2-chips" role="group" aria-label="Market orders to try"></div>
+
+      <div class="a2-grid">
+        <div>
+          <p class="side-title">The limit order book</p>
+          <div id="a2-ladder"></div>
+        </div>
+        <div class="mathpanel">
+          <p class="side-title">The arithmetic</p>
+          <div id="a2-math"><p class="mathhint">Tap an order above &mdash; the
+            fills appear level by level, exactly as the book is consumed.</p></div>
+        </div>
+      </div>
+
+      <p class="act-takeaway" id="tk2">The more you trade, the worse your
+        price &mdash; you face a schedule, not a number.</p>
+    </section>
+
+    <!-- =============================== ACT III ============================ -->
+    <section class="act" id="act3" aria-labelledby="a3-title">
+      <p class="act-eyebrow">Act III</p>
+      <h2 class="act-title" id="a3-title">Liquidity is a quantity</h2>
+
+      <button type="button" class="btn btn-navy" id="a3-btn">Sell 30 into both</button>
+
+      <div class="a3-grid">
+        <div>
+          <p class="side-title">Deck book — 15 / 10 / 10 a side</p>
+          <div id="a3-left"></div>
+          <p class="ladder-res" id="a3-left-res"></p>
+        </div>
+        <div>
+          <p class="side-title">Thin book — same prices, 5 / 3 / 3</p>
+          <div id="a3-right"></div>
+          <p class="ladder-res" id="a3-right-res"></p>
+        </div>
+      </div>
+
+      <p class="act-takeaway" id="tk3">Same order, no depth: a flash crash in
+        miniature.</p>
+    </section>
+
+    <!-- =============================== ACT IV ============================= -->
+    <section class="act" id="act4" aria-labelledby="a4-title">
+      <p class="act-eyebrow">Act IV</p>
+      <h2 class="act-title" id="a4-title">Resting orders wait &mdash; and sometimes gap</h2>
+
+      <div class="ot-controls">
+        <span id="a4-ob"></span>
+        <span id="a4-pb"></span>
+        <button type="button" class="btn" id="a4-btn">&#8635; New path</button>
+      </div>
+
+      <div class="chart-box">
+        <div id="a4-chart"></div>
+        <div class="legend">
+          <span><span class="swatch blue"></span>Price path</span>
+          <span><span class="swatch red-dash"></span>Your limit / trigger price</span>
+          <span><span class="dot gold"></span>First bar the order executes</span>
+        </div>
+      </div>
+      <p class="ot-result" id="a4-result"></p>
+      <p class="note">Limit orders fill at the limit price or better. Stop
+        orders only <em>trigger</em> a market order at the crossing price
+        &mdash; on a gap (a &plusmn;$1 jump in this path), execution can be
+        materially worse than the trigger.</p>
+
+      <p class="act-takeaway" id="tk4">Limit and stop orders trade price risk
+        for execution risk &mdash; and a stop is only a trigger.</p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
