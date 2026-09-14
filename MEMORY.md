@@ -30,10 +30,10 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      revealed line by line with a trade headline "SELL 30 · MARKET ORDER…"),
      one-row readouts, ladder + equally-sized depth-cost curve side by side,
      book editor in a disclosure. "shares" written out, never "sh".
-  4. `two-asset` — two-asset diversification, opportunity set vs ρ and weight
-     (L3 §4). Deck example A 8/13, B 16/20; Rule 2 shown in correlation form.
-  5. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
+  4. `capital-allocation` — CAL + utility, optimal allocation **w\*** (renamed
      from y\*), borrowing kink (L3 §2–3). Deck 7/15/22; w\* = 0.8264 at A = 2.
+  5. `two-asset` — two-asset diversification, opportunity set vs ρ and weight
+     (L3 §4). Deck example A 8/13, B 16/20; Rule 2 shown in correlation form.
      Point labels (C, w\*, P, r_f) placed by `LabelPlacer` with a white halo
      at 18px (C on two lines) since 2026-09-08 (they used to print across the
      CAL at the then-12px default; the site-wide default is 15px since
@@ -166,6 +166,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-09-14 (evening) — **Landing-page order**: Capital Allocation & Utility now
+  precedes Two-Asset Diversification in the tool overview (Christian; matches the
+  deck order §2–3 before §4). Only `index.html` card order + this file/README moved.
 - 2026-09-14 (later) — **Phone / iPad pass** (Christian: a mobile-friendly
   version for iPhones and iPads). The layouts already stacked at ≤900px;
   the problem was the charts: an SVG designed at ~720px shrinks to ~300px

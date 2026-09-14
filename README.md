@@ -27,8 +27,8 @@ talks to a Firebase Realtime Database (plain REST/SSE, no SDK).
 | [`tools/volatility-drag/`](tools/volatility-drag/) | L1 §4 | Volatility drag: arithmetic vs. geometric average, R_G ≈ R_A − ½σ², simulated wealth paths vs. the "arithmetic promise," 1991–2025 table presets. |
 | [`tools/fee-drag/`](tools/fee-drag/) | L1 §6 | Fund-fee drag: Class A front load vs. Class B level load + declining exit fee, crossover horizon, active-vs-passive preset ($99,628 gap). |
 | [`tools/market-depth/`](tools/market-depth/) | L2 §3 | Market depth & price impact: the deck quiz ("at what price can you sell 30?") animates a market order eating a four-level book while the arithmetic reveals line by line; depth-cost curve at the ladder's size; editable book behind a disclosure. Redesign of the order-book tool's depth half. |
-| [`tools/two-asset/`](tools/two-asset/) | L3 §4 | Two-asset opportunity set as ρ and weight vary; minimum-variance portfolio. |
 | [`tools/capital-allocation/`](tools/capital-allocation/) | L3 §2–3 | CAL from the risk-free asset through a risky portfolio; utility and optimal w*. |
+| [`tools/two-asset/`](tools/two-asset/) | L3 §4 | Two-asset opportunity set as ρ and weight vary; minimum-variance portfolio. |
 | [`tools/efficient-frontier/`](tools/efficient-frontier/) | L3 §5 | N-asset minimum-variance frontier, global MVP, and max-Sharpe tangency. |
 | [`tools/capm-sml/`](tools/capm-sml/) | L4 §2–3 | Security market line + alpha, and a simulated market-model OLS regression. |
 | [`tools/diversification/`](tools/diversification/) | L4 App. | Equal-weight portfolio risk vs. N: the 1/N term vanishes, correlation sets the systematic floor (web version of PortfolioVarianceAndDiversification.xlsx). |
