@@ -41,14 +41,14 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   6. `efficient-frontier` — N-asset frontier, global MVP, max-Sharpe tangency,
      tangency-weights bar (L3 §5). Defaults = 5 broad asset classes with
      realistic Sharpes (stocks 0.28–0.38, tangency ~0.47), NOT Jorion 1989.
-  7. `capm-sml` — SML + alpha and a simulated market-model OLS regression, two
-     side-by-side sections (L4 §2–3). Deck β = 1.45.
-  8. `diversification` — equal-weight portfolio σ vs N for 3 cases
+  7. `diversification` — equal-weight portfolio σ vs N for 3 cases
      (uncorrelated, common ρ, CAPM single-factor); β²=ρ coincide flag;
      variance-decomposition inset + share bar (L4 Appendix). Web version of
      `PortfolioVarianceAndDiversification.xlsx`. x-axis tracks the N slider;
      charts use `--stroke-scale: 1.5` (thick lines, base-size labels via the
      `--chart-*` variables).
+  8. `capm-sml` — SML + alpha and a simulated market-model OLS regression, two
+     side-by-side sections (L4 §2–3). Deck β = 1.45.
   9. `anomaly-lab` — L5 §1–2 (added 2026-07-12): live CAPM/FF3/Carhart
      time-series regressions on 10 VW decile portfolios per sort (beta /
      size / BM / momentum), adjustable 1963–2026 window (deck-window preset
@@ -167,7 +167,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 ## Changelog (newest first)
 
 - 2026-09-14 (evening) — **Landing-page order**: Capital Allocation & Utility now
-  precedes Two-Asset Diversification in the tool overview (Christian; matches the
+  precedes Two-Asset Diversification, and Diversification & Systematic Risk
+  precedes CAPM / SML, in the tool overview (Christian; matches the
   deck order §2–3 before §4). Only `index.html` card order + this file/README moved.
 - 2026-09-14 (later) — **Phone / iPad pass** (Christian: a mobile-friendly
   version for iPhones and iPads). The layouts already stacked at ≤900px;

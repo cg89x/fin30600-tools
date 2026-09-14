@@ -30,8 +30,8 @@ talks to a Firebase Realtime Database (plain REST/SSE, no SDK).
 | [`tools/capital-allocation/`](tools/capital-allocation/) | L3 §2–3 | CAL from the risk-free asset through a risky portfolio; utility and optimal w*. |
 | [`tools/two-asset/`](tools/two-asset/) | L3 §4 | Two-asset opportunity set as ρ and weight vary; minimum-variance portfolio. |
 | [`tools/efficient-frontier/`](tools/efficient-frontier/) | L3 §5 | N-asset minimum-variance frontier, global MVP, and max-Sharpe tangency. |
-| [`tools/capm-sml/`](tools/capm-sml/) | L4 §2–3 | Security market line + alpha, and a simulated market-model OLS regression. |
 | [`tools/diversification/`](tools/diversification/) | L4 App. | Equal-weight portfolio risk vs. N: the 1/N term vanishes, correlation sets the systematic floor (web version of PortfolioVarianceAndDiversification.xlsx). |
+| [`tools/capm-sml/`](tools/capm-sml/) | L4 §2–3 | Security market line + alpha, and a simulated market-model OLS regression. |
 | [`tools/anomaly-lab/`](tools/anomaly-lab/) | L5 §1–2 | Anomaly lab: live CAPM / FF3 / Carhart time-series regressions on 10 value-weighted decile portfolios per sort (beta, size, book-to-market, momentum) over an adjustable 1963–2026 window — SML scatter, alpha plots, factor loadings, RMS-alpha scoreboard, return decomposition, information-ratio card. Data baked from the Ken French library (`data.js`, regenerate with `code/make_data.py`). |
 | [`tools/beauty-contest/`](tools/beauty-contest/) | L6 §3 | The 2/3-of-the-average game, live in class: students submit by QR code (Firebase RTDB via plain REST/SSE — see its SETUP.md), instructor screen reveals mean/target/winner per round; built-in simulation mode needs no backend. |
 | [`tools/duration/`](tools/duration/) | L7 §3–4 | Price–yield curve with the duration tangent vs. exact repricing, the PV cash-flow fulcrum at t = D, and spot-curve/forward-rate pricing. |
