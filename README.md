@@ -171,6 +171,23 @@ fin30600-tools/
   SVG-text audit (bbox clipping + pairwise overlap per `<svg>`) on every
   tool in the browser; labels that sit near other labels or on a curve go
   through `LabelPlacer` rather than a fixed `dx/dy`.
+- **Phones and iPads (2026-09-14)** — layouts stack below 900px (a tool-
+  local grid or fixed panel width must collapse there too, e.g. market-
+  depth's `.row-eq`, capm-sml's 220px panel). Charts shrink to the viewport
+  (`svg.finchart max-width:100%`), so each `Chart` compensates with its own
+  `--chart-text-scale` on the `<svg>` — 0.87 × designed width / container
+  width, clamped to [1, 2.4], read ONCE at construction: all on-chart font
+  sizes multiply by it, the text-bearing margins / tick offsets scale with
+  it, tick counts thin out, `LabelPlacer` and `text({size})` honour it, and
+  `fitTitle()` shrinks an axis title that would overrun its axis. Rotating
+  the device changes the container but not the margins — reload. Fixed-
+  geometry SVGs (ladder rows, weights bars, the anomaly-lab decomposition
+  bars via class `compact`) use the damped root variables
+  `--chart-text-scale-half` / `-quarter` (viewport bands in `style.css`).
+  Grid items need `min-width: 0` or a wide MathJax row widens the page.
+  `(pointer: coarse)` enlarges sliders, buttons and checkboxes. Audit at
+  375px (mobile preset) after touching chart code; iPad portrait (768px)
+  renders charts near design size (scale 1).
   **Never add a `stroke-width` rule for `.series`/`.refline` to `style.css`** —
   a stylesheet rule beats the inline attribute and silently pins every curve
   to one width (this bug shipped once; that's why widths are inline styles now).

@@ -91,6 +91,13 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   2026-09-14: body 18px, chart ticks/titles/labels 15/16/15px
   (`--chart-tick/-title/-label/-tip` in `lib/style.css`), `chart.js` default
   margins 20/22/54/68 — change the variables, not per-tool literals.
+- **Phones / iPads** (2026-09-14): each `Chart` compensates its own shrink
+  with a per-svg `--chart-text-scale` (text ≈13 CSS px on screen at any
+  width; margins/ticks follow; read once → rotate = reload); fixed-geometry
+  SVGs use the damped `--chart-text-scale-half/-quarter` viewport bands;
+  layouts stack ≤900px (tool-local grids must collapse too — `.row-eq`,
+  capm-sml panel); coarse-pointer touch targets. Audit every tool at 375px
+  after touching chart code.
 - **Landing page** = one card per tool, in topic order.
 - **Release gating**: `releases.js` controls which tools students see
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
@@ -159,6 +166,36 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-09-14 (later) — **Phone / iPad pass** (Christian: a mobile-friendly
+  version for iPhones and iPads). The layouts already stacked at ≤900px;
+  the problem was the charts: an SVG designed at ~720px shrinks to ~300px
+  on a phone and its 15px text with it (≈6px). Now every `Chart` sets its
+  OWN `--chart-text-scale` on the `<svg>` at construction — 0.87 × designed
+  width / container width, clamped to [1, 2.4] (falls back to the
+  viewport-band value in `style.css` when the container has no layout) —
+  every on-chart font size multiplies by it (shared rules + the five per-
+  tool pins), the text-bearing margins / tick offsets scale with it, tick
+  counts thin out (`thin()` in renderAxes), `LabelPlacer` and `text({size})`
+  honour it, and `fitTitle()` shrinks an axis title that would overrun its
+  axis. Result: on-chart text lands at ~13 CSS px on screen at every width
+  (phone 375: 12.6–13.1px on all 12 tools; iPad portrait: scale 1; desktop
+  1440: 1.0–1.08). Read once per chart — rotate the device → reload.
+  Fixed-geometry SVGs (market-depth ladder, frontier weights bar, anomaly-
+  lab decomposition bars via class `compact`) use the damped
+  `--chart-text-scale-half` / `-quarter` root variables (viewport bands
+  1.3/1.6/1.9 at ≤600/480/400px). Layout fixes: market-depth `.row-eq`
+  (ladder + curve) now stacks ≤1150px (its tool-local rule out-specified
+  the shared collapse → a 129px chart on phones); capm-sml's 220px panel
+  goes full-width ≤900px; anomaly-lab grid cells got `min-width:0` (a
+  479px MathJax row was widening the whole page to 498px); ≤600px chrome
+  tightened (header, paddings, 2-column readouts, 1rem formula strips) and
+  `(pointer: coarse)` touch targets (taller sliders, 2.4rem buttons, bigger
+  checkboxes). Label fixes from the phone audit: two-asset A/B/MVP/P labels
+  via `LabelPlacer` (P on two lines — it used to run off the right edge),
+  frontier rf label below-right with a halo (collided with MVP), duration
+  exact/tangent/B label offsets × textScale, anomaly-lab decomposition bar
+  126px tall. Verified with the SVG clipping/overlap audit on all 12 tools
+  at 375px, spot checks at 768px (iPad portrait) and 1440px.
 - 2026-09-14 — **Legibility pass for the classroom projector** (Christian:
   chart axis text and the typeset math were too small from a distance).
   `lib/style.css`: body `--font-base` 16→18px (every rem size, MathJax

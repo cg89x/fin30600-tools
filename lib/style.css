@@ -88,6 +88,17 @@
   --chart-title: 16px;
   --chart-label: 15px;
   --chart-tip: 13px;
+  /* Phone/tablet compensation (2026-09-14): a chart is designed at ~720px
+     and SHRINKS to the viewport (svg.finchart max-width:100%), so its text
+     shrinks with it — 15px becomes ~6px on a 375px phone. The media bands
+     below raise this factor as the viewport narrows; every on-chart font
+     size multiplies by it, and chart.js reads it ONCE at construction to
+     scale the margins/tick offsets to match (rotate the device → reload).
+     --chart-text-scale-half is the damped version for fixed-geometry SVGs
+     (ladder rows, weights bars) whose boxes cannot grow. */
+  --chart-text-scale: 1;
+  --chart-text-scale-half: calc(1 + (var(--chart-text-scale) - 1) * 0.5);
+  --chart-text-scale-quarter: calc(1 + (var(--chart-text-scale) - 1) * 0.3);
 }
 
 * { box-sizing: border-box; }
@@ -305,12 +316,12 @@ mjx-assistive-mml {
 svg.finchart { display: block; width: auto; max-width: 100%; height: auto; }
 svg.finchart .grid { stroke: var(--grid); stroke-width: 1; }
 svg.finchart .spine { stroke: var(--axis); stroke-width: calc(1.2px * var(--stroke-scale)); }
-svg.finchart .tick { fill: var(--label); font-size: calc(var(--chart-tick) * var(--stroke-scale)); font-family: var(--font-chart); }
+svg.finchart .tick { fill: var(--label); font-size: calc(var(--chart-tick) * var(--stroke-scale) * var(--chart-text-scale)); font-family: var(--font-chart); }
 svg.finchart .tick-x { text-anchor: middle; }
 svg.finchart .tick-y { text-anchor: end; }
 svg.finchart .axis-title {
   fill: var(--label);
-  font-size: calc(var(--chart-title) * var(--stroke-scale));
+  font-size: calc(var(--chart-title) * var(--stroke-scale) * var(--chart-text-scale));
   font-weight: 600;
   text-anchor: middle;
   font-family: var(--font-chart);
@@ -318,7 +329,7 @@ svg.finchart .axis-title {
 /* NB: no stroke-width rule for .series here — a stylesheet rule would
    override the per-path width chart.js sets (inline style, already scaled
    by --stroke-scale). */
-svg.finchart .datalabel { font-size: calc(var(--chart-label) * var(--stroke-scale)); font-family: var(--font-chart); }
+svg.finchart .datalabel { font-size: calc(var(--chart-label) * var(--stroke-scale) * var(--chart-text-scale)); font-family: var(--font-chart); }
 /* .halo (chart.text {halo:true} / LabelPlacer): white outline painted BEHIND
    the glyphs so a data label stays legible where a curve runs behind it. */
 svg.finchart .datalabel.halo {
@@ -328,11 +339,15 @@ svg.finchart .datalabel.halo {
   stroke-linejoin: round;
 }
 svg.finchart .marker { /* radius handled inline; scaled by --point-scale where used */ }
+/* Fixed-geometry mini charts (e.g. the anomaly-lab decomposition bars): text
+   grows with the damped factor so it stays inside the fixed boxes. */
+svg.finchart.compact .tick,
+svg.finchart.compact .datalabel { font-size: calc(var(--chart-label) * var(--stroke-scale) * var(--chart-text-scale-half)); }
 
 /* hover tooltip (overlay layer, built by tools) */
 .chart-tooltip {
   fill: var(--navy);
-  font-size: calc(var(--chart-tip) * var(--stroke-scale));
+  font-size: calc(var(--chart-tip) * var(--stroke-scale) * var(--chart-text-scale));
   font-family: var(--font-chart);
 }
 .chart-tooltip-bg { fill: #fff; stroke: var(--panel-border); }
@@ -418,4 +433,35 @@ svg.finchart .marker { /* radius handled inline; scaled by --point-scale where u
   .tool-main { flex-direction: column; }
   .controls-panel { flex: 1 1 auto; width: 100%; }
   .chart-area { width: 100%; }
+}
+
+/* ------------------------------------------------ phones (added 2026-09-14) */
+/* Chart text compensation — see --chart-text-scale in :root. The bands track
+   the SVG shrink factor so on-chart text lands at ~12–15 CSS px on screen. */
+@media (max-width: 600px) { :root { --chart-text-scale: 1.3; } }
+@media (max-width: 480px) { :root { --chart-text-scale: 1.6; } }
+@media (max-width: 400px) { :root { --chart-text-scale: 1.9; } }
+
+/* Tighter chrome so the chart gets the width (16px side gutter kept). */
+@media (max-width: 600px) {
+  .app-header { padding: 0.8rem 1rem 0.7rem; }
+  .app-header h1 { font-size: 1.3rem; }
+  .app-header .subtitle { font-size: 0.62rem; letter-spacing: 0.12em; }
+  .tool-main { padding: 0.9rem 1rem; gap: 0.9rem; }
+  .controls-panel { padding: 0.9rem 0.9rem 1rem; }
+  .chart-box { padding: 0.4rem 0.3rem; }
+  .chart-row { gap: 0.9rem; }
+  .formula-strip { font-size: 1rem; padding: 0.6rem 0.7rem; }
+  .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem 0.5rem; }
+  .readout .v { font-size: 1.15rem; }
+  .app-footer { padding: 0.8rem 1rem; }
+  .landing { padding: 1.2rem 1rem 2rem; }
+}
+
+/* Touch: bigger slider hit area and button targets. */
+@media (pointer: coarse) {
+  .ctrl-range { height: calc(1.6rem * var(--stroke-scale)); }
+  .btn { padding: 0.5rem 0.9rem; min-height: 2.4rem; }
+  .ctrl-checkbox { width: 1.35rem; height: 1.35rem; }
+  .ctrl-numinput { min-height: 2.2rem; }
 }

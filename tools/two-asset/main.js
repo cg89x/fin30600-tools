@@ -14,7 +14,7 @@
 import {
   covFromCorr, twoAssetMean, twoAssetStd, twoAssetVar, mvpWeightTwoAsset,
 } from '../../lib/finmath.js';
-import { Chart, pct } from '../../lib/chart.js';
+import { Chart, pct, LabelPlacer } from '../../lib/chart.js';
 import { slider, numberInput, toggle, renderTeX, hydrateLabels } from '../../lib/ui.js';
 import { bindState } from '../../lib/state.js';
 
@@ -120,14 +120,23 @@ function drawData() {
   }
 
   // Opportunity-set curve for the current ρ (BLUE).
-  chart.path(curve(a.rho), { stroke: 'var(--blue)', width: 2.4 });
+  const oppSet = curve(a.rho);
+  chart.path(oppSet, { stroke: 'var(--blue)', width: 2.4 });
+
+  // Point labels go through LabelPlacer (halo; dodges the curve, the markers
+  // and each other, stays inside the plot) — since 2026-09-14, when the long
+  // portfolio label ran off the right edge at the phone text scale.
+  const lp = new LabelPlacer(chart);
+  lp.avoidPath(oppSet);
 
   // Assets A and B.
   const r = 5 * scale();
   chart.point(a.sigA, a.muA, { r, fill: 'var(--navy)' });
-  chart.text(a.sigA, a.muA, 'A', { dx: 8, dy: -6, fill: 'var(--navy)' });
   chart.point(a.sigB, a.muB, { r, fill: 'var(--navy)' });
-  chart.text(a.sigB, a.muB, 'B', { dx: 8, dy: -6, fill: 'var(--navy)' });
+  const boxA = lp.avoidPoint(a.sigA, a.muA, r);
+  const boxB = lp.avoidPoint(a.sigB, a.muB, r);
+  lp.label(a.sigA, a.muA, 'A', { r, own: boxA, fill: 'var(--navy)', prefer: ['lr', 'ur', 'll', 'ul'] });
+  lp.label(a.sigB, a.muB, 'B', { r, own: boxB, fill: 'var(--navy)', prefer: ['ur', 'lr', 'ul', 'll'] });
 
   // Minimum-variance portfolio (GOLD diamond).
   const wMvp = mvpWeightTwoAsset(a.sigA, a.sigB, cov);
@@ -135,8 +144,10 @@ function drawData() {
   if (Number.isFinite(wMvp)) {
     const sMvp = twoAssetStd(wMvp, a.sigA, a.sigB, cov);
     const eMvp = twoAssetMean(wMvp, a.muA, a.muB);
-    chart.point(sMvp, eMvp, { r: 6 * scale(), fill: 'var(--gold)', shape: 'diamond', stroke: '#fff' });
-    chart.text(sMvp, eMvp, 'MVP', { dx: -6, dy: 18, anchor: 'end', fill: 'var(--gold)' });
+    const rM = 6 * scale();
+    chart.point(sMvp, eMvp, { r: rM, fill: 'var(--gold)', shape: 'diamond', stroke: '#fff' });
+    const boxM = lp.avoidPoint(sMvp, eMvp, rM);
+    lp.label(sMvp, eMvp, 'MVP', { r: rM, own: boxM, fill: 'var(--gold)', prefer: ['ll', 'l', 'ul', 'lr'] });
   } else {
     mvpErr = true;
   }
@@ -144,8 +155,10 @@ function drawData() {
   // Current portfolio (BLUE dot, labeled with its values).
   const sP = twoAssetStd(a.wA, a.sigA, a.sigB, cov);
   const eP = twoAssetMean(a.wA, a.muA, a.muB);
-  chart.point(sP, eP, { r: 6.5 * scale(), fill: 'var(--blue)', stroke: '#fff' });
-  chart.text(sP, eP, `(E[r] = ${pctS(eP, 1)}, σ = ${pctS(sP, 1)})`, { dx: 10, dy: -8, fill: 'var(--blue)', klass: 'p-label' });
+  const rP = 6.5 * scale();
+  chart.point(sP, eP, { r: rP, fill: 'var(--blue)', stroke: '#fff' });
+  const boxP = lp.avoidPoint(sP, eP, rP);
+  lp.label(sP, eP, `E[r] = ${pctS(eP, 1)}\nσ = ${pctS(sP, 1)}`, { r: rP, own: boxP, fill: 'var(--blue)', klass: 'p-label', prefer: ['ur', 'lr', 'ul', 'll'] });
 
   updateReadouts(a, cov, sP, eP, wMvp, mvpErr);
   updateFormulas(a, cov, eP, sP);

@@ -142,8 +142,8 @@ export function renderOverlay(chart, m, pointScale, prevNodes) {
   });
   chart.overlayGroup.appendChild(rfDot);
   nodes.push(rfDot);
-  const rfLbl = el('text', {
-    x: chart.sx(0) + 6, y: chart.sy(m.rf) - 6, fill: 'var(--navy)', class: 'datalabel',
+  const rfLbl = el('text', { // below-right of the dot (halo): clear of the MVP label above it
+    x: chart.sx(0) + 6, y: chart.sy(m.rf), dy: '1.05em', fill: 'var(--navy)', class: 'datalabel halo',
   });
   svgMathText(rfLbl, `r_f = ${(m.rf * 100).toFixed(2).replace(/\.?0+$/, '')}%`);
   chart.overlayGroup.appendChild(rfLbl);

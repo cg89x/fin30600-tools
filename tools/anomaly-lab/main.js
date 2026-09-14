@@ -355,11 +355,11 @@ function drawScoreboard(i0, i1) {
 function drawDecompBar(host, dec, facs, domain, uid) {
   host.replaceChildren();
   const W = 560;
-  const H = 120; // 108 until 2026-09-14: +12 headroom for the 15px value label
+  const H = 126; // 108 until 2026-09-14: headroom for the 15px value label (phone text scale)
   const m = { left: 12, right: 12 };
-  const barY = 28;
+  const barY = 34;
   const barH = 38;
-  const axisY = 94;
+  const axisY = 100;
   const [lo, hi] = domain;
   const sx = (v) => m.left + ((v - lo) / (hi - lo)) * (W - m.left - m.right);
 
@@ -367,7 +367,7 @@ function drawDecompBar(host, dec, facs, domain, uid) {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('width', String(W));
   svg.setAttribute('height', String(H));
-  svg.setAttribute('class', 'finchart');
+  svg.setAttribute('class', 'finchart compact'); // compact: damped phone text scale (fixed 120px box)
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   svg.setAttribute('role', 'img');
   svg.style.aspectRatio = `${W} / ${H}`;

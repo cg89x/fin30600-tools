@@ -201,11 +201,13 @@ function drawPriceYield(m) {
     let moveRight = m.dy > 0;
     if (m.yNew < 0.02) moveRight = true;
     if (m.yNew > 0.14) moveRight = false;
+    // offsets follow the chart's phone text scale so the two labels stay apart
+    const ts = pyChart.textScale;
     pyChart.text(m.yNew, m.Bexact, `exact ${usd0(m.Bexact)}`, {
-      dx: moveRight ? 12 : -12, dy: -8, anchor: moveRight ? 'start' : 'end', fill: 'var(--gold)',
+      dx: (moveRight ? 12 : -12) * ts, dy: -8 * ts, anchor: moveRight ? 'start' : 'end', fill: 'var(--gold)',
     });
     pyChart.text(m.yNew, m.Bapprox, `tangent ${usd0(m.Bapprox)}`, {
-      dx: moveRight ? 12 : -12, dy: 16, anchor: moveRight ? 'start' : 'end', fill: 'var(--navy)',
+      dx: (moveRight ? 12 : -12) * ts, dy: 16 * ts, anchor: moveRight ? 'start' : 'end', fill: 'var(--navy)',
     });
   }
 
@@ -215,7 +217,7 @@ function drawPriceYield(m) {
   if (m.y > 0.14) bRight = false;
   pyChart.point(m.y, m.B0, { r: 6, fill: 'var(--blue)', stroke: '#fff' });
   pyChart.text(m.y, m.B0, `B = ${usd0(m.B0)}`, {
-    dx: bRight ? 12 : -12, dy: -10, anchor: bRight ? 'start' : 'end', fill: 'var(--blue)',
+    dx: (bRight ? 12 : -12) * pyChart.textScale, dy: -10 * pyChart.textScale, anchor: bRight ? 'start' : 'end', fill: 'var(--blue)',
   });
 }
 

@@ -15,9 +15,9 @@
     /* tool-local tweaks */
     /* the flex/grid display rules below would beat the UA [hidden] style */
     .chart-box { --stroke-scale: 1.5; }
-    .chart-box svg.finchart .tick { font-size: var(--chart-tick); }
-    .chart-box svg.finchart .axis-title { font-size: var(--chart-title); }
-    .chart-box svg.finchart .datalabel { font-size: var(--chart-label); }
+    .chart-box svg.finchart .tick { font-size: calc(var(--chart-tick) * var(--chart-text-scale)); }
+    .chart-box svg.finchart .axis-title { font-size: calc(var(--chart-title) * var(--chart-text-scale)); }
+    .chart-box svg.finchart .datalabel { font-size: calc(var(--chart-label) * var(--chart-text-scale)); }
 
     .note {
       font-size: 0.86rem;

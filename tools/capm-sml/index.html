@@ -23,6 +23,7 @@
     .sections-row .tool-section:last-of-type { border-right: none; }
     .tool-section .tool-main { padding: 1rem; gap: 0.9rem; }
     .tool-section .controls-panel { flex: 0 0 220px; width: 220px; padding: 0.8rem 0.9rem 1rem; }
+    @media (max-width: 900px) { .tool-section .controls-panel { flex: 1 1 auto; width: 100%; } }
     @media (max-width: 1250px) {
       .sections-row { grid-template-columns: 1fr; }
       .sections-row .tool-section { border-right: none; border-bottom: 1px solid var(--panel-border); }

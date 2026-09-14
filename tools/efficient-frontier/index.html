@@ -53,18 +53,18 @@
     }
 
     .weights-svg { display: block; width: auto; max-width: 100%; height: auto; }
-    .weights-svg .w-name { fill: var(--label); font-size: 15px; font-weight: 600; font-family: var(--font-chart); }
+    .weights-svg .w-name { fill: var(--label); font-size: calc(15px * var(--chart-text-scale-quarter)); font-weight: 600; font-family: var(--font-chart); }
     .weights-svg .w-val {
-      font-size: 15px; font-weight: 700;
+      font-size: calc(15px * var(--chart-text-scale-quarter)); font-weight: 700;
       font-family: var(--font-chart); font-variant-numeric: tabular-nums;
     }
-    .weights-svg .w-axis { fill: var(--muted); font-size: 13px; font-family: var(--font-chart); }
+    .weights-svg .w-axis { fill: var(--muted); font-size: calc(13px * var(--chart-text-scale-quarter)); font-family: var(--font-chart); }
     .weights-title {
       font-size: 0.82rem; font-weight: 700; color: var(--navy);
       text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 0.2rem;
     }
     svg.finchart .lbl-strong { font-weight: 700; }
-    .ef-tip-text { font-size: 13px; font-family: var(--font-chart); }
+    .ef-tip-text { font-size: calc(13px * var(--chart-text-scale)); font-family: var(--font-chart); }
 
     .btn-row { display: flex; gap: 0.5rem; margin-top: 0.2rem; }
     .subtle-btn {

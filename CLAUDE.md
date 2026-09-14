@@ -56,6 +56,15 @@ classroom projector AND used by students on their laptops (Canvas links).
   `font-size: var(--chart-tick)` etc., never a literal px, and the `chart.js`
   default margins (20/22/54/68) are sized for these — verify with the SVG
   overlap/clipping audit after touching sizes (README → Text sizes).
+- **Charts compensate their own shrink on phones.** `Chart` sets a per-svg
+  `--chart-text-scale` (0.87 × designed / container width, clamped [1, 2.4])
+  and sizes margins, tick offsets and tick counts from it ONCE at
+  construction; never hard-code on-chart px, and scale any fixed `dx/dy`
+  label offset by `chart.textScale` (or use `LabelPlacer`). Fixed-geometry
+  SVGs take `--chart-text-scale-half` / `-quarter`. Tool-local grids and
+  panel widths must collapse ≤900px like the shared layout; grid items
+  need `min-width: 0`. Audit at 375px after touching chart code (README →
+  Phones and iPads).
 - **All labels are real typeset math**, never raw pseudo-math like `r_f (%)`.
   HTML labels: `renderLabel`/`hydrateLabels` (`$...$` → MathJax) from `ui.js`.
   On-chart SVG labels: `svgMathText` in `chart.js` (`_x` → tspan subscripts).

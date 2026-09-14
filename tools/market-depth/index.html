@@ -13,9 +13,9 @@
   <style>
     /* tool-local tweaks */
     .chart-box { --stroke-scale: 1.5; }
-    .chart-box svg.finchart .tick { font-size: var(--chart-tick); }
-    .chart-box svg.finchart .axis-title { font-size: var(--chart-title); }
-    .chart-box svg.finchart .datalabel { font-size: var(--chart-label); }
+    .chart-box svg.finchart .tick { font-size: calc(var(--chart-tick) * var(--chart-text-scale)); }
+    .chart-box svg.finchart .axis-title { font-size: calc(var(--chart-title) * var(--chart-text-scale)); }
+    .chart-box svg.finchart .datalabel { font-size: calc(var(--chart-label) * var(--chart-text-scale)); }
 
     .note {
       font-size: 0.86rem;
@@ -147,15 +147,15 @@
     /* ------------------------------- ladder ------------------------------- */
     .ladder-svg { display: block; width: auto; max-width: 100%; height: auto; }
     .ladder-svg text { font-family: var(--font-chart); }
-    .ladder-svg .colhead { font-size: 13px; fill: var(--muted); }
-    .ladder-svg .price { font-size: 17px; font-weight: 700; }
+    .ladder-svg .colhead { font-size: calc(13px * var(--chart-text-scale-quarter)); fill: var(--muted); }
+    .ladder-svg .price { font-size: calc(17px * var(--chart-text-scale-quarter)); font-weight: 700; }
     .ladder-svg .price.ask { fill: var(--gold); }
     .ladder-svg .price.bid { fill: var(--blue); }
-    .ladder-svg .bestcap { font-size: 12px; fill: var(--muted); font-weight: 400; }
-    .ladder-svg .sizelabel { font-size: 15px; fill: var(--label); }
+    .ladder-svg .bestcap { font-size: calc(12px * var(--chart-text-scale-quarter)); fill: var(--muted); font-weight: 400; }
+    .ladder-svg .sizelabel { font-size: calc(15px * var(--chart-text-scale-quarter)); fill: var(--label); }
     .ladder-svg .sizelabel .consumed { fill: var(--red); font-weight: 700; }
-    .ladder-svg .sidecap { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; }
-    .ladder-svg .spread-note { font-size: 16px; font-weight: 700; fill: var(--navy); }
+    .ladder-svg .sidecap { font-size: 13px; /* fixed: sits in a 22px gutter */ font-weight: 700; letter-spacing: 0.12em; }
+    .ladder-svg .spread-note { font-size: calc(16px * var(--chart-text-scale-quarter)); font-weight: 700; fill: var(--navy); }
     .ladder-svg .spread-note.crossed { fill: var(--red); }
 
     .walk-result {
@@ -194,6 +194,7 @@
     /* --------------------------- layout rows ------------------------------- */
     /* bottom row: ladder beside the equally-sized depth-cost curve */
     .row-eq { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 1150px) { .row-eq { grid-template-columns: 1fr; } }
 
     /* ticket controls inline in the quiz strip */
     .ticket-sep {

@@ -104,6 +104,7 @@
     .score-table tr.cur-sort td.cur-model { background: rgba(201, 151, 0, 0.30); font-weight: 700; }
     /* decomposition panel */
     .decomp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1.2rem; }
+    .decomp-grid > *, .ir-grid > * { min-width: 0; } /* phones: the formula rows scroll instead of widening the page */
     @media (max-width: 1150px) { .decomp-grid { grid-template-columns: 1fr; } }
     .decomp-cell .cell-title {
       font-size: 0.82rem; font-weight: 700; color: var(--navy);
