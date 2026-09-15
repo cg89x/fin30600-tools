@@ -3,3 +3,11 @@
 temp/
 .claude/
 __pycache__/
+
+# local-only prototypes and the withdrawn margin-short tool live OUTSIDE the repo
+# (course tree: "Tools development (local prototypes)/", moved 2026-09-15); never commit them
+tools/margin-short/
+tools/proto-a-depth/
+tools/proto-a-types/
+tools/proto-b-unified/
+tools/proto-c-acts/
