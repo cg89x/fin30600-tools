@@ -166,6 +166,16 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-09-15 — **Local-only folders moved OUT of the repo** (Christian). His
+  2026-09-14 `git add -A` push ("update", 84aee13) had published the five
+  untracked folders — `tools/margin-short/` + `proto-a-depth/` /
+  `proto-a-types/` / `proto-b-unified/` / `proto-c-acts/` — so they were live
+  by URL. Commit cecb546: `git rm --cached` all five, moved them to the
+  course tree `FIN30600 - Investments/Tools development (local prototypes)/`
+  (README there; they only run when copied back to `tools/<name>/` because
+  of the `../../lib/` imports), and added the five paths to `.gitignore` so
+  a blanket add cannot re-commit them. No live tool changed; `margin-short`'s
+  releases.js key stays `true` (inert). Push from Christian's terminal.
 - 2026-09-14 (evening) — **Landing-page order**: Capital Allocation & Utility now
   precedes Two-Asset Diversification, and Diversification & Systematic Risk
   precedes CAPM / SML, in the tool overview (Christian; matches the
@@ -266,7 +276,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - 2026-07-12 — `margin-short` REMOVED from live (Christian: "for now"), but
   KEPT LOCALLY: `git rm --cached` only, so `tools/margin-short/` still exists
   untracked in the working tree (serves at localhost:8613; a plain
-  `git add tools/` would re-add it — deliberate). Its releases.js key stays
+  `git add tools/` would re-add it — deliberate). (2026-09-15: superseded —
+  that is exactly what happened on 09-14; the folder now lives in the course
+  tree's "Tools development (local prototypes)/" and is gitignored.) Its releases.js key stays
   `true` so the local copy isn't lock-screened; landing card + README row
   dropped. finmath margin/short functions + their tests stay (library code).
   L2 live coverage is now market-depth only. Suite at TWELVE live tools.
@@ -285,7 +297,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   "shares" spelled out, thin-book + round-trip cards cut). The order-types
   half (A2, `tools/proto-a-types/`) is approved but still LOCAL — untracked,
   along with `proto-a-depth/` (superseded), `proto-b-unified/`,
-  `proto-c-acts/` (not chosen; delete when Christian confirms). `order-book`
+  `proto-c-acts/` (not chosen; delete when Christian confirms). (2026-09-15:
+  all four moved to the course tree's "Tools development (local
+  prototypes)/" + gitignored — see the 09-15 changelog line.) `order-book`
   stays live until A2 ships, then retires. Also new: `docs/TOOL_USAGE.md`
   (≤100-word how-to-use blurb per tool, Canvas-ready). Suite now FOURTEEN
   tools.
