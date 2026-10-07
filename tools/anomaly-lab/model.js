@@ -3,7 +3,7 @@
  * model.js — pure computation layer for the Anomaly Lab (Topic 5 §1–2).
  *
  * No DOM: importable from node for numeric verification. Wraps the baked Ken
- * French monthly data (./data.js, percent/month, 1963-07..2026-05) and
+ * French monthly data (./data.js, percent/month, 1963-07..2026-08) and
  * lib/finmath's olsMulti into the per-decile statistics the tool plots:
  * average excess returns, time-series alphas, and factor loadings for CAPM /
  * Fama–French 3-factor / Carhart 4-factor regressions over an arbitrary

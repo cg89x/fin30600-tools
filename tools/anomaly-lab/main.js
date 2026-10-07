@@ -50,7 +50,7 @@ const DEFAULTS = {
   m: 'capm',   // model: capm | ff3 | ff3c
   v: 'sml',    // view: sml | alphas | loadings | scoreboard
   y0: 1963,    // window start year (calendar, inclusive)
-  y1: 2023,    // window end year (calendar, inclusive)
+  y1: 2026,    // window end year (calendar, inclusive)
   // information-ratio card (annual %)
   irm: 8,      // E[R_M − R_f]
   irs: 16,     // σ_M
@@ -599,7 +599,6 @@ function setWindow(y0, y1) {
   /** @type {any} */ (y1Ctrl).set(y1);
   renderAll();
 }
-$('preset-deck').addEventListener('click', () => setWindow(1963, 2023));
 $('preset-full').addEventListener('click', () => setWindow(1963, 2026));
 
 /* ------------------------------------------------ information-ratio card -- */

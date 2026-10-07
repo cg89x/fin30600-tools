@@ -82,9 +82,9 @@ L2 trading math (order-book walks — sell 30 → $251.25, margin magnification
 ±36.36%, margin-call prices $75/$82.50 and $57.69, short return −12%), and
 the multi-factor OLS engine against a pasted numpy cross-check.
 `tests/anomaly-lab-data.test.js` re-runs the anomaly lab's baked Ken French
-data through the deck's 1963–2023 window and checks the Topic 5 anchor
-numbers (market premium, beta-sort alphas, Carhart loadings, RMS-alpha
-table) to data-vintage tolerance.
+data over the full sample (1963-07..2026-08) and checks the Topic 5 deck
+numbers (factor premia, beta-sort alphas, Carhart loadings, RMS-alpha table),
+which since 2026-10-07 are computed from the same data.
 
 Syntax-check every module with:
 
