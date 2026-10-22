@@ -9,7 +9,7 @@
  * deck §1), (ii) the alphas the model leaves behind, (iii) the factor
  * loadings, and (iv) a scoreboard of RMS pricing errors across all sorts and
  * models (deck s23). Below the chart: the deck-s30 return decomposition for
- * D1 and D10, and the deck-s42 information-ratio card.
+ * D1 and D10, and the information-ratio card (Topic 5 §3, Treynor–Black example).
  *
  * All statistics live in ./model.js (pure, node-verifiable); the baked Ken
  * French data is ./data.js (percent/month). Everything shown here is an
@@ -51,11 +51,13 @@ const DEFAULTS = {
   v: 'sml',    // view: sml | alphas | loadings | scoreboard
   y0: 1963,    // window start year (calendar, inclusive)
   y1: 2026,    // window end year (calendar, inclusive)
-  // information-ratio card (annual %)
+  // information-ratio card (annual %) — the Topic 5 §3 Treynor–Black example
+  // (2026-10-22): market 8% / 20%, active portfolio of the two stock tips
+  // α = 6%, σ_ε = 20% → IR 0.30, SR_P = √(0.40² + 0.30²) = 0.50.
   irm: 8,      // E[R_M − R_f]
-  irs: 16,     // σ_M
-  ira: 3,      // fund α
-  ire: 15,     // σ_ε
+  irs: 20,     // σ_M
+  ira: 6,      // active-portfolio α
+  ire: 20,     // σ_ε
 };
 
 // Numeric ranges mirror the controls; hash values clamp to these (state.js).
