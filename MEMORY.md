@@ -112,6 +112,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   black-scholes 12/1. ALL LOCKED until the semester; within-module day
   picks are judgment calls (comments in releases.js) — nudge as pacing
   becomes clear. margin-short stays `true` (local-only, no live effect).
+  (2026-09-02: superseded — the dates above are the July picks; the operative
+  rule is "first class day of the topic" and `releases.js` is the record. Only
+  exception: beauty-contest '2026-11-05', ruled 2026-10-31.)
 - **Tests:** `node --test tests/*.test.js` — finmath.test.js (37: BS, parity,
   bond price/duration, forward-rate, L1 fee/average, L2 order-book/margin/
   short anchors, olsMulti numpy cross-check) + anomaly-lab-data.test.js
@@ -167,6 +170,13 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-10-31 — **beauty-contest release moved 2026-10-29 → 2026-11-05** (Christian:
+  "we are running behind on schedule. I will finish topic 5 on tuesday and then start
+  with EMH. Thursday we're going to do Behavioral"). The game is played in the
+  Behavioral part, now Th 11/5. EXCEPTION to the first-class-day rule; it re-locks the
+  tool that was live since 10/29. duration (11/5) and black-scholes (11/24) unchanged.
+  Committed locally; needs a push from Christian's terminal.
 
 - 2026-10-22 — **anomaly-lab IR card re-anchored** (Christian, course-side AGENTS.md
   audit): defaults `irm/irs/ira/ire` 8/16/3/15 → **8/20/6/20** = the Topic 5 §3
