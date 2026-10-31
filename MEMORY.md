@@ -114,7 +114,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   becomes clear. margin-short stays `true` (local-only, no live effect).
   (2026-09-02: superseded — the dates above are the July picks; the operative
   rule is "first class day of the topic" and `releases.js` is the record. Only
-  exception: beauty-contest '2026-11-05', ruled 2026-10-31.)
+  exceptions, both ruled 2026-10-31: beauty-contest '2026-11-05', duration '2026-11-10'.)
 - **Tests:** `node --test tests/*.test.js` — finmath.test.js (37: BS, parity,
   bond price/duration, forward-rate, L1 fee/average, L2 order-book/margin/
   short anchors, olsMulti numpy cross-check) + anomaly-lab-data.test.js
@@ -170,6 +170,11 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-10-31 (later) — **duration release moved 2026-11-05 → 2026-11-10** (Christian:
+  "Move to Tu 11/10"): Topic 7 now starts Tu 11/10 after the pacing slip. Second
+  exception to the first-class-day rule. black-scholes (11/24) unchanged. Committed
+  locally; needs a push from Christian's terminal.
 
 - 2026-10-31 — **beauty-contest release moved 2026-10-29 → 2026-11-05** (Christian:
   "we are running behind on schedule. I will finish topic 5 on tuesday and then start
