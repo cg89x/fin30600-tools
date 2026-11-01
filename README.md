@@ -35,6 +35,7 @@ talks to a Firebase Realtime Database (plain REST/SSE, no SDK).
 | [`tools/anomaly-lab/`](tools/anomaly-lab/) | L5 §1–2 | Anomaly lab: live CAPM / FF3 / Carhart time-series regressions on 10 value-weighted decile portfolios per sort (beta, size, book-to-market, momentum) over an adjustable 1963–2026 window — SML scatter, alpha plots, factor loadings, RMS-alpha scoreboard, return decomposition, information-ratio card. Data baked from the Ken French library (`data.js`, regenerate with `code/make_data.py`). |
 | [`tools/beauty-contest/`](tools/beauty-contest/) | L6 §3 | The 2/3-of-the-average game, live in class: students submit by QR code (Firebase RTDB via plain REST/SSE — see its SETUP.md), instructor screen reveals mean/target/winner per round; built-in simulation mode needs no backend. |
 | [`tools/duration/`](tools/duration/) | L7 §3–4 | Price–yield curve with the duration tangent vs. exact repricing, the PV cash-flow fulcrum at t = D, and spot-curve/forward-rate pricing. |
+| [`tools/option-strategies/`](tools/option-strategies/) | L8 §2 | Option strategies: payoff and profit at expiration for the deck's four examples (covered call, protective put, straddle, bull spread — same numbers, same tables), BKM §15.3's collar, strip, strap, bear spread, strangle, butterfly and iron condor, single options, or a custom position of up to four calls/puts/stock/bonds; break-evens, max profit/loss, the deck-style payoff table, and optional Black–Scholes premiums with the value-today curve. |
 | [`tools/black-scholes/`](tools/black-scholes/) | L8 §3–4 | Black–Scholes calls and puts: intrinsic vs. time value, delta hedge ratio, comparative statics in σ and T, put–call parity (deck's discrete-rate form). |
 
 ## Releasing tools to students
@@ -79,8 +80,11 @@ the bond math (price/duration hand-computed case, the deck's −D·Δy/(1+y)
 anchor of +1.16%, forward rates), the L1 fee/average math (Class A vs. B
 share-class anchors, the +100%/−50% arithmetic-vs-geometric example), and the
 L2 trading math (order-book walks — sell 30 → $251.25, margin magnification
-±36.36%, margin-call prices $75/$82.50 and $57.69, short return −12%), and
-the multi-factor OLS engine against a pasted numpy cross-check.
+±36.36%, margin-call prices $75/$82.50 and $57.69, short return −12%), the
+multi-factor OLS engine against a pasted numpy cross-check, and the L8 option-strategy
+math (the deck's covered-call / protective-put / straddle / bull-spread tables
+row for row, the HW8 butterfly regions, break-evens incl. the spread's $23, and
+put–call parity across Black–Scholes-valued legs).
 `tests/anomaly-lab-data.test.js` re-runs the anomaly lab's baked Ken French
 data over the full sample (1963-07..2026-08) and checks the Topic 5 deck
 numbers (factor premia, beta-sort alphas, Carhart loadings, RMS-alpha table),

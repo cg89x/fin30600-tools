@@ -133,6 +133,17 @@ t = D: duration is literally where the bond's value sits in time. The
 spot/forward panel prices the same bond off a curve instead of a single
 yield.
 
+## Option strategies (L8 §2)
+
+Pick a strategy and read its payoff (dashed) and profit (solid) at
+expiration. The four deck examples carry the slides' numbers, and the table
+below the chart matches the slide tables row by row. The readouts give the
+cost to enter, maximum profit and loss, and the break-even prices. Edit any
+position — long or short, strike, price — or add up to four, and the menu
+switches to "Custom". Turn on Black–Scholes pricing to price every option
+from S₀, σ, r and T and see the position's value today converge to the
+kinked payoff at expiration.
+
 ## Black–Scholes (L8 §3–4)
 
 Price a call or put: set S, X, σ, r, and T, and the tool draws the BS value

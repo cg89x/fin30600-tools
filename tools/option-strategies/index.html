@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Option Strategies · FIN 30600</title>
+  <link rel="stylesheet" href="../../lib/style.css">
+  <script>
+    // MathJax v3 (tex-svg): manual rendering only — tools call renderTeX().
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'local' } };
+  </script>
+  <script defer src="../../vendor/mathjax/tex-svg-full.js"></script>
+  <style>
+    /* tool-local tweaks */
+    /* projector-friendly chart: thicker lines, base-size text (the overrides
+       undo the --stroke-scale factor in the shared .tick/.axis-title rules) */
+    .chart-box { --stroke-scale: 1.5; }
+    .chart-box svg.finchart .tick { font-size: calc(var(--chart-tick) * var(--chart-text-scale)); }
+    .chart-box svg.finchart .axis-title { font-size: calc(var(--chart-title) * var(--chart-text-scale)); }
+    .chart-box svg.finchart .datalabel { font-size: calc(var(--chart-label) * var(--chart-text-scale)); }
+    .chart-row > .chart-box { min-width: 0; }
+    .note {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin: 0.15rem 0 0;
+      line-height: 1.35;
+    }
+    .inset-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0.1rem 0 0.35rem 0.2rem;
+    }
+    /* strategy menu */
+    .preset-title {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0.2rem 0 -0.3rem;
+    }
+    .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+    .preset-grid .btn { font-size: 0.86rem; padding: 0.32rem 0.5rem; text-align: center; }
+    .custom-flag { font-size: 0.86rem; color: var(--gold); font-weight: 700; margin: 0; }
+    /* strategy header card */
+    .strategy-head h2 {
+      margin: 0.1rem 0.2rem 0.25rem;
+      font-family: var(--font-display);
+      color: var(--navy);
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+    .strategy-head p { margin: 0 0.2rem 0.2rem; color: var(--label); line-height: 1.4; }
+    .formula-strip .formula-row { overflow-x: auto; overflow-y: hidden; }
+    /* legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      font-size: 0.86rem;
+      color: var(--label);
+      margin: 0.1rem 0.2rem 0;
+    }
+    .legend .swatch {
+      display: inline-block;
+      width: 1.4rem;
+      height: 0;
+      border-top-width: 3px;
+      border-top-style: solid;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+    .legend .swatch.blue { border-color: var(--blue); }
+    .legend .swatch.gold { border-color: var(--gold); border-top-style: dashed; }
+    .legend .swatch.navy { border-color: var(--navy); }
+    .legend .swatch.grey { border-color: var(--muted); border-top-width: 2px; border-top-style: dotted; }
+    /* tables (booktabs look, as in the deck) */
+    .lower { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 1150px) { .lower { grid-template-columns: 1fr; } }
+    .tbl-wrap { overflow-x: auto; }
+    table.tbl {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.92rem;
+      font-variant-numeric: tabular-nums;
+      border-top: 2px solid var(--navy);
+      border-bottom: 2px solid var(--navy);
+    }
+    table.tbl th, table.tbl td { padding: 0.28rem 0.45rem; text-align: right; white-space: nowrap; }
+    table.tbl thead th { border-bottom: 1px solid var(--navy); color: var(--navy); font-weight: 700; }
+    table.tbl td.total, table.tbl th.total { font-weight: 700; }
+    table.tbl td.profit { color: var(--blue); font-weight: 700; }
+    table.tbl td.payoff { color: var(--gold); font-weight: 700; }
+    /* leg editor */
+    table.legs td, table.legs th { text-align: left; }
+    table.legs select, table.legs input {
+      font: inherit;
+      font-size: 0.9rem;
+      padding: 0.18rem 0.3rem;
+      border: 1px solid var(--panel-border);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--label);
+    }
+    table.legs input { width: 4.6rem; }
+    table.legs input.qty { width: 3rem; }
+    table.legs input:disabled { background: var(--softblue); color: var(--navy); border-color: transparent; }
+    table.legs .na { color: var(--muted); padding-left: 0.6rem; }
+    table.legs button.remove {
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0.1rem 0.3rem;
+    }
+    table.legs button.remove:hover { color: var(--red); }
+    table.legs button.remove:disabled { visibility: hidden; }
+    .legs-actions { display: flex; gap: 0.5rem; margin: 0.5rem 0.2rem 0.2rem; align-items: center; }
+    .legs-actions .btn { font-size: 0.86rem; padding: 0.3rem 0.7rem; }
+    @media (pointer: coarse) {
+      table.legs select, table.legs input { min-height: 2.2rem; }
+    }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+</head>
+<body>
+  <header class="app-header">
+    <div class="titles">
+      <h1>Option Strategies</h1>
+      <p class="subtitle">FIN 30600 · Investment Theory — Topic 8 §2 · Notre Dame</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="../../">&larr; Back to all tools</a>
+    </div>
+  </header>
+
+  <main class="tool-main" hidden>
+    <section class="controls-panel" aria-label="Controls">
+      <h2>Option Strategies</h2>
+
+      <div class="group">
+        <div class="group-title">Choose a strategy</div>
+        <p class="preset-title">Deck examples</p>
+        <div class="preset-grid" id="presets-deck"></div>
+        <p class="preset-title">More from BKM §15.3</p>
+        <div class="preset-grid" id="presets-book"></div>
+        <p class="preset-title">Single options</p>
+        <div class="preset-grid" id="presets-single"></div>
+        <p class="custom-flag" id="custom-flag" hidden>Custom position (edited)</p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Option prices</div>
+        <div id="ctrl-bs"></div>
+        <div id="bs-controls" hidden>
+          <div class="group">
+            <div id="ctrl-s"></div>
+            <div id="ctrl-v"></div>
+            <div id="ctrl-r"></div>
+            <div id="ctrl-t"></div>
+          </div>
+        </div>
+        <p class="note" id="price-note"></p>
+      </div>
+
+      <div class="group">
+        <div class="group-title">Display</div>
+        <div id="ctrl-xh"></div>
+        <div id="ctrl-lg"></div>
+      </div>
+    </section>
+
+    <section class="chart-area">
+      <div class="chart-box strategy-head">
+        <h2 id="strategy-name"></h2>
+        <p id="strategy-blurb"></p>
+      </div>
+
+      <div class="formula-strip">
+        <div class="formula-row" id="f-position"></div>
+        <div class="formula-row" id="f-payoff"></div>
+      </div>
+
+      <div class="readouts" id="readouts"></div>
+
+      <div class="chart-box">
+        <div id="main-chart"></div>
+        <div class="legend">
+          <span><span class="swatch blue"></span>Profit at expiration</span>
+          <span><span class="swatch gold"></span>Payoff at expiration</span>
+          <span id="legend-today" hidden><span class="swatch navy"></span><span id="legend-today-text"></span></span>
+          <span id="legend-legs"><span class="swatch grey"></span>Profit on each position</span>
+        </div>
+      </div>
+
+      <div class="chart-row lower">
+        <div class="chart-box">
+          <p class="inset-title">Positions</p>
+          <div class="tbl-wrap">
+            <table class="tbl legs">
+              <thead>
+                <tr><th></th><th>Qty</th><th>Instrument</th><th data-label="Strike $X$"></th><th>Price</th><th></th></tr>
+              </thead>
+              <tbody id="legs-body"></tbody>
+            </table>
+          </div>
+          <div class="legs-actions">
+            <button class="btn" id="add-leg" type="button">+ Add a position</button>
+          </div>
+          <p class="note" id="legs-note">Price = premium per option (stock: purchase price; bond: its price today).
+            A bond pays its face value <em>X</em> at expiration. Up to four positions.</p>
+        </div>
+
+        <div class="chart-box">
+          <p class="inset-title">Payoffs at expiration</p>
+          <div class="tbl-wrap">
+            <table class="tbl" id="payoff-table"></table>
+          </div>
+          <p class="note">Profit = total payoff &minus; cost to enter, as in the deck (no interest on the premiums).</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span><a href="../../">&larr; Back to the tool index</a></span>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

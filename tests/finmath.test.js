@@ -539,3 +539,106 @@ test('olsMulti with one regressor agrees with ols; guards degenerate input', () 
   // too few observations -> null
   assert.equal(fm.olsMulti([[1, 2]], [1, 2]), null, 'n <= k+1');
 });
+
+/* ------------------------------------------------- option strategies (T8 §2) */
+// Deck tables, Topic 8 content/sec2_combinations.tex: S_T = 0, 10, ..., 60.
+const GRID = [0, 10, 20, 30, 40, 50, 60];
+const profitsOn = (legs) => GRID.map((s) => fm.strategyProfit(legs, s));
+
+test('strategy: deck covered call (stock $30, write C(40) at $5)', () => {
+  const legs = [
+    { kind: 'stock', q: 1, price: 30 },
+    { kind: 'call', q: -1, x: 40, price: 5 },
+  ];
+  assert.equal(fm.strategyCost(legs), 25);
+  assert.deepEqual(GRID.map((s) => fm.strategyPayoff(legs, s)), [0, 10, 20, 30, 40, 40, 40]);
+  assert.deepEqual(profitsOn(legs), [-25, -15, -5, 5, 15, 15, 15]);
+  const st = fm.strategyStats(legs);
+  assert.equal(st.maxProfit, 15);
+  assert.equal(st.minProfit, -25);
+  assert.deepEqual(st.breakevens, [25]);
+});
+
+test('strategy: deck protective put (stock $30, buy P(20) at $5)', () => {
+  const legs = [
+    { kind: 'stock', q: 1, price: 30 },
+    { kind: 'put', q: 1, x: 20, price: 5 },
+  ];
+  assert.deepEqual(profitsOn(legs), [-15, -15, -15, -5, 5, 15, 25]);
+  const st = fm.strategyStats(legs);
+  assert.equal(st.maxProfit, Infinity);
+  assert.equal(st.minProfit, -15);
+  assert.deepEqual(st.breakevens, [35]);
+});
+
+test('strategy: deck straddle (C(30) + P(30), $5 each)', () => {
+  const legs = [
+    { kind: 'call', q: 1, x: 30, price: 5 },
+    { kind: 'put', q: 1, x: 30, price: 5 },
+  ];
+  assert.deepEqual(profitsOn(legs), [20, 10, 0, -10, 0, 10, 20]);
+  const st = fm.strategyStats(legs);
+  assert.equal(st.maxProfit, Infinity);
+  assert.equal(st.minProfit, -10);
+  assert.deepEqual(st.breakevens, [20, 40]);
+});
+
+test('strategy: deck bull spread (+C(20) at $7, -C(30) at $4), breakeven $23', () => {
+  const legs = [
+    { kind: 'call', q: 1, x: 20, price: 7 },
+    { kind: 'call', q: -1, x: 30, price: 4 },
+  ];
+  assert.equal(fm.strategyCost(legs), 3);
+  assert.deepEqual(profitsOn(legs), [-3, -3, -3, 7, 7, 7, 7]);
+  const st = fm.strategyStats(legs);
+  assert.equal(st.maxProfit, 7);
+  assert.equal(st.minProfit, -3);
+  assert.deepEqual(st.breakevens, [23]);
+});
+
+test('strategy: butterfly payoff matches HW8 BKM 15.16 regions', () => {
+  // +C(X1) - 2C(X2) + C(X3): 0 | S - X1 | 2X2 - X1 - S | 0
+  const legs = [
+    { kind: 'call', q: 1, x: 20, price: 11 },
+    { kind: 'call', q: -2, x: 30, price: 5 },
+    { kind: 'call', q: 1, x: 40, price: 2 },
+  ];
+  for (const s of [0, 15, 20, 25, 30, 35, 40, 55]) {
+    const want = s < 20 ? 0 : s < 30 ? s - 20 : s < 40 ? 60 - 20 - s : 0;
+    assertNear(fm.strategyPayoff(legs, s), want, 1e-12, `S=${s}`);
+  }
+  const st = fm.strategyStats(legs);
+  assert.equal(fm.strategyCost(legs), 3);
+  assert.equal(st.maxProfit, 7);
+  assert.equal(st.minProfit, -3);
+  assert.deepEqual(st.breakevens, [23, 37]);
+});
+
+test('strategy: unlimited loss on a naked short call; flat-zero break-even range', () => {
+  const short = [{ kind: 'call', q: -1, x: 30, price: 5 }];
+  const st = fm.strategyStats(short);
+  assert.equal(st.minProfit, -Infinity);
+  assert.equal(st.maxProfit, 5);
+  assert.deepEqual(st.breakevens, [35]);
+  // long call bought at zero cost: profit is exactly 0 on [0, 30]
+  const free = fm.strategyStats([{ kind: 'call', q: 1, x: 30, price: 0 }]);
+  assert.deepEqual(free.zeroRange, [0, 30]);
+  // stock + bond legs: payoff S_T and X
+  assert.equal(fm.strategyPayoff([{ kind: 'bond', q: 1, x: 50, price: 48 }], 7), 50);
+  assert.equal(fm.strategyPayoff([{ kind: 'stock', q: -2, price: 10 }], 12), -24);
+});
+
+test('strategy: Black–Scholes value today obeys put–call parity across legs', () => {
+  // long call + bond paying X  ==  long put + stock (continuous discounting, q = 0)
+  const sig = 0.3, r = 0.05, T = 0.5, X = 30;
+  const a = [{ kind: 'call', q: 1, x: X }, { kind: 'bond', q: 1, x: X }];
+  const b = [{ kind: 'put', q: 1, x: X }, { kind: 'stock', q: 1 }];
+  for (const s of [10, 25, 30, 41]) {
+    assertNear(fm.strategyValueBS(a, s, sig, r, T), fm.strategyValueBS(b, s, sig, r, T), 1e-9, `S=${s}`);
+  }
+  // single leg = bsCall; quantity scales
+  assertNear(fm.strategyValueBS([{ kind: 'call', q: -2, x: 95 }], 100, 0.5, 0.1, 0.25),
+    -2 * fm.bsCall(100, 95, 0.5, 0.1, 0.25), 1e-12, 'qty');
+  // T -> 0 reduces to the expiration payoff
+  assertNear(fm.strategyValueBS(a, 37, sig, r, 0), fm.strategyPayoff(a, 37), 1e-12, 'T=0');
+});

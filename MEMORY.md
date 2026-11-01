@@ -6,7 +6,7 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Current state
 
-- **Twelve tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
+- **Thirteen tools** (`tools/<name>/` = `index.html` + `main.js`, plus extra
   tool-local modules where noted), listed in topic order:
   1. `volatility-drag` — L1 §4: 25 seeded wealth paths
      vs the "arithmetic promise" (1+μ)^t and geometric expectation,
@@ -80,7 +80,21 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
      (L7 §3–4). Defaults = deck Example 1 (8% coupon, 6y, y=8% → B=$1,000,
      D=4.9927); deck slide prints ΔB≈$46.20 from rounded D, tool uses full
      precision ($46.23).
-  12. `black-scholes` — BS call/put pricing (L8 §3–4): time-value band, delta
+  12. `option-strategies` — L8 §2 (added 2026-11-01): payoff (dashed gold) and
+     profit (solid blue) at expiration, each position's own profit line (grey
+     dotted, labelled at the right edge except on phones), break-even dots,
+     readouts (cost / max profit / max loss / break-evens), formula strip, and a
+     deck-style payoff table (S_T = 0, 10, …). 15 presets: deck covered call
+     (S 30, −C(40) 5), protective put (S 30, +P(20) 5), straddle (30, 5+5), bull
+     spread (+C(20) 7, −C(30) 4) — tables reproduce the slides; BKM §15.3 collar
+     (Ex. 15.5 strikes 60/80 on 70, premiums 3/3), strip, strap, bear spread,
+     strangle, butterfly (HW8), iron condor ("Captain Condor" reading), four single
+     options. Leg editor: up to 4 legs (call/put/stock/bond, ±1–3); any edit →
+     st=custom. Optional Black–Scholes toggle (S_0, σ, r, T) prices the legs and
+     draws "profit if closed today". Math: finmath `strategyPayoff/Cost/Profit/
+     Stats/ValueBS`. LabelPlacer gets `fontPx: 10` because this page pins
+     .datalabel at 15px against `--stroke-scale: 1.5`.
+  13. `black-scholes` — BS call/put pricing (L8 §3–4): time-value band, delta
      tangent + deck-phrased hedging readout, σ/T comparative statics, parity
      card in the deck's discrete form (anchors $3.29 and deck Ex. 1 $0.35).
      Defaults = deck example S=100, X=95, σ=50%, r=10%, T=0.25 (C=13.695).
@@ -115,9 +129,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   (2026-09-02: superseded — the dates above are the July picks; the operative
   rule is "first class day of the topic" and `releases.js` is the record. Only
   exceptions, both ruled 2026-10-31: beauty-contest '2026-11-05', duration '2026-11-10'.)
-- **Tests:** `node --test tests/*.test.js` — finmath.test.js (37: BS, parity,
+- **Tests:** `node --test tests/*.test.js` — finmath.test.js (44: BS, parity,
   bond price/duration, forward-rate, L1 fee/average, L2 order-book/margin/
-  short anchors, olsMulti numpy cross-check) + anomaly-lab-data.test.js
+  short anchors, olsMulti numpy cross-check, L8 option-strategy tables) + anomaly-lab-data.test.js
   (4: baked French data re-run through the deck's 1963–2023 window).
 - **Deploy:** push to `main` → GitHub Pages → christiankontz.com/fin30600-tools.
 
@@ -170,6 +184,15 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-11-01 — **New tool `option-strategies`** (Christian: "a new option pricing tool
+  … that shows students the different option strategies that the slides and the book
+  discuss, like a butterfly"). Topic 8 §2; release '2026-11-24' (T8 day 1, same as
+  black-scholes); landing card before black-scholes. finmath gains strategyPayoff /
+  strategyCost / strategyProfit / strategyStats / strategyValueBS; 7 new tests (deck
+  tables row for row, HW8 butterfly, unlimited-loss + flat-zero cases, BS parity across
+  legs) → 48 tests green. Checked in the preview at desktop and 375px (no page
+  h-scroll; tables scroll inside their cards). Committed locally; Christian pushes.
 
 - 2026-10-31 (later) — **duration release moved 2026-11-05 → 2026-11-10** (Christian:
   "Move to Tu 11/10"): Topic 7 now starts Tu 11/10 after the pacing slip. Second

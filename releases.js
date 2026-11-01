@@ -42,6 +42,7 @@ const RELEASES = {
   'anomaly-lab': '2026-10-15',      // T5 day 1 (Th 10/15)
   'beauty-contest': '2026-11-05',   // EXCEPTION to the rule (Christian 2026-10-31): pacing slipped — Tu 11/3 = end of T5 + EMH, Th 11/5 = Behavioral, where the game is played in class (was '2026-10-29')
   'duration': '2026-11-10',         // EXCEPTION (Christian 2026-10-31): T7 moves to Tu 11/10 after the pacing slip (was '2026-11-05')
+  'option-strategies': '2026-11-24', // T8 day 1 (Tu 11/24) — added 2026-11-01
   'black-scholes': '2026-11-24',    // T8 day 1 (Tu 11/24)
 };
 export default RELEASES;
