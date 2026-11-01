@@ -119,8 +119,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   `beauty-contest` (Christian 2026-11-01, "for now"). Footer states the
   anonymous visit counting.
 - **Visit counts** (2026-11-01): GoatCounter via `lib/analytics.js`, loaded by
-  every page; `GOATCOUNTER_CODE` = '' until Christian creates the account and
-  gives the code (tracking is OFF while it is empty). Skips `#preview`; count.js
+  every page; `GOATCOUNTER_CODE` = 'ckontz' (Christian's account, set 2026-11-01;
+  dashboard https://ckontz.goatcounter.com; '' switches it off). Skips `#preview`; count.js
   itself skips localhost.
 - **Release gating**: `releases.js` controls which tools students see
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
@@ -191,6 +191,9 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-11-01 (latest) — GoatCounter code set to `ckontz` (Christian's new account):
+  tracking is ON once pushed; dashboard https://ckontz.goatcounter.com.
 
 - 2026-11-01 (later) — **beauty-contest card hidden** (Christian: "you can hide the beauty
   contest card for now"): new `HIDDEN_CARDS` list in `releases.js`, applied by the

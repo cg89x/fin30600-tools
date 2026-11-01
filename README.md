@@ -46,7 +46,7 @@ views and unique visitors per path with referrer, browser, screen size and
 country). The URL hash — the tools' control state — is not sent. Local
 previews and `#preview` visits are not counted. The site code is
 `GOATCOUNTER_CODE` in that file; '' switches tracking off. Dashboard:
-`https://<code>.goatcounter.com`.
+https://ckontz.goatcounter.com.
 
 ## Releasing tools to students
 
