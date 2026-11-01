@@ -6,6 +6,7 @@
   <title>FIN 30600 · Investment Theory — Interactive Tools</title>
   <link rel="stylesheet" href="lib/style.css">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script type="module" src="lib/analytics.js"></script>
 </head>
 <body>
   <header class="app-header">
@@ -121,13 +122,16 @@
 
   <footer class="app-footer">
     <span>FIN 30600 Investment Theory · Mendoza College of Business</span>
+    <span>This site counts visits anonymously (GoatCounter: no cookies, no personal data).</span>
   </footer>
 
   <script type="module">
     // Release gating (see releases.js): unreleased tools are greyed out and
-    // unclickable — or removed entirely when HIDE_LOCKED is true.
-    import { isReleased, HIDE_LOCKED } from './releases.js';
+    // unclickable — or removed entirely when HIDE_LOCKED is true. Cards listed
+    // in HIDDEN_CARDS are removed whatever their release date.
+    import { isReleased, HIDE_LOCKED, HIDDEN_CARDS } from './releases.js';
     for (const card of document.querySelectorAll('.tool-card[data-tool]')) {
+      if (HIDDEN_CARDS.includes(card.dataset.tool)) { card.remove(); continue; }
       if (isReleased(card.dataset.tool)) continue;
       if (HIDE_LOCKED) { card.remove(); continue; }
       card.classList.add('locked');

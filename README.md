@@ -38,6 +38,16 @@ talks to a Firebase Realtime Database (plain REST/SSE, no SDK).
 | [`tools/option-strategies/`](tools/option-strategies/) | L8 §2 | Option strategies: payoff and profit at expiration for the deck's four examples (covered call, protective put, straddle, bull spread — same numbers, same tables), BKM §15.3's collar, strip, strap, bear spread, strangle, butterfly and iron condor, single options, or a custom position of up to four calls/puts/stock/bonds; break-evens, max profit/loss, the deck-style payoff table, and optional Black–Scholes premiums with the value-today curve. |
 | [`tools/black-scholes/`](tools/black-scholes/) | L8 §3–4 | Black–Scholes calls and puts: intrinsic vs. time value, delta hedge ratio, comparative statics in σ and T, put–call parity (deck's discrete-rate form). |
 
+## Visit counts
+
+Every page loads [`lib/analytics.js`](lib/analytics.js), which adds the
+GoatCounter script (goatcounter.com: no cookies, no personal data; counts page
+views and unique visitors per path with referrer, browser, screen size and
+country). The URL hash — the tools' control state — is not sent. Local
+previews and `#preview` visits are not counted. The site code is
+`GOATCOUNTER_CODE` in that file; '' switches tracking off. Dashboard:
+`https://<code>.goatcounter.com`.
+
 ## Releasing tools to students
 
 [`releases.js`](releases.js) (repo root) controls which tools students can

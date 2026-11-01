@@ -24,6 +24,14 @@
 
 export const HIDE_LOCKED = false;
 
+/**
+ * HIDDEN_CARDS: tools whose landing card is removed outright, released or
+ * not, until the key is taken off this list. The tool page itself is still
+ * gated by RELEASES below (a direct link or QR code works once released).
+ * 2026-11-01 (Christian): beauty-contest hidden "for now".
+ */
+export const HIDDEN_CARDS = ['beauty-contest'];
+
 // RULE (Christian, 2026-09-02): every tool releases at 12:00am LOCAL on the
 // FIRST class day of its topic per the syllabus — the same day the topic's
 // Canvas module opens — never a later within-topic day. Fall 2026 first days:

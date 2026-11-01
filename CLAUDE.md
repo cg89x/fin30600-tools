@@ -93,6 +93,14 @@ classroom projector AND used by students on their laptops (Canvas links).
   (instructor-only; state writes preserve it). Gating is a courtesy curtain,
   not security — the repo and the static HTML are public.
 
+- **Every page loads `lib/analytics.js`** (`<script type="module">` in the
+  `<head>`, after the favicon link) — anonymous GoatCounter visit counts, no
+  cookies. The site code lives in ONE place, `GOATCOUNTER_CODE` in that file
+  ('' = off); `#preview` and localhost are never counted. A new page needs the
+  tag too.
+- **`HIDDEN_CARDS` in `releases.js`** removes a tool's landing card whatever
+  its release date (the tool page stays gated by `RELEASES` only).
+
 ## Run / test / deploy
 
 ```bash

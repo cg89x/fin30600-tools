@@ -114,7 +114,14 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   layouts stack ≤900px (tool-local grids must collapse too — `.row-eq`,
   capm-sml panel); coarse-pointer touch targets. Audit every tool at 375px
   after touching chart code.
-- **Landing page** = one card per tool, in topic order.
+- **Landing page** = one card per tool, in topic order. `HIDDEN_CARDS` in
+  `releases.js` removes a card regardless of its release date — currently
+  `beauty-contest` (Christian 2026-11-01, "for now"). Footer states the
+  anonymous visit counting.
+- **Visit counts** (2026-11-01): GoatCounter via `lib/analytics.js`, loaded by
+  every page; `GOATCOUNTER_CODE` = '' until Christian creates the account and
+  gives the code (tracking is OFF while it is empty). Skips `#preview`; count.js
+  itself skips localhost.
 - **Release gating**: `releases.js` controls which tools students see
   (true / false / 'YYYY-MM-DD' per tool + HIDE_LOCKED flag); tool pages
   self-gate via `lib/release.js` `gateTool()`; `#preview` = instructor
@@ -184,6 +191,15 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 - More than one Claude session sometimes commits here — fetch before push.
 
 ## Changelog (newest first)
+
+- 2026-11-01 (later) — **beauty-contest card hidden** (Christian: "you can hide the beauty
+  contest card for now"): new `HIDDEN_CARDS` list in `releases.js`, applied by the
+  landing-page script; the tool still releases 2026-11-05 and works by direct link / QR.
+  **Visit tracking** (Christian: "install tracking so that I know how many people visit
+  the pages"; chose GoatCounter over a Firebase counter and Google Analytics):
+  `lib/analytics.js` + one module tag on all 15 pages; code still empty (off). Verified in
+  the preview with a dummy code: script injected on normal pages, absent under
+  `#preview`, no hits sent from localhost.
 
 - 2026-11-01 — **New tool `option-strategies`** (Christian: "a new option pricing tool
   … that shows students the different option strategies that the slides and the book
