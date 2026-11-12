@@ -197,8 +197,8 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
   The "Spot curve, forward rates & pricing off the curve" card in
   `tools/duration/index.html` carries `hidden` + `display:none` (spotpanel.js still runs;
   remove both to show it again). Macaulay and modified duration show two decimals in the
-  readouts and the formula strip (`main.js`). The landing card text still names forward
-  rates. Checked in the preview; 48 tests green. Committed locally; Christian pushes.
+  readouts and the formula strip (`main.js`). The landing card blurb no longer names forward
+  rates (restore it with the panel). Checked in the preview; 48 tests green. Committed locally; Christian pushes.
 
 - 2026-11-01 (latest) — GoatCounter code set to `ckontz` (Christian's new account):
   tracking is ON once pushed; dashboard https://ckontz.goatcounter.com.
