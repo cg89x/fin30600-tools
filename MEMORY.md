@@ -192,6 +192,14 @@ entry and add a dated changelog line on top. One line per fact; not a diary.
 
 ## Changelog (newest first)
 
+- 2026-11-12 — **duration: spot-curve panel hidden; durations to two decimals**
+  (Christian: "Hide for now"; "use only 2 decimals points for the duration displays").
+  The "Spot curve, forward rates & pricing off the curve" card in
+  `tools/duration/index.html` carries `hidden` + `display:none` (spotpanel.js still runs;
+  remove both to show it again). Macaulay and modified duration show two decimals in the
+  readouts and the formula strip (`main.js`). The landing card text still names forward
+  rates. Checked in the preview; 48 tests green. Committed locally; Christian pushes.
+
 - 2026-11-01 (latest) — GoatCounter code set to `ckontz` (Christian's new account):
   tracking is ON once pushed; dashboard https://ckontz.goatcounter.com.
 

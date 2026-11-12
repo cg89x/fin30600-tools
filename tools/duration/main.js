@@ -273,8 +273,8 @@ function drawCashFlows(m) {
 function drawReadouts(m) {
   const rows = [
     ['Bond price $B$', usd2(m.B0), 'blue'],
-    ['Macaulay duration $D$', `${m.D.toFixed(4)} yr`, ''],
-    ['Modified duration $D^{*} = D/(1+y)$', `${m.Dstar.toFixed(4)} yr`, ''],
+    ['Macaulay duration $D$', `${m.D.toFixed(2)} yr`, ''],
+    ['Modified duration $D^{*} = D/(1+y)$', `${m.Dstar.toFixed(2)} yr`, ''],
     ['$\\Delta B/B$ — duration approx', signedPct(m.relApprox), ''],
     ['$\\Delta B/B$ — exact repricing', signedPct(m.relExact), 'gold'],
     ['Exact new price $B(y+\\Delta y)$', usd2(m.Bexact), 'gold'],
@@ -304,7 +304,7 @@ function drawFormulas(m) {
   renderTeX(
     /** @type {HTMLElement} */ (document.getElementById('f-rel')),
     `\\frac{\\Delta B}{B} \\;\\approx\\; -D\\cdot\\frac{\\Delta y}{1+y}` +
-    ` \\;=\\; -${BLUE}{${m.D.toFixed(4)}}\\cdot\\frac{${dyStr}}{${(1 + m.y).toFixed(4)}}` +
+    ` \\;=\\; -${BLUE}{${m.D.toFixed(2)}}\\cdot\\frac{${dyStr}}{${(1 + m.y).toFixed(4)}}` +
     ` \\;=\\; \\mathbf{${signedPctTeX(m.relApprox)}}` +
     ` \\qquad\\text{vs. exact repricing: } ${GOLD}{\\mathbf{${signedPctTeX(m.relExact)}}}`,
   );
